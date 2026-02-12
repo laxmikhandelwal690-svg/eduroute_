@@ -34,7 +34,7 @@ export const BuddyChat = () => {
     setIsTyping(true);
 
     setTimeout(() => {
-      let aiText = "That's a great question! React State can be tricky. You should generally use the simplest state possible (useState) before moving to more complex solutions like Context or Redux.";
+      let aiText = "React State can be tricky. You should generally use the simplest state possible (useState) before moving to more complex solutions like Context or Redux.";
       if (isHinglish) {
         aiText = "Ye kaafi sahi sawaal hai! React State thoda tricky ho sakta hai. Aapko pehle simple state (useState) use karni chahiye, uske baad hi Context ya Redux jaise complex solutions par jaana chahiye.";
       }
