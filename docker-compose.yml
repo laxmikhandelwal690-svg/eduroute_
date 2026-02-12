@@ -1,0 +1,29 @@
+services:
+  api:
+    build: 
+      context: ./backend
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGODB_URI=mongodb://mongo:27017/eduroute
+      - JWT_SECRET=supersecret
+    depends_on:
+      - mongo
+
+  web:
+    build:
+      context: .
+    ports:
+      - "5173:5173"
+    environment:
+      - VITE_API_URL=http://localhost:5000/api
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+
+volumes:
+  mongo-data:
