@@ -9,7 +9,7 @@ const TOP_THREE = [
 
 const LEADERBOARD_LIST = [
   { rank: 4, name: 'Arjun Gupta', points: 7650, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun', college: 'DTU' },
-  { rank: 5, name: 'Alex Rivera', points: 7420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex', college: 'IIT Jodhpur', isUser: true },
+  { rank: 5, name: 'Vansh Rivera', points: 7420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Vansh', college: 'IIT Jodhpur', isUser: true },
   { rank: 6, name: 'Priya Das', points: 7100, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya', college: 'VIT Vellore' },
   { rank: 7, name: 'Kabir Singh', points: 6850, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kabir', college: 'SRM University' },
   { rank: 8, name: 'Zoya Khan', points: 6420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Zoya', college: 'MSU Baroda' },
