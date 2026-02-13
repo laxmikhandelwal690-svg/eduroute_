@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
-import { Gift, Lock, CheckCircle2, ShoppingBag, Sparkles, ArrowRight, Star } from 'lucide-react';
+import { useState } from 'react';
+import { Gift, Lock, CheckCircle2, ShoppingBag, Sparkles, ArrowRight, Star, Volume2, VolumeX } from 'lucide-react';
+import { useUISound } from '../../contexts/SoundContext';
 
 const REWARDS = [
   { 
@@ -41,6 +43,14 @@ const REWARDS = [
 ];
 
 export const Rewards = () => {
+  const { isMuted, toggleMuted, playSuccess } = useUISound();
+  const [claimedReward, setClaimedReward] = useState<string | null>(null);
+
+  const handleClaim = (rewardTitle: string) => {
+    setClaimedReward(rewardTitle);
+    playSuccess();
+  };
+
   return (
     <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto">
       <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -64,6 +74,28 @@ export const Rewards = () => {
         </div>
       </header>
 
+
+      {claimedReward && (
+        <div className="mb-8 rounded-2xl border border-emerald-100 bg-emerald-50 px-5 py-4 text-emerald-700 font-semibold flex items-center justify-between gap-4">
+          <span>Success! <strong>{claimedReward}</strong> has been added to your claimed rewards.</span>
+          <button
+            onClick={() => setClaimedReward(null)}
+            className="text-sm font-bold text-emerald-700 hover:text-emerald-900 transition-colors"
+          >
+            Dismiss
+          </button>
+        </div>
+      )}
+
+      <div className="mb-8 flex justify-end">
+        <button
+          onClick={toggleMuted}
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+        >
+          {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+          UI Sounds: {isMuted ? 'Muted' : 'On'}
+        </button>
+      </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
         {REWARDS.map((reward) => (
           <motion.div
@@ -106,6 +138,7 @@ export const Rewards = () => {
                </div>
                <button 
                  disabled={reward.locked}
+                 onClick={() => handleClaim(reward.title)}
                  className={`flex items-center gap-2 px-8 py-4 rounded-2xl font-black text-sm transition-all shadow-lg ${
                    reward.locked 
                      ? 'bg-slate-200 text-slate-400 shadow-none cursor-not-allowed' 
