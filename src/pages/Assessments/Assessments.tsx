@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { 
   Trophy, 
@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   AlertCircle
 } from 'lucide-react';
+import { useUISound } from '../../contexts/SoundContext';
 
 const ASSESSMENTS = [
   { id: '1', title: 'React Performance optimization', category: 'Frontend', questions: 20, time: '30m', level: 'Intermediate', points: 200 },
@@ -19,6 +20,13 @@ const ASSESSMENTS = [
 
 export const Assessments = () => {
   const [view, setView] = useState<'list' | 'quiz' | 'results'>('list');
+  const { playAchievement } = useUISound();
+
+  useEffect(() => {
+    if (view === 'results') {
+      playAchievement();
+    }
+  }, [view, playAchievement]);
 
   return (
     <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto">

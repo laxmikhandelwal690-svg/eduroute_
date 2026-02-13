@@ -8,8 +8,11 @@ import {
   X, 
   ExternalLink,
   Settings,
-  Bell
+  Bell,
+  Volume2,
+  VolumeX
 } from 'lucide-react';
+import { useUISound } from '../../contexts/SoundContext';
 
 const PENDING_VERIFICATIONS = [
   { id: '1', name: 'Arjun Gupta', college: 'DTU Delhi', date: '2 hours ago', document: 'id_card_front.jpg' },
@@ -18,6 +21,8 @@ const PENDING_VERIFICATIONS = [
 ];
 
 export const AdminDashboard = () => {
+  const { isMuted, toggleMuted } = useUISound();
+
   return (
     <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto">
       <header className="mb-12 flex items-center justify-between">
@@ -91,6 +96,16 @@ export const AdminDashboard = () => {
                  </button>
                  <button className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left font-bold text-slate-700 hover:bg-indigo-50 hover:border-indigo-100 hover:text-indigo-600 transition-all flex items-center justify-between">
                     Manage Rewards <TrendingUp className="h-4 w-4" />
+                 </button>
+                 <button
+                    onClick={toggleMuted}
+                    className="w-full p-4 bg-slate-50 border border-slate-100 rounded-2xl text-left font-bold text-slate-700 hover:bg-indigo-50 hover:border-indigo-100 hover:text-indigo-600 transition-all flex items-center justify-between"
+                 >
+                    UI Sound Feedback
+                    <span className="inline-flex items-center gap-1.5 text-xs font-black uppercase tracking-widest text-slate-400">
+                      {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
+                      {isMuted ? 'Muted' : 'On'}
+                    </span>
                  </button>
               </div>
            </div>
