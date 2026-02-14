@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard,
   Map,
@@ -14,6 +14,7 @@ import {
   X
 } from 'lucide-react';
 import { useState } from 'react';
+import { logout } from '../utils/auth';
 
 const NAVIGATION = [
   { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -28,16 +29,22 @@ const NAVIGATION = [
 
 export const MainLayout = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const handleLogout = () => {
+    logout();
+    navigate('/');
+  };
+
   return (
-    <div className="flex h-screen bg-slate-50">
+    <div className="flex h-screen bg-slate-100/80 text-slate-800">
       {/* Sidebar Desktop */}
-      <aside className="hidden lg:flex w-72 flex-col border-r border-slate-200 bg-white">
+      <aside className="hidden lg:flex w-72 flex-col border-r border-slate-200/80 bg-white/90 backdrop-blur-xl">
         <div className="p-6 border-b border-slate-100">
           <Link to="/dashboard" className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl">E</div>
-            <span className="text-xl font-bold text-slate-900">EDUROUTE</span>
+            <div className="h-10 w-10 rounded-xl bg-slate-900 flex items-center justify-center text-white font-bold text-xl">E</div>
+            <span className="text-xl font-semibold text-slate-900 tracking-tight">EDUROUTE</span>
           </Link>
         </div>
 
@@ -48,10 +55,10 @@ export const MainLayout = () => {
               <Link
                 key={item.path}
                 to={item.path}
-                className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
+                className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-sm transition-all ${
                   isActive
-                    ? 'bg-indigo-600 text-white shadow-lg shadow-indigo-200'
-                    : 'text-slate-600 hover:bg-slate-50'
+                    ? 'bg-slate-900 text-white shadow-sm'
+                    : 'text-slate-600 hover:bg-slate-100'
                 }`}
               >
                 <item.icon className="h-5 w-5" />
@@ -64,14 +71,14 @@ export const MainLayout = () => {
         <div className="p-4 border-t border-slate-100 space-y-2">
           <Link
             to="/admin"
-            className="flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm text-slate-600 hover:bg-slate-50 transition-all"
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-sm text-slate-600 hover:bg-slate-100 transition-all"
           >
             <Settings className="h-5 w-5" />
             Settings
           </Link>
           <button
-            onClick={() => window.location.href = '/'}
-            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm text-slate-600 hover:bg-red-50 hover:text-red-600 transition-all"
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-sm text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-all"
           >
             <LogOut className="h-5 w-5" />
             Logout
@@ -80,10 +87,10 @@ export const MainLayout = () => {
       </aside>
 
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white border-b border-slate-200 px-4 py-3 z-40 flex items-center justify-between">
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-white/95 backdrop-blur border-b border-slate-200 px-4 py-3 z-40 flex items-center justify-between">
         <Link to="/dashboard" className="flex items-center gap-2">
-          <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg">E</div>
-          <span className="text-lg font-bold text-slate-900">EDUROUTE</span>
+          <div className="h-8 w-8 rounded-lg bg-slate-900 flex items-center justify-center text-white font-bold text-lg">E</div>
+          <span className="text-lg font-semibold text-slate-900 tracking-tight">EDUROUTE</span>
         </Link>
         <button
           onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
@@ -98,15 +105,15 @@ export const MainLayout = () => {
         <div className="lg:hidden fixed inset-0 bg-white z-30 pt-16 overflow-y-auto">
           <nav className="p-4 space-y-2">
             {NAVIGATION.map((item) => {
-              const isActive = location.pathname === item.path;
+              const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
               return (
                 <Link
                   key={item.path}
                   to={item.path}
                   onClick={() => setIsMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
+                  className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-sm transition-all ${
                     isActive
-                      ? 'bg-indigo-600 text-white'
+                      ? 'bg-slate-900 text-white'
                       : 'text-slate-600 hover:bg-slate-50'
                   }`}
                 >
@@ -115,6 +122,21 @@ export const MainLayout = () => {
                 </Link>
               );
             })}
+            <Link
+              to="/admin"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-sm text-slate-600 hover:bg-slate-50 transition-all"
+            >
+              <Settings className="h-5 w-5" />
+              Settings
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-semibold text-sm text-slate-600 hover:bg-rose-50 hover:text-rose-600 transition-all"
+            >
+              <LogOut className="h-5 w-5" />
+              Logout
+            </button>
           </nav>
         </div>
       )}
