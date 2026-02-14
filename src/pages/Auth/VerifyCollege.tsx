@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Upload, CheckCircle2, Info, ChevronRight } from 'lucide-react';
+import { markLoggedIn } from '../../utils/auth';
 
 export const VerifyCollege = () => {
   const navigate = useNavigate();
@@ -11,6 +12,11 @@ export const VerifyCollege = () => {
   const handleUpload = () => {
     setStatus('uploading');
     setTimeout(() => setStatus('pending'), 2000);
+  };
+
+  const proceedToDashboard = () => {
+    markLoggedIn();
+    navigate('/dashboard');
   };
 
   return (
@@ -61,7 +67,7 @@ export const VerifyCollege = () => {
                   Submit for Verification
                 </button>
                 <button 
-                  onClick={() => navigate('/dashboard')}
+                  onClick={proceedToDashboard}
                   className="flex-1 py-3 px-4 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all"
                 >
                   Skip for Now
@@ -87,7 +93,7 @@ export const VerifyCollege = () => {
                 Your verification is now pending. We'll notify you via email once it's complete.
               </p>
               <button
-                onClick={() => navigate('/dashboard')}
+                onClick={proceedToDashboard}
                 className="inline-flex items-center px-8 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all group"
               >
                 Go to Dashboard <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />

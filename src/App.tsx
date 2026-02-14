@@ -1,4 +1,6 @@
+import { ReactElement } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { isAuthenticated } from './utils/auth';
 import { LandingPage } from './pages/LandingPage';
 import { Dashboard } from './pages/Dashboard';
 import { MyCourses } from './pages/MyCourses';
@@ -33,6 +35,15 @@ import { SoftSkills } from './pages/Growth/SoftSkills';
 // Admin
 import { AdminDashboard } from './pages/Admin/AdminDashboard';
 
+
+const ProtectedRoute = ({ children }: { children: ReactElement }) => {
+  if (!isAuthenticated()) {
+    return <Navigate to="/" replace />;
+  }
+
+  return children;
+};
+
 export function App() {
   return (
     <Router>
@@ -46,7 +57,13 @@ export function App() {
         <Route path="/verify-college" element={<VerifyCollege />} />
         
         {/* App Shell */}
-        <Route element={<MainLayout />}>
+        <Route
+          element={
+            <ProtectedRoute>
+              <MainLayout />
+            </ProtectedRoute>
+          }
+        >
           <Route path="/dashboard" element={<Dashboard />} />
           
           {/* Learning */}
