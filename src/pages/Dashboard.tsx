@@ -2,8 +2,10 @@ import { motion } from 'framer-motion';
 import { PlayCircle, Clock, Star, Users, Trophy, ArrowRight, ShieldCheck } from 'lucide-react';
 import { COURSES, MOCK_USER } from '../data/mockData';
 import { Course } from '../types';
+import { useAuth } from '../contexts/AuthContext';
 
 export const Dashboard = () => {
+  const { user } = useAuth();
   const enrolledCourses = COURSES.filter(c => MOCK_USER.enrolledCourses.includes(c.id));
   const recommendedCourses = COURSES.filter(c => !MOCK_USER.enrolledCourses.includes(c.id));
 
@@ -11,7 +13,7 @@ export const Dashboard = () => {
     <div className="flex-1 overflow-y-auto p-4 md:p-8">
       <header className="mb-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-black text-slate-900">Welcome back, {MOCK_USER.name.split(' ')[0]}! 👋</h1>
+          <h1 className="text-3xl font-black text-slate-900">Welcome back, {(user?.name || MOCK_USER.name).split(' ')[0]}! 👋</h1>
           <p className="mt-2 text-slate-500 font-medium">You've completed 45% of your current path. Keep it up!</p>
         </div>
         <div className="flex items-center gap-4 rounded-[28px] bg-amber-50 p-6 border border-amber-200">
