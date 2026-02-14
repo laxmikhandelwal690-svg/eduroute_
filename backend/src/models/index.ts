@@ -30,9 +30,13 @@ export const User = mongoose.model<IUser>('User', UserSchema);
 // OTP Model
 const OTPSchema = new Schema({
   email: { type: String, required: true },
-  code: { type: String, required: true },
+  codeHash: { type: String, required: true },
+  purpose: { type: String, enum: ['signup', 'login'], default: 'signup' },
+  attempts: { type: Number, default: 0 },
+  maxAttempts: { type: Number, default: 5 },
   expiresAt: { type: Date, required: true },
-});
+  consumedAt: { type: Date },
+}, { timestamps: true });
 OTPSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
 export const OTP = mongoose.model('OTP', OTPSchema);
 

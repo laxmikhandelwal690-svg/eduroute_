@@ -30,8 +30,17 @@ router.get('/assessments/:id', authMiddleware, async (req, res) => {
 });
 
 router.post('/assessments/:id/attempt', authMiddleware, async (req: any, res) => {
+  const score = Number(req.body?.score);
+  const totalQuestions = Number(req.body?.totalQuestions);
+
+  if (!Number.isFinite(score) || !Number.isFinite(totalQuestions) || score < 0 || totalQuestions <= 0) {
+    return res.status(400).json({ success: false, error: 'Invalid assessment attempt payload' });
+  }
+
   const attempt = new Attempt({
     ...req.body,
+    score,
+    totalQuestions,
     userId: req.user.id,
     assessmentId: req.params.id
   });
@@ -72,6 +81,9 @@ router.get('/rewards', async (req, res) => {
 // --- AI Buddy Simulator ---
 router.post('/buddy/chat', authMiddleware, async (req, res) => {
   const { message, language } = req.body;
+  if (!message || String(message).trim().length > 1000) {
+    return res.status(400).json({ success: false, error: 'message is required and must be <= 1000 chars' });
+  }
   // This would normally call an LLM. Here we return deterministic responses.
   let response = "That's an interesting question! Let's look at your roadmap for guidance.";
   if (language === 'hinglish') {
@@ -81,7 +93,7 @@ router.post('/buddy/chat', authMiddleware, async (req, res) => {
 });
 
 // --- Admin Documentation ---
-router.get('/docs', (req, res) => {
+router.get('/docs', authMiddleware, adminMiddleware, (req, res) => {
   const routes = [
     { method: 'GET', path: '/api/roadmaps', description: 'Get all roadmaps' },
     { method: 'GET', path: '/api/assessments', description: 'Get all assessments' },

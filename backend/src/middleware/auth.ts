@@ -2,15 +2,24 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
 export const authMiddleware = (req: any, res: Response, next: NextFunction) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  if (!token) return res.status(401).json({ success: false, error: 'Unauthorized' });
+  const authHeader = req.headers.authorization || '';
+  const [scheme, token] = authHeader.split(' ');
+
+  if (scheme !== 'Bearer' || !token) {
+    return res.status(401).json({ success: false, error: 'Missing bearer token' });
+  }
+
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    return res.status(500).json({ success: false, error: 'Server auth configuration error' });
+  }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'secret');
+    const decoded = jwt.verify(token, secret);
     req.user = decoded;
-    next();
+    return next();
   } catch (err) {
-    res.status(401).json({ success: false, error: 'Invalid token' });
+    return res.status(401).json({ success: false, error: 'Invalid or expired token' });
   }
 };
 
@@ -18,5 +27,5 @@ export const adminMiddleware = (req: any, res: Response, next: NextFunction) => 
   if (req.user?.role !== 'admin') {
     return res.status(403).json({ success: false, error: 'Access denied' });
   }
-  next();
+  return next();
 };
