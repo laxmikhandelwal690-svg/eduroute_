@@ -49,7 +49,7 @@ export const AuthModal = ({ isOpen, onClose }: AuthModalProps) => {
             <button
               onClick={() => {
                 onClose();
-                navigate('/signup');
+                navigate('/login');
               }}
               className="w-full py-4 bg-white border border-slate-200 text-slate-900 rounded-2xl font-bold hover:bg-slate-50 transition-all"
             >

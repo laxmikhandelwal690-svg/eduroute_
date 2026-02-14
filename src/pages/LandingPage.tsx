@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Rocket, Target, BookOpen, ChevronRight, Play, Sparkles, Trophy, Briefcase } from 'lucide-react';
 import { AuthModal } from '../components/AuthModal';
 
 export const LandingPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const demoSectionRef = useRef<HTMLElement | null>(null);
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-amber-50/40">
@@ -27,7 +28,7 @@ export const LandingPage = () => {
               <span className="text-sm font-bold uppercase tracking-widest">AI Career Platform for Every Student</span>
             </div>
 
-            <h1 className="text-6xl md:text-8xl font-black text-slate-900 leading-[0.9] mb-8">
+            <h1 className="text-4xl sm:text-6xl md:text-8xl font-black text-slate-900 leading-[0.9] mb-8">
               Build Skills. <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 via-amber-500 to-orange-500">
                 Get Hired.
@@ -46,7 +47,10 @@ export const LandingPage = () => {
               >
                 Start Your Roadmap <Rocket className="h-6 w-6" />
               </button>
-              <button className="flex items-center gap-3 text-slate-900 font-bold hover:text-emerald-700 transition-colors">
+              <button
+                onClick={() => demoSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
+                className="flex items-center gap-3 text-slate-900 font-bold hover:text-emerald-700 transition-colors"
+              >
                  <div className="h-14 w-14 rounded-full border border-slate-200 flex items-center justify-center bg-white shadow-lg">
                     <Play className="h-5 w-5 fill-current" />
                  </div>
@@ -107,7 +111,7 @@ export const LandingPage = () => {
       </div>
       
       {/* Featured Section */}
-      <section className="bg-slate-50 py-32">
+      <section ref={demoSectionRef} className="bg-slate-50 py-20 sm:py-32">
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-20">
                <h2 className="text-4xl font-black text-slate-900 mb-4">Everything You Need to Succeed</h2>
