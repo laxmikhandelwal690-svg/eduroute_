@@ -1,5 +1,28 @@
-import { Suspense, lazy } from 'react';
+import { Suspense, lazy, type ReactElement } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
+
+const AUTH_STORAGE_KEY = 'eduroute:is-authenticated';
+
+const isUserAuthenticated = () => {
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem(AUTH_STORAGE_KEY) === 'true';
+};
+
+const ProtectedRoute = ({ children }: { children: ReactElement }) => {
+  if (!isUserAuthenticated()) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return children;
+};
+
+const PublicOnlyRoute = ({ children }: { children: ReactElement }) => {
+  if (isUserAuthenticated()) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  return children;
+};
 
 const LandingPage = lazy(() => import('./pages/LandingPage').then((module) => ({ default: module.LandingPage })));
 const Dashboard = lazy(() => import('./pages/Dashboard').then((module) => ({ default: module.Dashboard })));
@@ -37,12 +60,46 @@ export function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
 
-          <Route path="/signup" element={<Signup />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/verify-otp" element={<VerifyOTP />} />
-          <Route path="/verify-college" element={<VerifyCollege />} />
+          <Route
+            path="/signup"
+            element={(
+              <PublicOnlyRoute>
+                <Signup />
+              </PublicOnlyRoute>
+            )}
+          />
+          <Route
+            path="/login"
+            element={(
+              <PublicOnlyRoute>
+                <Login />
+              </PublicOnlyRoute>
+            )}
+          />
+          <Route
+            path="/verify-otp"
+            element={(
+              <PublicOnlyRoute>
+                <VerifyOTP />
+              </PublicOnlyRoute>
+            )}
+          />
+          <Route
+            path="/verify-college"
+            element={(
+              <PublicOnlyRoute>
+                <VerifyCollege />
+              </PublicOnlyRoute>
+            )}
+          />
 
-          <Route element={<MainLayout />}>
+          <Route
+            element={(
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            )}
+          >
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/courses" element={<MyCourses />} />
             <Route path="/browse" element={<BrowseCourses />} />

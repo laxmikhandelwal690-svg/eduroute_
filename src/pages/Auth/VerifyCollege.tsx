@@ -9,6 +9,11 @@ export const VerifyCollege = () => {
   const [status, setStatus] = useState<'idle' | 'uploading' | 'pending'>('idle');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  const completeVerification = () => {
+    localStorage.setItem('eduroute:is-authenticated', 'true');
+    navigate('/dashboard');
+  };
+
   const handleUpload = (event: React.FormEvent) => {
     event.preventDefault();
     if (!file) return;
@@ -73,7 +78,7 @@ export const VerifyCollege = () => {
                 </button>
                 <button
                   type="button"
-                  onClick={() => navigate('/dashboard')}
+                  onClick={completeVerification}
                   className="flex-1 py-3 px-4 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all"
                 >
                   Skip for Now
@@ -99,7 +104,7 @@ export const VerifyCollege = () => {
                 Your verification is now pending. We'll notify you via email once it's complete.
               </p>
               <button
-                onClick={() => navigate('/dashboard')}
+                onClick={completeVerification}
                 className="inline-flex items-center px-8 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all group"
               >
                 Go to Dashboard <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
