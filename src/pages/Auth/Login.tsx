@@ -9,6 +9,7 @@ export const Login = () => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+    localStorage.setItem('eduroute:is-authenticated', 'true');
     navigate('/dashboard');
   };
 
