@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Upload, CheckCircle2, Info, ChevronRight } from 'lucide-react';
@@ -7,8 +7,11 @@ export const VerifyCollege = () => {
   const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<'idle' | 'uploading' | 'pending'>('idle');
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleUpload = () => {
+  const handleUpload = (event: React.FormEvent) => {
+    event.preventDefault();
+    if (!file) return;
     setStatus('uploading');
     setTimeout(() => setStatus('pending'), 2000);
   };
@@ -29,21 +32,29 @@ export const VerifyCollege = () => {
           className="bg-white py-8 px-6 shadow-xl rounded-3xl border border-slate-100"
         >
           {status === 'idle' && (
-            <div className="space-y-6">
-              <div 
-                className="border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center hover:border-indigo-400 transition-colors cursor-pointer group"
-                onDragOver={(e) => e.preventDefault()}
-                onDrop={(e) => {
-                  e.preventDefault();
-                  if (e.dataTransfer.files[0]) setFile(e.dataTransfer.files[0]);
+            <form className="space-y-6" onSubmit={handleUpload}>
+              <button
+                type="button"
+                className="w-full border-2 border-dashed border-slate-200 rounded-2xl p-12 text-center hover:border-indigo-400 transition-colors cursor-pointer group"
+                onClick={() => fileInputRef.current?.click()}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={(event) => {
+                  event.preventDefault();
+                  if (event.dataTransfer.files[0]) setFile(event.dataTransfer.files[0]);
                 }}
               >
                 <Upload className="mx-auto h-12 w-12 text-slate-300 group-hover:text-indigo-500 transition-colors" />
                 <p className="mt-4 text-sm font-medium text-slate-600">
                   {file ? file.name : 'Drag and drop your ID card here, or click to browse'}
                 </p>
-                <input type="file" className="hidden" />
-              </div>
+              </button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                className="hidden"
+                accept="image/*,.pdf"
+                onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+              />
 
               <div className="bg-blue-50 p-4 rounded-xl flex gap-3">
                 <Info className="h-5 w-5 text-blue-600 shrink-0" />
@@ -52,22 +63,23 @@ export const VerifyCollege = () => {
                 </p>
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <button
-                  onClick={handleUpload}
+                  type="submit"
                   disabled={!file}
                   className="flex-1 py-3 px-4 bg-indigo-600 text-white rounded-xl font-bold disabled:opacity-50 hover:bg-indigo-700 transition-all active:scale-95"
                 >
                   Submit for Verification
                 </button>
-                <button 
+                <button
+                  type="button"
                   onClick={() => navigate('/dashboard')}
                   className="flex-1 py-3 px-4 bg-white border border-slate-200 text-slate-600 rounded-xl font-bold hover:bg-slate-50 transition-all"
                 >
                   Skip for Now
                 </button>
               </div>
-            </div>
+            </form>
           )}
 
           {status === 'uploading' && (

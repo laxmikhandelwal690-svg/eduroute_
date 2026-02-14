@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Filter, Clock, Star, Users, ChevronDown } from 'lucide-react';
+import { Search, Filter, Clock, Star, ChevronDown } from 'lucide-react';
 import { COURSES } from '../data/mockData';
 import { Course } from '../types';
 import { Link } from 'react-router-dom';

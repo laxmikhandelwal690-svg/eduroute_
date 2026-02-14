@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Send, Sparkles, Languages, RefreshCcw, ThumbsUp, Trash2 } from 'lucide-react';
 
 const INITIAL_MESSAGES = [
