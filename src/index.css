@@ -1,4 +1,31 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
 @import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+    font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+  }
+
+  button {
+    @apply rounded-xl font-semibold;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+  }
+
+  button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.12);
+  }
+
+  button:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 2px solid rgba(99, 102, 241, 0.35);
+    outline-offset: 2px;
+  }
+}
 
 @layer components {
   @keyframes blob {
@@ -48,8 +75,10 @@
   animation: blob 7s infinite;
 }
 
-body {
-  @apply text-slate-900 antialiased bg-slate-50;
+* {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
 }
 
 ::-webkit-scrollbar {
@@ -70,9 +99,10 @@ body {
 }
 
 .glass {
-  @apply bg-white/70 backdrop-blur-xl border border-white/20;
+  @apply border border-white/20 bg-white/70 backdrop-blur-xl;
+  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
 }
 
 .text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600;
+  @apply bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent;
 }
