@@ -14,6 +14,7 @@ import {
   X
 } from 'lucide-react';
 import { useState } from 'react';
+import { useAuth } from '../contexts/AuthContext';
 
 const NAVIGATION = [
   { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -28,6 +29,7 @@ const NAVIGATION = [
 
 export const MainLayout = () => {
   const location = useLocation();
+  const { user, logout } = useAuth();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -62,6 +64,7 @@ export const MainLayout = () => {
         </nav>
 
         <div className="p-4 border-t border-slate-100 space-y-2">
+          <div className="px-4 py-2 text-xs font-bold text-slate-500">Signed in as {user?.name || 'Guest'}</div>
           <Link
             to="/admin"
             className="flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm text-slate-600 hover:bg-slate-50 transition-all"
@@ -70,7 +73,7 @@ export const MainLayout = () => {
             Settings
           </Link>
           <button
-            onClick={() => window.location.href = '/'}
+            onClick={() => { logout(); window.location.href = '/'; }}
             className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm text-slate-600 hover:bg-red-50 hover:text-red-600 transition-all"
           >
             <LogOut className="h-5 w-5" />

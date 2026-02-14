@@ -11,6 +11,7 @@ import { MainLayout } from './layouts/MainLayout';
 import { Signup } from './pages/Auth/Signup';
 import { VerifyOTP } from './pages/Auth/VerifyOTP';
 import { VerifyCollege } from './pages/Auth/VerifyCollege';
+import { Login } from './pages/Auth/Login';
 
 // Roadmap Pages
 import { RoadmapList } from './pages/Roadmaps/RoadmapList';
@@ -42,6 +43,7 @@ export function App() {
         
         {/* Auth Flow */}
         <Route path="/signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
         <Route path="/verify-otp" element={<VerifyOTP />} />
         <Route path="/verify-college" element={<VerifyCollege />} />
         
