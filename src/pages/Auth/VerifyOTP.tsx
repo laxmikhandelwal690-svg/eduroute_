@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShieldCheck, ArrowRight, RefreshCcw } from 'lucide-react';
+import { getStoredUserProfile } from '../../utils/userProfile';
 
 export const VerifyOTP = () => {
   const navigate = useNavigate();
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
+  const signupEmail = getStoredUserProfile()?.email || 'your email';
 
   const handleChange = (index: number, value: string) => {
     if (value.length > 1) return;
@@ -34,7 +36,7 @@ export const VerifyOTP = () => {
         </div>
         <h2 className="text-3xl font-extrabold text-slate-900">Check your email</h2>
         <p className="mt-2 text-slate-600">
-          We sent a 6-digit code to <span className="font-bold text-slate-900 text-emerald-700">vansh@example.com</span>
+          We sent a 6-digit code to <span className="font-bold text-slate-900 text-emerald-700">{signupEmail}</span>
         </p>
       </div>
 
