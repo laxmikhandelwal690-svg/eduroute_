@@ -1,26 +1,66 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL?.replace(/\/$/, '') || 'http://localhost:5000/api';
+const isBrowser = typeof window !== 'undefined';
+
+const resolveApiBaseUrl = () => {
+  const envApiUrl = import.meta.env.VITE_API_URL?.trim();
+  if (envApiUrl) {
+    return envApiUrl.replace(/\/$/, '');
+  }
+
+  if (!isBrowser) {
+    return 'http://localhost:5000/api';
+  }
+
+  const { hostname } = window.location;
+  const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1';
+
+  return isLocalhost ? 'http://localhost:5000/api' : '/api';
+};
+
+const API_BASE_URL = resolveApiBaseUrl();
 
 type ApiResponse<T> = {
-  success: boolean;
+  success?: boolean;
+  ok?: boolean;
   error?: string;
 } & T;
 
+const parseResponseData = async <T>(response: Response): Promise<ApiResponse<T>> => {
+  const contentType = response.headers.get('content-type') || '';
+
+  if (contentType.includes('application/json')) {
+    return response.json() as Promise<ApiResponse<T>>;
+  }
+
+  const rawText = await response.text();
+  return {
+    success: response.ok,
+    error: rawText || `Unexpected response (${response.status})`,
+  } as ApiResponse<T>;
+};
+
 const apiRequest = async <T>(path: string, options: RequestInit): Promise<T> => {
-  const response = await fetch(`${API_BASE_URL}${path}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(options.headers || {}),
-    },
-  });
+  let response: Response;
 
-  const data = await response.json() as ApiResponse<T>;
+  try {
+    response = await fetch(`${API_BASE_URL}${path}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(options.headers || {}),
+      },
+    });
+  } catch {
+    throw new Error('Unable to connect to server. Please try again in a moment.');
+  }
 
-  if (!response.ok || !data.success) {
+  const data = await parseResponseData<T>(response);
+  const isSuccessful = response.ok && (data.success ?? data.ok ?? true);
+
+  if (!isSuccessful) {
     throw new Error(data.error || 'Request failed');
   }
 
-  return data;
+  return data as T;
 };
 
 export const apiRegisterUser = async (payload: { name: string; email: string; password: string }) => apiRequest<{ token: string }>('/auth/register', {
