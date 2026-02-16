@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, ShieldCheck, ArrowRight } from 'lucide-react';
+import { parseGoogleCredential, saveUserProfile } from '../../utils/userProfile';
 
 const GOOGLE_CLIENT_SCRIPT_ID = 'google-identity-services';
 
@@ -56,6 +57,11 @@ export const Signup = () => {
               return;
             }
 
+            const googleProfile = parseGoogleCredential(credential);
+            if (googleProfile) {
+              saveUserProfile(googleProfile);
+            }
+
             localStorage.setItem('eduroute:is-authenticated', 'true');
             navigate('/dashboard');
           },
@@ -87,6 +93,12 @@ export const Signup = () => {
 
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
+
+    saveUserProfile({
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+    });
+
     navigate('/verify-otp');
   };
 

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Trophy, Medal, Crown, TrendingUp, Search, User, Award } from 'lucide-react';
+import { getCurrentUser } from '../../utils/userProfile';
 
 const TOP_THREE = [
   { rank: 2, name: 'Siddharth M.', points: 8420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sid', college: 'IIT Bombay' },
@@ -16,6 +17,17 @@ const LEADERBOARD_LIST = [
 ];
 
 export const Leaderboard = () => {
+  const currentUser = getCurrentUser();
+  const leaderboardList = LEADERBOARD_LIST.map((entry) =>
+    entry.isUser
+      ? {
+          ...entry,
+          name: currentUser.name,
+          avatar: currentUser.avatar,
+        }
+      : entry
+  );
+
   return (
     <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto">
       <header className="mb-12 text-center">
@@ -113,7 +125,7 @@ export const Leaderboard = () => {
           </div>
 
           <div className="divide-y divide-slate-50">
-            {LEADERBOARD_LIST.map((user) => (
+            {leaderboardList.map((user) => (
               <div 
                 key={user.rank}
                 className={`flex items-center justify-between p-6 transition-colors hover:bg-slate-50 ${user.isUser ? 'bg-indigo-50/50' : ''}`}
