@@ -160,18 +160,3 @@ const SoftSkillAttemptSchema = new Schema({
   completed: { type: Boolean, default: false },
 });
 export const SoftSkillAttempt = mongoose.model('SoftSkillAttempt', SoftSkillAttemptSchema);
-
-
-// Course Model
-const CourseSchema = new Schema({
-  title: { type: String, required: true },
-  description: { type: String, required: true },
-  category: { type: String, required: true },
-  level: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced'], default: 'Beginner' },
-  duration: { type: String, required: true },
-  instructor: { type: String, required: true },
-  thumbnail: { type: String },
-  published: { type: Boolean, default: true },
-  createdBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },
-}, { timestamps: true });
-export const Course = mongoose.model('Course', CourseSchema);

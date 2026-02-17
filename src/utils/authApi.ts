@@ -1,5 +1,3 @@
-import { getAuthToken } from './rbacAuth';
-
 const isBrowser = typeof window !== 'undefined';
 
 const resolveApiBaseUrl = () => {
@@ -40,7 +38,7 @@ const parseResponseData = async <T>(response: Response): Promise<ApiResponse<T>>
   } as ApiResponse<T>;
 };
 
-const apiRequest = async <T>(path: string, options: RequestInit = {}): Promise<T> => {
+const apiRequest = async <T>(path: string, options: RequestInit): Promise<T> => {
   let response: Response;
 
   try {
@@ -48,7 +46,6 @@ const apiRequest = async <T>(path: string, options: RequestInit = {}): Promise<T
       ...options,
       headers: {
         'Content-Type': 'application/json',
-        ...(getAuthToken() ? { Authorization: `Bearer ${getAuthToken()}` } : {}),
         ...(options.headers || {}),
       },
     });
@@ -66,18 +63,10 @@ const apiRequest = async <T>(path: string, options: RequestInit = {}): Promise<T
   return data as T;
 };
 
-export const apiRegisterUser = async (payload: { name: string; email: string; password: string }) => apiRequest<{ token: string; user: any }>('/auth/register', {
+export const apiRegisterUser = async (payload: { name: string; email: string; password: string }) => apiRequest<{ token: string }>('/auth/register', {
   method: 'POST',
   body: JSON.stringify(payload),
 });
-
-export const apiRoleLogin = async (payload: { email: string; password: string; role: 'student' | 'admin' }) => {
-  const endpoint = payload.role === 'admin' ? '/auth/login/staff' : '/auth/login/student';
-  return apiRequest<{ token: string; user: any }>(endpoint, {
-    method: 'POST',
-    body: JSON.stringify({ email: payload.email, password: payload.password }),
-  });
-};
 
 export const apiSendOtp = async (email: string) => apiRequest<{ cooldownSeconds: number }>('/auth/otp/send', {
   method: 'POST',
@@ -87,15 +76,4 @@ export const apiSendOtp = async (email: string) => apiRequest<{ cooldownSeconds:
 export const apiVerifyOtp = async (payload: { email: string; otp: string }) => apiRequest<{ message: string }>('/auth/otp/verify', {
   method: 'POST',
   body: JSON.stringify(payload),
-});
-
-export const apiGetCourses = () => apiRequest<{ data: any[] }>('/courses');
-export const apiCreateCourse = (payload: Record<string, unknown>) => apiRequest<{ data: any }>('/courses', { method: 'POST', body: JSON.stringify(payload) });
-export const apiUpdateCourse = (id: string, payload: Record<string, unknown>) => apiRequest<{ data: any }>(`/courses/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
-export const apiDeleteCourse = (id: string) => apiRequest<{ message: string }>(`/courses/${id}`, { method: 'DELETE' });
-
-export const apiGetPendingStudents = () => apiRequest<{ data: any[] }>('/students/pending');
-export const apiVerifyStudent = (id: string, action: 'approve' | 'reject') => apiRequest<{ data: any }>(`/students/${id}/verification`, {
-  method: 'PATCH',
-  body: JSON.stringify({ action }),
 });

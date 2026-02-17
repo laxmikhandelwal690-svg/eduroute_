@@ -86,15 +86,7 @@ const sendOtpEmail = async (toEmail: string, name: string, otpCode: string) => {
   }
 };
 
-const issueAuthToken = (user: { id: string; role: 'student' | 'admin'; email: string; name: string }) => jwt.sign(user, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' });
-
-const buildAuthPayload = (user: any) => ({
-  id: user.id,
-  name: user.name,
-  email: user.email,
-  role: user.role,
-  verificationStatus: user.collegeVerified,
-});
+const issueAuthToken = (userId: string) => jwt.sign({ id: userId }, process.env.JWT_SECRET || 'secret', { expiresIn: '1d' });
 
 router.post('/register', pendingRegisterRateLimiter, async (req, res) => {
   try {
@@ -120,16 +112,18 @@ router.post('/register', pendingRegisterRateLimiter, async (req, res) => {
       name: name.trim(),
       email: normalizedEmail,
       password: passwordHash,
-      role: 'student',
       isVerified: false,
-      collegeVerified: 'pending',
     });
 
-    const authPayload = buildAuthPayload(user);
     return res.status(201).json({
       success: true,
-      token: issueAuthToken(authPayload),
-      user: authPayload,
+      token: issueAuthToken(user.id),
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        verificationStatus: user.isVerified ? 'verified' : 'pending',
+      },
     });
   } catch (error) {
     console.error('Register error:', error);
@@ -137,7 +131,7 @@ router.post('/register', pendingRegisterRateLimiter, async (req, res) => {
   }
 });
 
-const loginByRole = (expectedRole: 'student' | 'admin') => async (req: express.Request, res: express.Response) => {
+router.post('/login', pendingRegisterRateLimiter, async (req, res) => {
   try {
     const { email, password } = req.body as {
       email?: string;
@@ -155,29 +149,26 @@ const loginByRole = (expectedRole: 'student' | 'admin') => async (req: express.R
       return res.status(401).json({ success: false, error: 'Invalid credentials' });
     }
 
-    if (user.role !== expectedRole) {
-      return res.status(403).json({ success: false, error: `Unauthorized for ${expectedRole} login` });
-    }
-
     const isPasswordValid = await bcrypt.compare(password, user.password);
     if (!isPasswordValid) {
       return res.status(401).json({ success: false, error: 'Invalid credentials' });
     }
 
-    const authPayload = buildAuthPayload(user);
     return res.json({
       success: true,
-      token: issueAuthToken(authPayload),
-      user: authPayload,
+      token: issueAuthToken(user.id),
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        verificationStatus: user.isVerified ? 'verified' : 'pending',
+      },
     });
   } catch (error) {
     console.error('Login error:', error);
     return res.status(500).json({ success: false, error: 'Unable to login user' });
   }
-};
-
-router.post('/login/student', pendingRegisterRateLimiter, loginByRole('student'));
-router.post('/login/staff', pendingRegisterRateLimiter, loginByRole('admin'));
+});
 
 router.post('/otp/send', otpRateLimiter, async (req, res) => {
   try {
@@ -293,6 +284,7 @@ router.post('/otp/verify', verifyRateLimiter, async (req, res) => {
 
     user.isVerified = true;
     await user.save();
+
     await OTP.deleteMany({ email: normalizedEmail });
 
     return res.json({
