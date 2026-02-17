@@ -63,10 +63,11 @@ export const BuddyChat = () => {
     return SKILL_CHECK_QUESTIONS.filter((question) => skillAnswers[question.key] === false).map((question) => question.key.toUpperCase());
   }, [skillAnswers]);
 
-  const handleSend = async () => {
-    if (!input.trim()) return;
+  const handleSend = async (presetMessage?: string) => {
+    const messageToSend = (presetMessage ?? input).trim();
+    if (!messageToSend) return;
 
-    const userText = input.trim();
+    const userText = messageToSend;
     const userMessage: BuddyMessage = { id: Date.now(), role: 'user', text: userText, timestamp: toTimestamp() };
 
     setMessages((prev) => [...prev, userMessage]);
@@ -176,7 +177,7 @@ export const BuddyChat = () => {
               'How to prepare resume and portfolio for product companies?',
               'Recommend hackathons in Bengaluru this month',
             ].map((prompt) => (
-              <button key={prompt} onClick={() => setInput(prompt)} className="text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl font-semibold">
+              <button key={prompt} onClick={() => handleSend(prompt)} className="text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl font-semibold">
                 {prompt}
               </button>
             ))}
