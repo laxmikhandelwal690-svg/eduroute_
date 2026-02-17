@@ -1,15 +1,31 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Rocket, Target, BookOpen, ChevronRight, Play, Sparkles, Trophy, Briefcase } from 'lucide-react';
+import { Rocket, Target, BookOpen, ChevronRight, Play, Sparkles, Trophy, Briefcase, Linkedin } from 'lucide-react';
 import { AuthModal } from '../components/AuthModal';
 
 export const LandingPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const demoSectionRef = useRef<HTMLElement | null>(null);
+  const linkedinUrl = 'https://www.linkedin.com/in/vansh-khandelwal-22636a373';
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-100">
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+
+      <header className="relative z-20 border-b border-white/60 bg-white/65 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
+          <div className="text-xl font-black tracking-tight text-slate-900">EDUROUTE</div>
+          <a
+            href={linkedinUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/30 bg-[#0A66C2] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#0A66C2]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#004182]"
+          >
+            <Linkedin className="h-4 w-4" />
+            Connect on LinkedIn
+          </a>
+        </div>
+      </header>
 
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(167,243,208,0.7),transparent_45%),radial-gradient(circle_at_85%_18%,rgba(186,230,253,0.65),transparent_42%),radial-gradient(circle_at_65%_74%,rgba(253,186,116,0.45),transparent_48%),linear-gradient(135deg,rgba(240,253,250,0.95),rgba(239,246,255,0.9)_45%,rgba(255,247,237,0.88))]" />
       <div className="pointer-events-none absolute -top-16 left-16 h-72 w-72 rounded-full bg-emerald-200/35 blur-3xl" />
@@ -146,6 +162,47 @@ export const LandingPage = () => {
             </div>
          </div>
       </section>
+
+      <section className="relative py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-10 text-center">
+            <h2 className="mb-3 text-4xl font-black text-slate-900">About the Team</h2>
+            <p className="text-lg font-medium text-slate-500">Meet the builder behind Eduroute.</p>
+          </div>
+
+          <div className="mx-auto max-w-md rounded-3xl border border-white/70 bg-white/70 p-6 text-center shadow-xl shadow-slate-200/60 backdrop-blur-xl">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#0A66C2] text-white">
+              <Linkedin className="h-6 w-6" />
+            </div>
+            <h3 className="text-2xl font-black text-slate-900">Vansh Khandelwal</h3>
+            <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-slate-500">Founder, Eduroute</p>
+            <a
+              href={linkedinUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/30 bg-[#0A66C2] px-6 py-3 font-bold text-white shadow-lg shadow-[#0A66C2]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#004182]"
+            >
+              <Linkedin className="h-5 w-5" />
+              Connect on LinkedIn
+            </a>
+          </div>
+        </div>
+      </section>
+
+      <footer className="relative border-t border-white/60 bg-white/65 py-10 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6 lg:px-8">
+          <p className="text-sm font-semibold text-slate-500">© {new Date().getFullYear()} Eduroute. All rights reserved.</p>
+          <a
+            href={linkedinUrl}
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/30 bg-[#0A66C2] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#0A66C2]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#004182]"
+          >
+            <Linkedin className="h-4 w-4" />
+            Connect on LinkedIn
+          </a>
+        </div>
+      </footer>
     </div>
   );
 };
