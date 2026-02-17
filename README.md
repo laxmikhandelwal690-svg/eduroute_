@@ -55,6 +55,15 @@ eduroute_
 
 ---
 
+## Production Reliability Notes
+
+Buddy now has graceful fallback behavior so the UI remains usable even when external services are unavailable:
+- If Netlify functions or DB are temporarily down, chat still works using local browser persistence (`localStorage`).
+- If AI provider keys are missing, Buddy serves a structured fallback mentor response instead of failing.
+- Quick prompt buttons are wired to send immediately for better click feedback.
+
+---
+
 ## Environment Configuration
 
 Set these variables in **Netlify Site Settings → Environment Variables**:
