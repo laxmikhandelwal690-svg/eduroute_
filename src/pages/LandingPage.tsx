@@ -1,7 +1,9 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Rocket, Target, BookOpen, ChevronRight, Play, Sparkles, Trophy, Briefcase } from 'lucide-react';
+import { Rocket, Target, BookOpen, ChevronRight, Play, Sparkles, Trophy, Briefcase, Linkedin } from 'lucide-react';
 import { AuthModal } from '../components/AuthModal';
+
+const LINKEDIN_URL = 'https://www.linkedin.com/in/vansh-khandelwal-22636a373';
 
 export const LandingPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -10,6 +12,27 @@ export const LandingPage = () => {
   return (
     <div className="relative min-h-screen overflow-hidden bg-amber-50/40">
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
+
+      {/* Navbar */}
+      <header className="relative z-10 border-b border-slate-200/70 bg-white/90 backdrop-blur">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl bg-slate-900 flex items-center justify-center text-white font-black">E</div>
+            <span className="text-xl font-black text-slate-900">EDUROUTE</span>
+          </div>
+
+          <a
+            href={LINKEDIN_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-[#0A66C2] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#0A66C2]/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#0A66C2]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A66C2]"
+            aria-label="Connect with Vansh Khandelwal on LinkedIn"
+          >
+            <Linkedin className="h-4 w-4" />
+            Connect on LinkedIn
+          </a>
+        </div>
+      </header>
       
       <div className="absolute top-0 left-0 w-full h-[420px] bg-gradient-to-b from-emerald-100/80 via-amber-100/40 to-transparent" />
 
@@ -142,6 +165,61 @@ export const LandingPage = () => {
             </div>
          </div>
       </section>
+
+      {/* About / Team LinkedIn Bio Card */}
+      <section className="bg-white py-20 sm:py-24 border-y border-slate-100">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-2xl mx-auto text-center mb-12">
+            <p className="text-sm font-bold uppercase tracking-[0.2em] text-slate-400">About the Team</p>
+            <h2 className="mt-3 text-3xl sm:text-4xl font-black text-slate-900">Meet the Builder Behind Eduroute</h2>
+          </div>
+
+          <div className="max-w-3xl mx-auto rounded-3xl border border-slate-200 bg-slate-50 p-6 sm:p-8 shadow-sm">
+            <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+              <div className="h-16 w-16 rounded-2xl bg-[#0A66C2] text-white flex items-center justify-center shrink-0">
+                <Linkedin className="h-8 w-8" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-2xl font-black text-slate-900">Vansh Khandelwal</h3>
+                <p className="text-slate-600 font-medium">Founder & Product Builder, Eduroute</p>
+                <p className="mt-3 text-slate-500 leading-relaxed">
+                  Building AI-powered career learning experiences that help students from every background become
+                  industry-ready and employable.
+                </p>
+              </div>
+              <a
+                href={LINKEDIN_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0A66C2] px-6 py-3 text-sm font-bold text-white transition-all hover:scale-[1.02] hover:bg-[#0857a5]"
+              >
+                <Linkedin className="h-4 w-4" />
+                Connect on LinkedIn
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-slate-200 py-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+          <div>
+            <p className="font-bold">© {new Date().getFullYear()} EDUROUTE</p>
+            <p className="text-sm text-slate-400">AI career guidance and hiring pathways for every student.</p>
+          </div>
+
+          <a
+            href={LINKEDIN_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 rounded-full bg-[#0A66C2] px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#0857a5]"
+          >
+            <Linkedin className="h-4 w-4" />
+            Connect on LinkedIn
+          </a>
+        </div>
+      </footer>
     </div>
   );
 };
