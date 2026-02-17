@@ -1,142 +1,252 @@
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Send, Sparkles, Languages, RefreshCcw, ThumbsUp, Trash2 } from 'lucide-react';
+import { Send, Sparkles, Languages, Brain, Trophy, CalendarRange, BriefcaseBusiness } from 'lucide-react';
+import { fetchBuddyProgress, saveSkillGap, sendBuddyMessage } from '../../services/buddyApi';
+import { getCurrentUser } from '../../utils/userProfile';
+import type { BuddyLanguage, BuddyMessage, BuddyProgress } from '../../types/buddy';
 
-const INITIAL_MESSAGES = [
-  { id: 1, role: 'ai', text: "Hello! I'm Buddy, your personal EDUROUTE guide. I've analyzed your recent React progress. Want to discuss how to improve your scores in 'State Management'?", timestamp: '10:30 AM' }
+const DEFAULT_MESSAGE: BuddyMessage = {
+  id: 1,
+  role: 'ai',
+  text: "Hey champ! I'm Buddy 👋 Ask me for learning roadmap, skill-gap test, internships, or weekly motivation.",
+  timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+};
+
+const SKILL_CHECK_QUESTIONS = [
+  { key: 'html', text: 'Can you build a semantic responsive webpage using HTML/CSS?' },
+  { key: 'js', text: 'Are you comfortable with JavaScript fundamentals (DOM, async/await, ES6)?' },
+  { key: 'react', text: 'Can you create React apps with state management and API calls?' },
+  { key: 'dsa', text: 'Do you solve DSA/coding problems at least 3 times per week?' },
 ];
 
+
+const toTimestamp = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
 export const BuddyChat = () => {
-  const [messages, setMessages] = useState(INITIAL_MESSAGES);
+  const userId = `buddy-${getCurrentUser().email.toLowerCase()}`;
+  const [messages, setMessages] = useState<BuddyMessage[]>([DEFAULT_MESSAGE]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [isHinglish, setIsHinglish] = useState(false);
+  const [language, setLanguage] = useState<BuddyLanguage>('english');
+  const [progress, setProgress] = useState<BuddyProgress | null>(null);
+  const [skillAnswers, setSkillAnswers] = useState<Record<string, boolean>>({});
+  const [error, setError] = useState('');
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
-    }
-  }, [messages, isTyping]);
-
-  const handleSend = () => {
-    if (!input.trim()) return;
-
-    const userMessage = { 
-      id: Date.now(), 
-      role: 'user', 
-      text: input, 
-      timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+    const loadData = async () => {
+      try {
+        const data = await fetchBuddyProgress(userId);
+        setProgress(data.progress);
+        setLanguage(data.progress.preferredLanguage || 'english');
+        if (data.history?.length) {
+          const restoredMessages = data.history.map((entry: { role: string; text: string }, index: number) => ({
+            id: index + 2,
+            role: entry.role === 'assistant' ? 'ai' : 'user',
+            text: entry.text,
+            timestamp: toTimestamp(),
+          }));
+          setMessages([DEFAULT_MESSAGE, ...restoredMessages]);
+        }
+      } catch (loadError) {
+        console.error(loadError);
+      }
     };
 
-    setMessages([...messages, userMessage]);
+    loadData();
+  }, [userId]);
+
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages, isTyping]);
+
+  const missingSkills = useMemo(() => {
+    return SKILL_CHECK_QUESTIONS.filter((question) => skillAnswers[question.key] === false).map((question) => question.key.toUpperCase());
+  }, [skillAnswers]);
+
+  const handleSend = async () => {
+    if (!input.trim() || isTyping) return;
+
+    const userText = input.trim();
+    const userMessage: BuddyMessage = { id: Date.now(), role: 'user', text: userText, timestamp: toTimestamp() };
+
+    setMessages((prev) => [...prev, userMessage]);
     setInput('');
+    setError('');
     setIsTyping(true);
 
-    setTimeout(() => {
-      let aiText = "That's a great question! React State can be tricky. You should generally use the simplest state possible (useState) before moving to more complex solutions like Context or Redux.";
-      if (isHinglish) {
-        aiText = "Ye kaafi sahi sawaal hai! React State thoda tricky ho sakta hai. Aapko pehle simple state (useState) use karni chahiye, uske baad hi Context ya Redux jaise complex solutions par jaana chahiye.";
-      }
+    try {
+      const response = await sendBuddyMessage({ userId, message: userText, language });
 
-      setMessages(prev => [...prev, { 
-        id: Date.now() + 1, 
-        role: 'ai', 
-        text: aiText,
-        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
-      }]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 1,
+          role: 'ai',
+          text: response.reply,
+          timestamp: toTimestamp(),
+        },
+      ]);
+
+      setProgress((prev) => ({
+        points: response.gamification?.points || prev?.points || 0,
+        level: response.gamification?.level || prev?.level || 1,
+        achievements: prev?.achievements || ['Welcome to Buddy 🚀'],
+        weeklyChallenges: prev?.weeklyChallenges || ['Complete one skill challenge this week'],
+        missingSkills: prev?.missingSkills || [],
+        preferredLanguage: language,
+      }));
+    } catch (sendError: any) {
+      setError(sendError.message || 'Buddy is temporarily unavailable.');
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
+  };
+
+  const runSkillGapAnalyzer = async () => {
+    try {
+      const saved = await saveSkillGap({ userId, missingSkills });
+      setProgress(saved.progress);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: Date.now() + 2,
+          role: 'ai',
+          text: `Skill gap analysis done ✅ Missing focus skills: ${missingSkills.length ? missingSkills.join(', ') : 'No critical gaps found. Keep leveling up!'}.`,
+          timestamp: toTimestamp(),
+        },
+      ]);
+    } catch (analysisError: any) {
+      setError(analysisError.message || 'Could not save skill-gap analysis.');
+    }
+  };
+
+
+  const handleSendFromPrompt = async (prompt: string) => {
+    if (!prompt.trim()) return;
+    setInput(prompt);
+    const userMessage: BuddyMessage = { id: Date.now(), role: 'user', text: prompt, timestamp: toTimestamp() };
+    setMessages((prev) => [...prev, userMessage]);
+    setError('');
+    setIsTyping(true);
+    try {
+      const response = await sendBuddyMessage({ userId, message: prompt, language });
+      setMessages((prev) => [...prev, { id: Date.now() + 11, role: 'ai', text: response.reply, timestamp: toTimestamp() }]);
+      setProgress((prev) => ({
+        points: response.gamification?.points || prev?.points || 0,
+        level: response.gamification?.level || prev?.level || 1,
+        achievements: prev?.achievements || ['Welcome to Buddy 🚀'],
+        weeklyChallenges: prev?.weeklyChallenges || ['Complete one skill challenge this week'],
+        missingSkills: prev?.missingSkills || [],
+        preferredLanguage: language,
+      }));
+    } catch (sendError: any) {
+      setError(sendError.message || 'Buddy is temporarily unavailable.');
+    } finally {
+      setIsTyping(false);
+      setInput('');
+    }
   };
 
   return (
     <div className="flex-1 flex flex-col h-[calc(100vh-64px)] overflow-hidden bg-slate-50">
-      <header className="bg-white border-b border-slate-200 px-8 py-6 flex items-center justify-between shadow-sm z-10">
+      <header className="bg-white border-b border-slate-200 px-4 md:px-8 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4 shadow-sm z-10">
         <div className="flex items-center gap-4">
-          <div className="h-14 w-14 bg-indigo-600 rounded-[20px] flex items-center justify-center text-white shadow-xl shadow-indigo-100">
-            <Sparkles className="h-7 w-7" />
+          <div className="h-12 w-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white">
+            <Sparkles className="h-6 w-6" />
           </div>
           <div>
-            <h1 className="text-xl font-black text-slate-900">Buddy AI</h1>
-            <div className="flex items-center gap-2 mt-1">
-              <span className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></span>
-              <span className="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Learning Gap Analyzer</span>
-            </div>
+            <h1 className="text-xl font-black text-slate-900">Buddy AI Mentor</h1>
+            <p className="text-xs text-slate-500 font-semibold">Roadmaps • Skill Gap • Internships • Motivation</p>
           </div>
         </div>
-        <div className="flex items-center gap-4">
-          <button 
-            onClick={() => setIsHinglish(!isHinglish)}
-            className={`flex items-center gap-2 px-5 py-2.5 rounded-2xl font-black text-[11px] uppercase tracking-widest transition-all border ${
-              isHinglish ? 'bg-indigo-600 text-white border-indigo-600 shadow-xl shadow-indigo-200' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-            }`}
-          >
-            <Languages className="h-4 w-4" /> {isHinglish ? 'Hinglish Mode' : 'English Mode'}
-          </button>
-          <button className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all">
-            <Trash2 className="h-5 w-5" />
-          </button>
-        </div>
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value as BuddyLanguage)}
+          className="px-4 py-2 border border-slate-200 rounded-xl text-sm font-semibold"
+        >
+          <option value="english">English</option>
+          <option value="hindi">Hindi</option>
+          <option value="hinglish">Hinglish</option>
+        </select>
       </header>
 
-      <div ref={scrollRef} className="flex-1 overflow-y-auto p-6 md:p-12 space-y-8 scroll-smooth">
+      <div className="px-4 md:px-8 pt-4 grid grid-cols-1 lg:grid-cols-4 gap-4 bg-slate-50">
+        <InfoCard icon={Trophy} title="Level" value={`Lv. ${progress?.level || 1}`} />
+        <InfoCard icon={Sparkles} title="Points" value={`${progress?.points || 0} XP`} />
+        <InfoCard icon={CalendarRange} title="Weekly Challenge" value={progress?.weeklyChallenges?.[0] || 'Start your first challenge'} />
+        <InfoCard icon={BriefcaseBusiness} title="Career Focus" value={progress?.missingSkills?.[0] || 'No major skill gap'} />
+      </div>
+
+      <div className="px-4 md:px-8 py-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <section className="bg-white border border-slate-100 rounded-2xl p-4">
+          <h2 className="font-bold text-slate-900 flex items-center gap-2"><Brain className="h-4 w-4 text-indigo-600" /> Skill Gap Analyzer</h2>
+          <div className="mt-3 space-y-2">
+            {SKILL_CHECK_QUESTIONS.map((question) => (
+              <div key={question.key} className="flex items-center justify-between text-sm border border-slate-100 rounded-xl px-3 py-2">
+                <span className="text-slate-700">{question.text}</span>
+                <div className="flex gap-2">
+                  <button type="button" onClick={() => setSkillAnswers((prev) => ({ ...prev, [question.key]: true }))} className={`px-3 py-1 rounded-lg ${skillAnswers[question.key] === true ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600'}`}>Yes</button>
+                  <button type="button" onClick={() => setSkillAnswers((prev) => ({ ...prev, [question.key]: false }))} className={`px-3 py-1 rounded-lg ${skillAnswers[question.key] === false ? 'bg-red-100 text-red-700' : 'bg-slate-100 text-slate-600'}`}>No</button>
+                </div>
+              </div>
+            ))}
+          </div>
+          <button type="button" onClick={runSkillGapAnalyzer} className="mt-3 w-full bg-slate-900 text-white py-2 rounded-xl font-semibold">Analyze My Skill Gap</button>
+        </section>
+
+        <section className="bg-white border border-slate-100 rounded-2xl p-4">
+          <h2 className="font-bold text-slate-900 flex items-center gap-2"><Languages className="h-4 w-4 text-indigo-600" /> Quick Prompts</h2>
+          <div className="mt-3 flex flex-wrap gap-2">
+            {[
+              'Create a Web Developer roadmap for beginner to pro',
+              'Suggest internships for my current skill level',
+              'How to prepare resume and portfolio for product companies?',
+              'Recommend hackathons in Bengaluru this month',
+            ].map((prompt) => (
+              <button key={prompt} type="button" onClick={() => { setInput(prompt); void handleSendFromPrompt(prompt); }} className="text-xs bg-indigo-50 text-indigo-700 px-3 py-2 rounded-xl font-semibold hover:bg-indigo-100 active:scale-[0.99] transition">
+                {prompt}
+              </button>
+            ))}
+          </div>
+        </section>
+      </div>
+
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 md:px-8 pb-4 space-y-4">
         {messages.map((msg) => (
-          <motion.div
-            key={msg.id}
-            initial={{ opacity: 0, y: 20, scale: 0.95 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div className={`max-w-[80%] md:max-w-[60%] ${msg.role === 'user' ? 'ml-12' : 'mr-12'}`}>
-              <div className={`p-6 md:p-8 rounded-[32px] shadow-sm ${
-                msg.role === 'user' 
-                  ? 'bg-indigo-600 text-white' 
-                  : 'bg-white text-slate-800 border border-slate-100'
-              }`}>
-                <p className="text-base font-medium leading-relaxed">{msg.text}</p>
-              </div>
-              <div className={`flex items-center gap-3 mt-3 px-2 ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{msg.timestamp}</span>
-                {msg.role === 'ai' && (
-                  <div className="flex gap-2">
-                    <button className="p-1.5 text-slate-300 hover:text-indigo-600 transition-colors"><ThumbsUp className="h-3 w-3" /></button>
-                    <button className="p-1.5 text-slate-300 hover:text-indigo-600 transition-colors"><RefreshCcw className="h-3 w-3" /></button>
-                  </div>
-                )}
-              </div>
+          <motion.div key={msg.id} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+            <div className={`max-w-3xl p-4 rounded-2xl ${msg.role === 'user' ? 'bg-indigo-600 text-white' : 'bg-white border border-slate-100 text-slate-800'}`}>
+              <p className="text-sm whitespace-pre-wrap">{msg.text}</p>
+              <p className="text-[10px] mt-2 opacity-70">{msg.timestamp}</p>
             </div>
           </motion.div>
         ))}
-        {isTyping && (
-          <div className="flex justify-start">
-            <div className="bg-white border border-slate-100 p-6 rounded-[24px] flex gap-2">
-              <span className="h-2 w-2 bg-indigo-600 rounded-full animate-bounce"></span>
-              <span className="h-2 w-2 bg-indigo-600 rounded-full animate-bounce delay-150"></span>
-              <span className="h-2 w-2 bg-indigo-600 rounded-full animate-bounce delay-300"></span>
-            </div>
-          </div>
-        )}
+        {isTyping && <div className="text-sm text-slate-500">Buddy is typing...</div>}
+        {error && <div className="text-sm text-red-600 bg-red-50 px-3 py-2 rounded-lg">{error}</div>}
       </div>
 
-      <div className="p-6 md:p-12 bg-white border-t border-slate-100">
-        <div className="max-w-4xl mx-auto relative group">
+      <div className="p-4 md:p-6 bg-white border-t border-slate-100">
+        <div className="relative max-w-4xl mx-auto">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            onKeyPress={(e) => e.key === 'Enter' && handleSend()}
-            placeholder="Ask Buddy for advice, roadmaps, or learning gaps..."
-            className="w-full pl-8 pr-20 py-6 bg-slate-50 border border-slate-100 rounded-[28px] focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 focus:bg-white outline-none transition-all shadow-lg shadow-slate-200/50 font-medium text-lg"
+            onKeyDown={(e) => e.key === 'Enter' && handleSend()}
+            placeholder="Ask Buddy for roadmaps, internships, events, and motivation..."
+            className="w-full pl-4 pr-14 py-4 border border-slate-200 rounded-2xl outline-none focus:ring-4 focus:ring-indigo-500/10"
           />
-          <button 
-            onClick={handleSend}
-            disabled={!input.trim()}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-4 bg-slate-900 text-white rounded-[20px] shadow-xl hover:bg-indigo-600 disabled:opacity-50 transition-all active:scale-90"
-          >
-            <Send className="h-6 w-6" />
+          <button type="button" onClick={handleSend} disabled={!input.trim() || isTyping} className="absolute right-2 top-1/2 -translate-y-1/2 p-3 bg-slate-900 text-white rounded-xl disabled:opacity-40">
+            <Send className="h-4 w-4" />
           </button>
         </div>
       </div>
     </div>
   );
 };
+
+const InfoCard = ({ icon: Icon, title, value }: { icon: any; title: string; value: string }) => (
+  <div className="bg-white rounded-2xl border border-slate-100 p-4">
+    <div className="flex items-center gap-2 text-slate-500 text-xs font-bold uppercase tracking-wider"><Icon className="h-4 w-4" /> {title}</div>
+    <div className="mt-2 text-sm font-semibold text-slate-900">{value}</div>
+  </div>
+);
