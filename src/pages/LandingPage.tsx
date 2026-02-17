@@ -8,10 +8,13 @@ export const LandingPage = () => {
   const demoSectionRef = useRef<HTMLElement | null>(null);
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-amber-50/40">
+    <div className="relative min-h-screen overflow-hidden bg-slate-100">
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
-      
-      <div className="absolute top-0 left-0 w-full h-[420px] bg-gradient-to-b from-emerald-100/80 via-amber-100/40 to-transparent" />
+
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(167,243,208,0.7),transparent_45%),radial-gradient(circle_at_85%_18%,rgba(186,230,253,0.65),transparent_42%),radial-gradient(circle_at_65%_74%,rgba(253,186,116,0.45),transparent_48%),linear-gradient(135deg,rgba(240,253,250,0.95),rgba(239,246,255,0.9)_45%,rgba(255,247,237,0.88))]" />
+      <div className="pointer-events-none absolute -top-16 left-16 h-72 w-72 rounded-full bg-emerald-200/35 blur-3xl" />
+      <div className="pointer-events-none absolute top-20 right-12 h-80 w-80 rounded-full bg-sky-200/40 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-10 right-1/4 h-72 w-72 rounded-full bg-orange-200/30 blur-3xl" />
 
       <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
         <div className="grid gap-12 lg:grid-cols-2 items-center">
@@ -20,7 +23,7 @@ export const LandingPage = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: "easeOut" }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-emerald-100 border border-emerald-200 rounded-2xl text-emerald-700">
+            <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-2xl border border-white/50 bg-white/45 text-emerald-800 shadow-lg shadow-sky-100/50 backdrop-blur-xl">
                <span className="relative flex h-2 w-2">
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-700"></span>
@@ -28,7 +31,7 @@ export const LandingPage = () => {
               <span className="text-sm font-bold uppercase tracking-widest">AI Career Platform for Every Student</span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-8xl font-black text-slate-900 leading-[0.9] mb-8">
+            <h1 className="text-4xl sm:text-6xl md:text-8xl font-black text-slate-900 leading-[0.9] mb-8 drop-shadow-[0_6px_24px_rgba(148,163,184,0.25)]">
               Build Skills. <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 via-amber-500 to-orange-500">
                 Get Hired.
@@ -43,7 +46,7 @@ export const LandingPage = () => {
             <div className="flex flex-col sm:flex-row items-center gap-6">
               <button
                 onClick={() => setIsAuthOpen(true)}
-                className="w-full sm:w-auto px-10 py-5 bg-slate-900 text-white rounded-[24px] font-black text-lg shadow-2xl shadow-slate-200 hover:bg-emerald-700 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
+                className="w-full sm:w-auto px-10 py-5 rounded-[24px] border border-white/60 bg-white/70 text-slate-900 font-black text-lg shadow-2xl shadow-slate-200/60 backdrop-blur-xl transition-all hover:scale-105 hover:bg-white/85 active:scale-95 flex items-center justify-center gap-3"
               >
                 Start Your Roadmap <Rocket className="h-6 w-6" />
               </button>
@@ -51,7 +54,7 @@ export const LandingPage = () => {
                 onClick={() => demoSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
                 className="flex items-center gap-3 text-slate-900 font-bold hover:text-emerald-700 transition-colors"
               >
-                 <div className="h-14 w-14 rounded-full border border-slate-200 flex items-center justify-center bg-white shadow-lg">
+                 <div className="h-14 w-14 rounded-full border border-white/70 flex items-center justify-center bg-white/65 shadow-lg backdrop-blur-lg">
                     <Play className="h-5 w-5 fill-current" />
                  </div>
                  Watch Demo
@@ -63,7 +66,7 @@ export const LandingPage = () => {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1, duration: 1 }}
-            className="mt-24 grid grid-cols-3 gap-8 border-t border-slate-100 pt-12"
+            className="mt-24 grid grid-cols-3 gap-8 rounded-3xl border border-white/55 bg-white/40 p-8 shadow-lg shadow-slate-200/60 backdrop-blur-xl"
           >
               {[
               { label: 'Learners', value: '45k+' },
@@ -100,7 +103,7 @@ export const LandingPage = () => {
                 desc: 'Apply for skill-based roles and discover company culture through short videos.',
               },
             ].map((item, index) => (
-              <div key={index} className="bg-white/90 backdrop-blur border border-amber-100 rounded-3xl p-6 shadow-sm">
+              <div key={index} className="rounded-3xl border border-white/50 bg-white/50 p-6 shadow-lg shadow-slate-200/40 backdrop-blur-xl">
                 <item.icon className="h-7 w-7 text-emerald-700 mb-4" />
                 <h3 className="text-xl font-black text-slate-900 mb-2">{item.title}</h3>
                 <p className="text-slate-600">{item.desc}</p>
@@ -111,28 +114,29 @@ export const LandingPage = () => {
       </div>
       
       {/* Featured Section */}
-      <section ref={demoSectionRef} className="bg-slate-50 py-20 sm:py-32">
+      <section ref={demoSectionRef} className="relative py-20 sm:py-32">
+         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/15 via-sky-50/40 to-orange-50/35" />
          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-20">
                <h2 className="text-4xl font-black text-slate-900 mb-4">Everything You Need to Succeed</h2>
                <p className="text-slate-500 font-medium text-lg">From zero to your first high-paying internship.</p>
             </div>
             <div className="grid md:grid-cols-3 gap-12">
-               <div className="bg-white p-10 rounded-[40px] border border-slate-100 shadow-sm hover:shadow-2xl transition-all">
+               <div className="rounded-[40px] border border-white/55 bg-white/55 p-10 shadow-lg shadow-slate-200/45 backdrop-blur-xl transition-all hover:shadow-2xl">
                   <div className="h-16 w-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-8">
                      <Target className="h-8 w-8" />
                   </div>
                   <h3 className="text-2xl font-black text-slate-900 mb-4">AI Roadmaps</h3>
                   <p className="text-slate-500 font-medium leading-relaxed">Dynamic paths that adjust based on your speed and performance.</p>
                </div>
-               <div className="bg-white p-10 rounded-[40px] border border-slate-100 shadow-sm hover:shadow-2xl transition-all">
+               <div className="rounded-[40px] border border-white/55 bg-white/55 p-10 shadow-lg shadow-slate-200/45 backdrop-blur-xl transition-all hover:shadow-2xl">
                   <div className="h-16 w-16 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-8">
                      <BookOpen className="h-8 w-8" />
                   </div>
                   <h3 className="text-2xl font-black text-slate-900 mb-4">Skill Tests</h3>
                   <p className="text-slate-500 font-medium leading-relaxed">Weekly assessments to keep your skills sharp and points high.</p>
                </div>
-               <div className="bg-white p-10 rounded-[40px] border border-slate-100 shadow-sm hover:shadow-2xl transition-all">
+               <div className="rounded-[40px] border border-white/55 bg-white/55 p-10 shadow-lg shadow-slate-200/45 backdrop-blur-xl transition-all hover:shadow-2xl">
                   <div className="h-16 w-16 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 mb-8">
                      <ChevronRight className="h-8 w-8" />
                   </div>
