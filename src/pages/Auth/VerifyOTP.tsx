@@ -1,31 +1,100 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ShieldCheck, ArrowRight, RefreshCcw } from 'lucide-react';
 import { getStoredUserProfile } from '../../utils/userProfile';
+import { apiSendOtp, apiVerifyOtp } from '../../utils/authApi';
+
+const RESEND_SECONDS = 60;
 
 export const VerifyOTP = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const signupEmail = location.state?.email || getStoredUserProfile()?.email || '';
+
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
-  const signupEmail = getStoredUserProfile()?.email || 'your email';
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isResending, setIsResending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [cooldownSeconds, setCooldownSeconds] = useState(RESEND_SECONDS);
+
+  useEffect(() => {
+    if (cooldownSeconds <= 0) {
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setCooldownSeconds((previous) => Math.max(0, previous - 1));
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [cooldownSeconds]);
+
+  useEffect(() => {
+    if (!signupEmail) {
+      navigate('/signup');
+    }
+  }, [navigate, signupEmail]);
 
   const handleChange = (index: number, value: string) => {
-    if (value.length > 1) return;
+    if (!/^\d?$/.test(value)) return;
+
     const newOtp = [...otp];
     newOtp[index] = value;
     setOtp(newOtp);
 
-    // Auto-focus next input
     if (value && index < 5) {
       const nextInput = document.getElementById(`otp-${index + 1}`);
       nextInput?.focus();
     }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Simulate verification
-    navigate('/verify-college');
+    setError(null);
+    setSuccess(null);
+
+    const otpValue = otp.join('');
+    if (otpValue.length !== 6) {
+      setError('Enter the 6-digit code sent to your email.');
+      return;
+    }
+
+    setIsSubmitting(true);
+    try {
+      await apiVerifyOtp({ email: signupEmail, otp: otpValue });
+      setSuccess('Email verified successfully! Redirecting...');
+      localStorage.setItem('eduroute:is-authenticated', 'true');
+      setTimeout(() => {
+        navigate('/dashboard');
+      }, 1000);
+    } catch (verifyError) {
+      setError(verifyError instanceof Error ? verifyError.message : 'Invalid OTP. Try again.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleResendOtp = async () => {
+    if (cooldownSeconds > 0 || !signupEmail) {
+      return;
+    }
+
+    setError(null);
+    setSuccess(null);
+    setIsResending(true);
+
+    try {
+      const response = await apiSendOtp(signupEmail);
+      setCooldownSeconds(response.cooldownSeconds || RESEND_SECONDS);
+      setOtp(['', '', '', '', '', '']);
+      setSuccess('A new OTP has been sent to your email address.');
+    } catch (resendError) {
+      setError(resendError instanceof Error ? resendError.message : 'Unable to resend OTP right now.');
+    } finally {
+      setIsResending(false);
+    }
   };
 
   return (
@@ -36,7 +105,7 @@ export const VerifyOTP = () => {
         </div>
         <h2 className="text-3xl font-extrabold text-slate-900">Check your email</h2>
         <p className="mt-2 text-slate-600">
-          We sent a 6-digit code to <span className="font-bold text-slate-900 text-emerald-700">{signupEmail}</span>
+          We sent a 6-digit code to <span className="font-bold text-emerald-700">{signupEmail || 'your email'}</span>
         </p>
       </div>
 
@@ -53,6 +122,7 @@ export const VerifyOTP = () => {
                   key={i}
                   id={`otp-${i}`}
                   type="text"
+                  inputMode="numeric"
                   maxLength={1}
                   value={digit}
                   onChange={(e) => handleChange(i, e.target.value)}
@@ -61,17 +131,26 @@ export const VerifyOTP = () => {
               ))}
             </div>
 
+            {error ? <p className="text-sm text-red-600">{error}</p> : null}
+            {success ? <p className="text-sm text-emerald-700">{success}</p> : null}
+
             <button
               type="submit"
-              className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-emerald-700 hover:bg-emerald-800 transition-all active:scale-95"
+              disabled={isSubmitting}
+              className="w-full flex justify-center py-3.5 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-emerald-700 hover:bg-emerald-800 disabled:bg-emerald-300 transition-all active:scale-95"
             >
-              Verify & Continue <ArrowRight className="ml-2 h-4 w-4" />
+              {isSubmitting ? 'Verifying...' : 'Verify & Continue'} <ArrowRight className="ml-2 h-4 w-4" />
             </button>
           </form>
 
           <div className="mt-6 text-center">
-            <button className="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-emerald-700 transition-colors">
-              <RefreshCcw className="mr-2 h-4 w-4" /> Resend Code
+            <button
+              onClick={handleResendOtp}
+              disabled={cooldownSeconds > 0 || isResending}
+              className="inline-flex items-center text-sm font-semibold text-slate-500 hover:text-emerald-700 disabled:text-slate-400 transition-colors"
+            >
+              <RefreshCcw className="mr-2 h-4 w-4" />
+              {cooldownSeconds > 0 ? `Resend Code in ${cooldownSeconds}s` : isResending ? 'Resending...' : 'Resend Code'}
             </button>
           </div>
         </motion.div>
