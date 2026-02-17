@@ -1,9 +1,82 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Rocket, Target, BookOpen, ChevronRight, Play, Sparkles, Trophy, Briefcase, Linkedin } from 'lucide-react';
+import {
+  Rocket,
+  Target,
+  BookOpen,
+  ChevronRight,
+  Play,
+  Sparkles,
+  Trophy,
+  Briefcase,
+  Linkedin,
+  type LucideIcon,
+} from 'lucide-react';
 import { AuthModal } from '../components/AuthModal';
 
 const LINKEDIN_URL = 'https://www.linkedin.com/in/vansh-khandelwal-22636a373';
+
+const STATS = [
+  { label: 'Learners', value: '45k+' },
+  { label: 'Roadmaps', value: '80+' },
+  { label: 'Hiring Partners', value: '120+' },
+];
+
+const HIGHLIGHTS: { icon: LucideIcon; title: string; desc: string }[] = [
+  {
+    icon: Sparkles,
+    title: 'AI Buddy in English, Hindi & Hinglish',
+    desc: '24/7 personalized guidance for roadmap planning, interview prep, and doubts.',
+  },
+  {
+    icon: Trophy,
+    title: 'Gamified Progress + Leaderboards',
+    desc: 'Complete tasks, earn points, unlock rewards, and stand out to recruiters.',
+  },
+  {
+    icon: Briefcase,
+    title: 'Internships & Direct Company Hiring',
+    desc: 'Apply for skill-based roles and discover company culture through short videos.',
+  },
+];
+
+const FEATURES: { icon: LucideIcon; title: string; desc: string; iconClass: string }[] = [
+  {
+    icon: Target,
+    title: 'AI Roadmaps',
+    desc: 'Dynamic paths that adjust based on your speed and performance.',
+    iconClass: 'bg-emerald-50 text-emerald-600',
+  },
+  {
+    icon: BookOpen,
+    title: 'Skill Tests',
+    desc: 'Weekly assessments to keep your skills sharp and points high.',
+    iconClass: 'bg-amber-50 text-amber-600',
+  },
+  {
+    icon: ChevronRight,
+    title: 'Direct Hiring',
+    desc: 'Top performers get fast-tracked into verified internships.',
+    iconClass: 'bg-orange-50 text-orange-600',
+  },
+];
+
+const LinkedInButton = ({ className = '', ariaLabel }: { className?: string; ariaLabel?: string }) => (
+  <a
+    href={LINKEDIN_URL}
+    target="_blank"
+    rel="noopener noreferrer"
+    aria-label={ariaLabel}
+    className={[
+      'inline-flex items-center gap-2 rounded-full bg-[#0A66C2] text-sm font-bold text-white transition-all',
+      'hover:-translate-y-0.5 hover:bg-[#0857a5] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A66C2]',
+      className,
+    ].join(' ')}
+  >
+    <Linkedin className="h-4 w-4" />
+    Connect on LinkedIn
+  </a>
+);
 
 export const LandingPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
@@ -13,75 +86,71 @@ export const LandingPage = () => {
     <div className="relative min-h-screen overflow-hidden bg-amber-50/40">
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
 
-      {/* Navbar */}
+      {/* Top navbar with LinkedIn CTA */}
       <header className="relative z-10 border-b border-slate-200/70 bg-white/90 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between gap-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl bg-slate-900 flex items-center justify-center text-white font-black">E</div>
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-slate-900 text-white font-black">E</div>
             <span className="text-xl font-black text-slate-900">EDUROUTE</span>
           </div>
 
-          <a
-            href={LINKEDIN_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-[#0A66C2] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#0A66C2]/30 transition-all hover:-translate-y-0.5 hover:shadow-xl hover:shadow-[#0A66C2]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#0A66C2]"
-            aria-label="Connect with Vansh Khandelwal on LinkedIn"
-          >
-            <Linkedin className="h-4 w-4" />
-            Connect on LinkedIn
-          </a>
+          <LinkedInButton
+            className="px-5 py-2.5 shadow-lg shadow-[#0A66C2]/30 hover:shadow-xl hover:shadow-[#0A66C2]/40"
+            ariaLabel="Connect with Vansh Khandelwal on LinkedIn"
+          />
         </div>
       </header>
-      
-      <div className="absolute top-0 left-0 w-full h-[420px] bg-gradient-to-b from-emerald-100/80 via-amber-100/40 to-transparent" />
+
+      {/* Hero background layers */}
+      <div className="absolute left-0 top-0 h-[420px] w-full bg-gradient-to-b from-emerald-100/80 via-amber-100/40 to-transparent" />
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(167,243,208,0.7),transparent_45%),radial-gradient(circle_at_85%_18%,rgba(186,230,253,0.65),transparent_42%),radial-gradient(circle_at_65%_74%,rgba(253,186,116,0.45),transparent_48%),linear-gradient(135deg,rgba(240,253,250,0.95),rgba(239,246,255,0.9)_45%,rgba(255,247,237,0.88))]" />
       <div className="pointer-events-none absolute -top-16 left-16 h-72 w-72 rounded-full bg-emerald-200/35 blur-3xl" />
-      <div className="pointer-events-none absolute top-20 right-12 h-80 w-80 rounded-full bg-sky-200/40 blur-3xl" />
+      <div className="pointer-events-none absolute right-12 top-20 h-80 w-80 rounded-full bg-sky-200/40 blur-3xl" />
       <div className="pointer-events-none absolute bottom-10 right-1/4 h-72 w-72 rounded-full bg-orange-200/30 blur-3xl" />
 
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
-        <div className="grid gap-12 lg:grid-cols-2 items-center">
+      {/* Hero content */}
+      <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-24 sm:px-6 lg:px-8">
+        <div className="grid items-center gap-12 lg:grid-cols-2">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
+            transition={{ duration: 0.8, ease: 'easeOut' }}
           >
-            <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 bg-emerald-100 border border-emerald-200 rounded-2xl text-emerald-700">
-               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-700"></span>
+            <div className="mb-8 inline-flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-100 px-4 py-2 text-emerald-700">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-700" />
               </span>
               <span className="text-sm font-bold uppercase tracking-widest">AI Career Platform for Every Student</span>
             </div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-8xl font-black text-slate-900 leading-[0.9] mb-8">
+            <h1 className="mb-8 text-4xl font-black leading-[0.9] text-slate-900 sm:text-6xl md:text-8xl">
               Build Skills. <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 via-amber-500 to-orange-500">
+              <span className="bg-gradient-to-r from-emerald-700 via-amber-500 to-orange-500 bg-clip-text text-transparent">
                 Get Hired.
               </span>
             </h1>
 
-            <p className="text-xl text-slate-500 font-medium leading-relaxed max-w-lg mb-12">
+            <p className="mb-12 max-w-lg text-xl font-medium leading-relaxed text-slate-500">
               EDUROUTE maps each career role into step-by-step levels from Beginner to Pro, with AI Buddy guidance,
               assessments, internships, and direct hiring opportunities—designed for students from every city and town.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex flex-col items-center gap-6 sm:flex-row">
               <button
                 onClick={() => setIsAuthOpen(true)}
-                className="w-full sm:w-auto px-10 py-5 bg-slate-900 text-white rounded-[24px] font-black text-lg shadow-2xl shadow-slate-200 hover:bg-emerald-700 transition-all hover:scale-105 active:scale-95 flex items-center justify-center gap-3"
+                className="flex w-full items-center justify-center gap-3 rounded-[24px] bg-slate-900 px-10 py-5 text-lg font-black text-white shadow-2xl shadow-slate-200 transition-all hover:scale-105 hover:bg-emerald-700 active:scale-95 sm:w-auto"
               >
                 Start Your Roadmap <Rocket className="h-6 w-6" />
               </button>
               <button
                 onClick={() => demoSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                className="flex items-center gap-3 text-slate-900 font-bold hover:text-emerald-700 transition-colors"
+                className="flex items-center gap-3 font-bold text-slate-900 transition-colors hover:text-emerald-700"
               >
-                 <div className="h-14 w-14 rounded-full border border-slate-200 flex items-center justify-center bg-white shadow-lg">
-                    <Play className="h-5 w-5 fill-current" />
-                 </div>
-                 Watch Demo
+                <div className="flex h-14 w-14 items-center justify-center rounded-full border border-slate-200 bg-white shadow-lg">
+                  <Play className="h-5 w-5 fill-current" />
+                </div>
+                Watch Demo
               </button>
             </div>
           </motion.div>
@@ -92,14 +161,10 @@ export const LandingPage = () => {
             transition={{ delay: 1, duration: 1 }}
             className="mt-24 grid grid-cols-3 gap-8 border-t border-slate-100 pt-12"
           >
-              {[
-              { label: 'Learners', value: '45k+' },
-              { label: 'Roadmaps', value: '80+' },
-              { label: 'Hiring Partners', value: '120+' },
-            ].map((stat, i) => (
-              <div key={i}>
+            {STATS.map((stat) => (
+              <div key={stat.label}>
                 <div className="text-3xl font-black text-slate-900">{stat.value}</div>
-                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">{stat.label}</div>
+                <div className="text-sm font-bold uppercase tracking-widest text-slate-400">{stat.label}</div>
               </div>
             ))}
           </motion.div>
@@ -110,118 +175,73 @@ export const LandingPage = () => {
             transition={{ delay: 0.3, duration: 0.9 }}
             className="space-y-4"
           >
-            {[
-              {
-                icon: Sparkles,
-                title: 'AI Buddy in English, Hindi & Hinglish',
-                desc: '24/7 personalized guidance for roadmap planning, interview prep, and doubts.',
-              },
-              {
-                icon: Trophy,
-                title: 'Gamified Progress + Leaderboards',
-                desc: 'Complete tasks, earn points, unlock rewards, and stand out to recruiters.',
-              },
-              {
-                icon: Briefcase,
-                title: 'Internships & Direct Company Hiring',
-                desc: 'Apply for skill-based roles and discover company culture through short videos.',
-              },
-            ].map((item, index) => (
-              <div key={index} className="bg-white/90 backdrop-blur border border-amber-100 rounded-3xl p-6 shadow-sm">
-                <item.icon className="h-7 w-7 text-emerald-700 mb-4" />
-                <h3 className="text-xl font-black text-slate-900 mb-2">{item.title}</h3>
+            {HIGHLIGHTS.map((item) => (
+              <div key={item.title} className="rounded-3xl border border-amber-100 bg-white/90 p-6 shadow-sm backdrop-blur">
+                <item.icon className="mb-4 h-7 w-7 text-emerald-700" />
+                <h3 className="mb-2 text-xl font-black text-slate-900">{item.title}</h3>
                 <p className="text-slate-600">{item.desc}</p>
               </div>
             ))}
           </motion.div>
         </div>
       </div>
-      
-      {/* Featured Section */}
+
+      {/* Featured section */}
       <section ref={demoSectionRef} className="bg-slate-50 py-20 sm:py-32">
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-20">
-               <h2 className="text-4xl font-black text-slate-900 mb-4">Everything You Need to Succeed</h2>
-               <p className="text-slate-500 font-medium text-lg">From zero to your first high-paying internship.</p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-12">
-               <div className="bg-white p-10 rounded-[40px] border border-slate-100 shadow-sm hover:shadow-2xl transition-all">
-                  <div className="h-16 w-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-8">
-                     <Target className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-2xl font-black text-slate-900 mb-4">AI Roadmaps</h3>
-                  <p className="text-slate-500 font-medium leading-relaxed">Dynamic paths that adjust based on your speed and performance.</p>
-               </div>
-               <div className="bg-white p-10 rounded-[40px] border border-slate-100 shadow-sm hover:shadow-2xl transition-all">
-                  <div className="h-16 w-16 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-8">
-                     <BookOpen className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-2xl font-black text-slate-900 mb-4">Skill Tests</h3>
-                  <p className="text-slate-500 font-medium leading-relaxed">Weekly assessments to keep your skills sharp and points high.</p>
-               </div>
-               <div className="bg-white p-10 rounded-[40px] border border-slate-100 shadow-sm hover:shadow-2xl transition-all">
-                  <div className="h-16 w-16 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 mb-8">
-                     <ChevronRight className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-2xl font-black text-slate-900 mb-4">Direct Hiring</h3>
-                  <p className="text-slate-500 font-medium leading-relaxed">Top performers get fast-tracked into verified internships.</p>
-               </div>
-            </div>
-         </div>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mb-20 text-center">
+            <h2 className="mb-4 text-4xl font-black text-slate-900">Everything You Need to Succeed</h2>
+            <p className="text-lg font-medium text-slate-500">From zero to your first high-paying internship.</p>
+          </div>
+          <div className="grid gap-12 md:grid-cols-3">
+            {FEATURES.map((feature) => (
+              <div key={feature.title} className="rounded-[40px] border border-slate-100 bg-white p-10 shadow-sm transition-all hover:shadow-2xl">
+                <div className={`mb-8 flex h-16 w-16 items-center justify-center rounded-2xl ${feature.iconClass}`}>
+                  <feature.icon className="h-8 w-8" />
+                </div>
+                <h3 className="mb-4 text-2xl font-black text-slate-900">{feature.title}</h3>
+                <p className="font-medium leading-relaxed text-slate-500">{feature.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
       </section>
 
-      {/* About / Team LinkedIn Bio Card */}
-      <section className="bg-white py-20 sm:py-24 border-y border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-2xl mx-auto text-center mb-12">
+      {/* About / Team section with bio card */}
+      <section className="border-y border-slate-100 bg-white py-20 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto mb-12 max-w-2xl text-center">
             <p className="text-sm font-bold uppercase tracking-[0.2em] text-slate-400">About the Team</p>
-            <h2 className="mt-3 text-3xl sm:text-4xl font-black text-slate-900">Meet the Builder Behind Eduroute</h2>
+            <h2 className="mt-3 text-3xl font-black text-slate-900 sm:text-4xl">Meet the Builder Behind Eduroute</h2>
           </div>
 
-          <div className="max-w-3xl mx-auto rounded-3xl border border-slate-200 bg-slate-50 p-6 sm:p-8 shadow-sm">
-            <div className="flex flex-col sm:flex-row sm:items-center gap-6">
-              <div className="h-16 w-16 rounded-2xl bg-[#0A66C2] text-white flex items-center justify-center shrink-0">
+          <div className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-slate-50 p-6 shadow-sm sm:p-8">
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+              <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#0A66C2] text-white">
                 <Linkedin className="h-8 w-8" />
               </div>
               <div className="flex-1">
                 <h3 className="text-2xl font-black text-slate-900">Vansh Khandelwal</h3>
-                <p className="text-slate-600 font-medium">Founder & Product Builder, Eduroute</p>
-                <p className="mt-3 text-slate-500 leading-relaxed">
+                <p className="font-medium text-slate-600">Founder & Product Builder, Eduroute</p>
+                <p className="mt-3 leading-relaxed text-slate-500">
                   Building AI-powered career learning experiences that help students from every background become
                   industry-ready and employable.
                 </p>
               </div>
-              <a
-                href={LINKEDIN_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center justify-center gap-2 rounded-full bg-[#0A66C2] px-6 py-3 text-sm font-bold text-white transition-all hover:scale-[1.02] hover:bg-[#0857a5]"
-              >
-                <Linkedin className="h-4 w-4" />
-                Connect on LinkedIn
-              </a>
+              <LinkedInButton className="justify-center px-6 py-3 hover:scale-[1.02]" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="bg-slate-900 text-slate-200 py-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+      {/* Footer with LinkedIn CTA */}
+      <footer className="bg-slate-900 py-10 text-slate-200">
+        <div className="mx-auto flex max-w-7xl flex-col items-start justify-between gap-4 px-4 sm:px-6 md:flex-row md:items-center lg:px-8">
           <div>
             <p className="font-bold">© {new Date().getFullYear()} EDUROUTE</p>
             <p className="text-sm text-slate-400">AI career guidance and hiring pathways for every student.</p>
           </div>
-
-          <a
-            href={LINKEDIN_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 rounded-full bg-[#0A66C2] px-6 py-3 text-sm font-bold text-white transition-all hover:-translate-y-0.5 hover:bg-[#0857a5]"
-          >
-            <Linkedin className="h-4 w-4" />
-            Connect on LinkedIn
-          </a>
+          <LinkedInButton className="px-6 py-3" />
         </div>
       </footer>
     </div>
