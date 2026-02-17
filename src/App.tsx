@@ -1,32 +1,24 @@
 import { Suspense, lazy, type ReactElement } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
-import { getAuthUser, isAuthenticated } from './utils/rbacAuth';
 
-const ProtectedRoute = ({ children }: { children: ReactElement }) => {
-  if (!isAuthenticated()) {
-    return <Navigate to="/login" replace />;
-  }
+const AUTH_STORAGE_KEY = 'eduroute:is-authenticated';
 
-  return children;
+const isUserAuthenticated = () => {
+  if (typeof window === 'undefined') return false;
+  return localStorage.getItem(AUTH_STORAGE_KEY) === 'true';
 };
 
-const RoleRoute = ({ children, role }: { children: ReactElement; role: 'student' | 'admin' }) => {
-  const user = getAuthUser();
-  if (!user) {
+const ProtectedRoute = ({ children }: { children: ReactElement }) => {
+  if (!isUserAuthenticated()) {
     return <Navigate to="/login" replace />;
-  }
-
-  if (user.role !== role) {
-    return <Navigate to={user.role === 'admin' ? '/admin' : '/dashboard'} replace />;
   }
 
   return children;
 };
 
 const PublicOnlyRoute = ({ children }: { children: ReactElement }) => {
-  if (isAuthenticated()) {
-    const user = getAuthUser();
-    return <Navigate to={user?.role === 'admin' ? '/admin' : '/dashboard'} replace />;
+  if (isUserAuthenticated()) {
+    return <Navigate to="/dashboard" replace />;
   }
 
   return children;
@@ -55,7 +47,11 @@ const Events = lazy(() => import('./pages/Growth/Events').then((module) => ({ de
 const SoftSkills = lazy(() => import('./pages/Growth/SoftSkills').then((module) => ({ default: module.SoftSkills })));
 const AdminDashboard = lazy(() => import('./pages/Admin/AdminDashboard').then((module) => ({ default: module.AdminDashboard })));
 
-const PageLoader = () => <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500 font-semibold">Loading...</div>;
+const PageLoader = () => (
+  <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500 font-semibold">
+    Loading...
+  </div>
+);
 
 export function App() {
   return (
@@ -63,28 +59,63 @@ export function App() {
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
-          <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
-          <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
-          <Route path="/verify-otp" element={<PublicOnlyRoute><VerifyOTP /></PublicOnlyRoute>} />
-          <Route path="/verify-college" element={<PublicOnlyRoute><VerifyCollege /></PublicOnlyRoute>} />
 
-          <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-            <Route path="/dashboard" element={<RoleRoute role="student"><Dashboard /></RoleRoute>} />
-            <Route path="/courses" element={<RoleRoute role="student"><MyCourses /></RoleRoute>} />
-            <Route path="/browse" element={<RoleRoute role="student"><BrowseCourses /></RoleRoute>} />
-            <Route path="/course/:id" element={<RoleRoute role="student"><CourseDetails /></RoleRoute>} />
-            <Route path="/paths" element={<RoleRoute role="student"><Pathways /></RoleRoute>} />
-            <Route path="/roadmaps" element={<RoleRoute role="student"><RoadmapList /></RoleRoute>} />
-            <Route path="/roadmaps/:role" element={<RoleRoute role="student"><RoadmapDetail /></RoleRoute>} />
-            <Route path="/assessments" element={<RoleRoute role="student"><Assessments /></RoleRoute>} />
-            <Route path="/buddy" element={<RoleRoute role="student"><BuddyChat /></RoleRoute>} />
-            <Route path="/leaderboard" element={<RoleRoute role="student"><Leaderboard /></RoleRoute>} />
-            <Route path="/rewards" element={<RoleRoute role="student"><Rewards /></RoleRoute>} />
-            <Route path="/internships" element={<RoleRoute role="student"><Internships /></RoleRoute>} />
-            <Route path="/companies/:id" element={<RoleRoute role="student"><CompanyDetail /></RoleRoute>} />
-            <Route path="/events" element={<RoleRoute role="student"><Events /></RoleRoute>} />
-            <Route path="/soft-skills" element={<RoleRoute role="student"><SoftSkills /></RoleRoute>} />
-            <Route path="/admin" element={<RoleRoute role="admin"><AdminDashboard /></RoleRoute>} />
+          <Route
+            path="/signup"
+            element={(
+              <PublicOnlyRoute>
+                <Signup />
+              </PublicOnlyRoute>
+            )}
+          />
+          <Route
+            path="/login"
+            element={(
+              <PublicOnlyRoute>
+                <Login />
+              </PublicOnlyRoute>
+            )}
+          />
+          <Route
+            path="/verify-otp"
+            element={(
+              <PublicOnlyRoute>
+                <VerifyOTP />
+              </PublicOnlyRoute>
+            )}
+          />
+          <Route
+            path="/verify-college"
+            element={(
+              <PublicOnlyRoute>
+                <VerifyCollege />
+              </PublicOnlyRoute>
+            )}
+          />
+
+          <Route
+            element={(
+              <ProtectedRoute>
+                <MainLayout />
+              </ProtectedRoute>
+            )}
+          >
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/courses" element={<MyCourses />} />
+            <Route path="/browse" element={<BrowseCourses />} />
+            <Route path="/course/:id" element={<CourseDetails />} />
+            <Route path="/paths" element={<Pathways />} />
+            <Route path="/roadmaps" element={<RoadmapList />} />
+            <Route path="/roadmaps/:role" element={<RoadmapDetail />} />
+            <Route path="/assessments" element={<Assessments />} />
+            <Route path="/buddy" element={<BuddyChat />} />
+            <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/rewards" element={<Rewards />} />
+            <Route path="/internships" element={<Internships />} />
+            <Route path="/companies/:id" element={<CompanyDetail />} />
+            <Route path="/events" element={<Events />} />
+            <Route path="/soft-skills" element={<SoftSkills />} />
+            <Route path="/admin" element={<AdminDashboard />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />
