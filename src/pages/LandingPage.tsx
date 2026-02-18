@@ -6,7 +6,8 @@ import { AuthModal } from '../components/AuthModal';
 export const LandingPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const demoSectionRef = useRef<HTMLElement | null>(null);
-  const linkedinUrl = 'https://www.linkedin.com/in/vansh-khandelwal-22636a373';
+  const founderLinkedinUrl = 'https://www.linkedin.com/in/vansh-khandelwal-22636a373';
+  const coFounderLinkedinUrl = 'https://www.linkedin.com/in/deepesh-chauhan-a12413382';
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-100">
@@ -16,7 +17,7 @@ export const LandingPage = () => {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
           <div className="text-xl font-black tracking-tight text-slate-900">EDUROUTE</div>
           <a
-            href={linkedinUrl}
+            href={founderLinkedinUrl}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/30 bg-[#0A66C2] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#0A66C2]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#004182]"
@@ -167,24 +168,43 @@ export const LandingPage = () => {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 text-center">
             <h2 className="mb-3 text-4xl font-black text-slate-900">About the Team</h2>
-            <p className="text-lg font-medium text-slate-500">Meet the builder behind Eduroute.</p>
+            <p className="text-lg font-medium text-slate-500">Meet the founder and co-founder behind Eduroute.</p>
           </div>
 
-          <div className="mx-auto max-w-md rounded-3xl border border-white/70 bg-white/70 p-6 text-center shadow-xl shadow-slate-200/60 backdrop-blur-xl">
-            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#0A66C2] text-white">
-              <Linkedin className="h-6 w-6" />
+          <div className="mx-auto grid w-full max-w-4xl gap-6 md:grid-cols-2">
+            <div className="rounded-3xl border border-white/70 bg-white/70 p-6 text-center shadow-xl shadow-slate-200/60 backdrop-blur-xl">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#0A66C2] text-white">
+                <Linkedin className="h-6 w-6" />
+              </div>
+              <h3 className="text-2xl font-black text-slate-900">Vansh Khandelwal</h3>
+              <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-slate-500">Founder, Eduroute</p>
+              <a
+                href={founderLinkedinUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/30 bg-[#0A66C2] px-6 py-3 font-bold text-white shadow-lg shadow-[#0A66C2]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#004182]"
+              >
+                <Linkedin className="h-5 w-5" />
+                Connect on LinkedIn
+              </a>
             </div>
-            <h3 className="text-2xl font-black text-slate-900">Vansh Khandelwal</h3>
-            <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-slate-500">Founder, Eduroute</p>
-            <a
-              href={linkedinUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/30 bg-[#0A66C2] px-6 py-3 font-bold text-white shadow-lg shadow-[#0A66C2]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#004182]"
-            >
-              <Linkedin className="h-5 w-5" />
-              Connect on LinkedIn
-            </a>
+
+            <div className="rounded-3xl border border-white/70 bg-white/70 p-6 text-center shadow-xl shadow-slate-200/60 backdrop-blur-xl">
+              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#0A66C2] text-white">
+                <Linkedin className="h-6 w-6" />
+              </div>
+              <h3 className="text-2xl font-black text-slate-900">Deepesh Chauhan</h3>
+              <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-slate-500">Co-Founder, Eduroute</p>
+              <a
+                href={coFounderLinkedinUrl}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/30 bg-[#0A66C2] px-6 py-3 font-bold text-white shadow-lg shadow-[#0A66C2]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#004182]"
+              >
+                <Linkedin className="h-5 w-5" />
+                Connect on LinkedIn
+              </a>
+            </div>
           </div>
         </div>
       </section>
@@ -193,7 +213,7 @@ export const LandingPage = () => {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6 lg:px-8">
           <p className="text-sm font-semibold text-slate-500">© {new Date().getFullYear()} Eduroute. All rights reserved.</p>
           <a
-            href={linkedinUrl}
+            href={founderLinkedinUrl}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/30 bg-[#0A66C2] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#0A66C2]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#004182]"
