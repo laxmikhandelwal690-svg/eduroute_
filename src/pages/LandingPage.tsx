@@ -6,7 +6,7 @@ import { AuthModal } from '../components/AuthModal';
 export const LandingPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const demoSectionRef = useRef<HTMLElement | null>(null);
-  const linkedinUrl = 'https://www.linkedin.com/in/vansh-khandelwal-22636a373';
+  const linkedinUrl = 'https://www.linkedin.com/in/deepesh-chauhan-a12413382';
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-100">
@@ -167,15 +167,15 @@ export const LandingPage = () => {
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 text-center">
             <h2 className="mb-3 text-4xl font-black text-slate-900">About the Team</h2>
-            <p className="text-lg font-medium text-slate-500">Meet the builder behind Eduroute.</p>
+            <p className="text-lg font-medium text-slate-500">Meet the co-founder behind Eduroute.</p>
           </div>
 
           <div className="mx-auto max-w-md rounded-3xl border border-white/70 bg-white/70 p-6 text-center shadow-xl shadow-slate-200/60 backdrop-blur-xl">
             <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#0A66C2] text-white">
               <Linkedin className="h-6 w-6" />
             </div>
-            <h3 className="text-2xl font-black text-slate-900">Vansh Khandelwal</h3>
-            <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-slate-500">Founder, Eduroute</p>
+            <h3 className="text-2xl font-black text-slate-900">Deepesh Chauhan</h3>
+            <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-slate-500">Co-Founder, Eduroute</p>
             <a
               href={linkedinUrl}
               target="_blank"
