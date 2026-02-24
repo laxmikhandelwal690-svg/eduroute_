@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Mail, Lock, User, ShieldCheck, ArrowRight } from 'lucide-react';
 import { parseGoogleCredential, saveUserProfile } from '../../utils/userProfile';
+import { apiRegisterUser, apiSendOtp } from '../../utils/authApi';
 
 const GOOGLE_CLIENT_SCRIPT_ID = 'google-identity-services';
 
@@ -27,6 +28,7 @@ export const Signup = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({ name: '', email: '', password: '' });
   const [googleError, setGoogleError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const googleButtonRef = useRef<HTMLDivElement | null>(null);
   const googleClientId = useMemo(
     () => import.meta.env.VITE_GOOGLE_CLIENT_ID?.trim() || '234757313390-8ihis6sl6h1635ievvaitfcjjndqv1je.apps.googleusercontent.com',
@@ -91,15 +93,31 @@ export const Signup = () => {
     };
   }, [googleClientId, navigate]);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+    setIsSubmitting(true);
 
-    saveUserProfile({
-      name: formData.name.trim(),
-      email: formData.email.trim(),
-    });
+    try {
+      const payload = {
+        name: formData.name.trim(),
+        email: formData.email.trim(),
+        password: formData.password,
+      };
 
-    navigate('/verify-otp');
+      saveUserProfile({ name: payload.name, email: payload.email });
+
+      try {
+        const registerResponse = await apiRegisterUser(payload);
+        localStorage.setItem('eduroute:auth-token', registerResponse.token);
+        await apiSendOtp(payload.email);
+      } catch (error) {
+        console.warn('Signup API unavailable, continuing with local OTP flow.', error);
+      }
+
+      navigate('/verify-otp', { state: { email: payload.email } });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -173,16 +191,18 @@ export const Signup = () => {
             <div className="flex items-start gap-3 p-4 bg-indigo-50 rounded-xl">
               <ShieldCheck className="h-5 w-5 text-indigo-600 mt-0.5 shrink-0" />
               <p className="text-xs text-indigo-700">
-                Verify your college ID later to get student-exclusive rewards and certifications.
+                Verify your email with a one-time password for account security.
               </p>
             </div>
+
 
             <div>
               <button
                 type="submit"
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-95"
+                disabled={isSubmitting}
+                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-95"
               >
-                Sign up <ArrowRight className="ml-2 h-4 w-4" />
+                {isSubmitting ? 'Creating account...' : 'Sign up'} <ArrowRight className="ml-2 h-4 w-4" />
               </button>
             </div>
           </form>
