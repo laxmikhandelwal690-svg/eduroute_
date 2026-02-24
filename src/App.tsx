@@ -54,6 +54,7 @@ const CompanyDetail = lazy(() => import('./pages/Career/CompanyDetail').then((mo
 const Events = lazy(() => import('./pages/Growth/Events').then((module) => ({ default: module.Events })));
 const SoftSkills = lazy(() => import('./pages/Growth/SoftSkills').then((module) => ({ default: module.SoftSkills })));
 const AdminDashboard = lazy(() => import('./pages/Admin/AdminDashboard').then((module) => ({ default: module.AdminDashboard })));
+const ProfileDashboard = lazy(() => import('./pages/Profile/ProfileDashboard').then((module) => ({ default: module.ProfileDashboard })));
 
 const PageLoader = () => <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500 font-semibold">Loading...</div>;
 
@@ -84,6 +85,7 @@ export function App() {
             <Route path="/companies/:id" element={<RoleRoute role="student"><CompanyDetail /></RoleRoute>} />
             <Route path="/events" element={<RoleRoute role="student"><Events /></RoleRoute>} />
             <Route path="/soft-skills" element={<RoleRoute role="student"><SoftSkills /></RoleRoute>} />
+            <Route path="/profile" element={<RoleRoute role="student"><ProfileDashboard /></RoleRoute>} />
             <Route path="/admin" element={<RoleRoute role="admin"><AdminDashboard /></RoleRoute>} />
           </Route>
 
