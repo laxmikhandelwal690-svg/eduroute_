@@ -10,8 +10,7 @@ export const VerifyCollege = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const completeVerification = () => {
-    localStorage.setItem('eduroute:is-authenticated', 'true');
-    navigate('/dashboard');
+    navigate('/');
   };
 
   const handleUpload = (event: React.FormEvent) => {
@@ -107,7 +106,7 @@ export const VerifyCollege = () => {
                 onClick={completeVerification}
                 className="inline-flex items-center px-8 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all group"
               >
-                Go to Dashboard <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                Go to Home <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           )}
