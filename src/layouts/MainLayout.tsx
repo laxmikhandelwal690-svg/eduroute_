@@ -1,4 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
+import { getAuthUser } from '../utils/rbacAuth';
+import { getStoredUserProfile } from '../utils/userProfile';
 import {
   LayoutDashboard,
   Map,
@@ -13,7 +15,7 @@ import {
   Menu,
   X
 } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
 const NAVIGATION = [
   { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -30,14 +32,33 @@ export const MainLayout = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const profileIdentity = useMemo(() => {
+    const authUser = getAuthUser();
+    const storedProfile = getStoredUserProfile();
+
+    const name = authUser?.name || storedProfile?.name || 'Learner';
+    const photo = storedProfile?.avatar || '';
+
+    return {
+      name,
+      photo,
+      initial: name.trim().charAt(0).toUpperCase() || 'L',
+    };
+  }, []);
+
   return (
     <div className="flex h-screen bg-slate-50">
       {/* Sidebar Desktop */}
       <aside className="hidden lg:flex w-72 flex-col border-r border-slate-200 bg-white">
-        <div className="p-6 border-b border-slate-100">
+        <div className="p-6 border-b border-slate-100 flex items-center justify-between gap-2">
           <Link to="/dashboard" className="flex items-center gap-3">
             <div className="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl">E</div>
             <span className="text-xl font-bold text-slate-900">EDUROUTE</span>
+          </Link>
+          <Link to="/profile" className="group" aria-label="Open profile dashboard">
+            <div className="h-10 w-10 overflow-hidden rounded-full border border-slate-200 bg-indigo-600 text-white flex items-center justify-center font-bold shadow-sm group-hover:scale-105">
+              {profileIdentity.photo ? <img src={profileIdentity.photo} alt={profileIdentity.name} className="h-full w-full object-cover" /> : profileIdentity.initial}
+            </div>
           </Link>
         </div>
 
@@ -85,12 +106,17 @@ export const MainLayout = () => {
           <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg">E</div>
           <span className="text-lg font-bold text-slate-900">EDUROUTE</span>
         </Link>
-        <button
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-          className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
-        >
-          {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        <div className="flex items-center gap-2">
+          <Link to="/profile" className="h-9 w-9 overflow-hidden rounded-full border border-slate-200 bg-indigo-600 text-white flex items-center justify-center font-bold" aria-label="Open profile dashboard">
+            {profileIdentity.photo ? <img src={profileIdentity.photo} alt={profileIdentity.name} className="h-full w-full object-cover" /> : profileIdentity.initial}
+          </Link>
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 hover:bg-slate-100 rounded-xl transition-colors"
+          >
+            {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
