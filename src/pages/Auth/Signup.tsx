@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowRight, Lock, Mail, Sparkles, User } from 'lucide-react';
-import { apiRegisterUser, apiSendOtp } from '../../utils/authApi';
+import { apiRegisterUser } from '../../utils/authApi';
 import { saveAuthSession } from '../../utils/rbacAuth';
 import { parseGoogleCredential, saveUserProfile } from '../../utils/userProfile';
 
@@ -169,13 +169,11 @@ export const Signup = () => {
       console.log('[Signup] Register request started for:', payload.email);
       const registerResponse = await apiRegisterUser(payload);
 
-      saveAuthSession(registerResponse.token, registerResponse.user);
+      localStorage.setItem('eduroute:auth-token', registerResponse.token);
       saveUserProfile({ name: payload.name, email: payload.email });
 
-      await apiSendOtp(payload.email);
-
-      console.log('[Signup] Registration successful, redirecting to /verify-otp');
-      navigate('/verify-otp', { state: { email: payload.email } });
+      console.log('[Signup] Registration successful, redirecting to /verify-college');
+      navigate('/verify-college');
     } catch (error) {
       console.error('[Signup] Registration failed:', error);
       setApiError(error instanceof Error ? error.message : 'Signup failed. Please try again.');
