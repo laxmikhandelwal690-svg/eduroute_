@@ -13,6 +13,8 @@ const OTP_TTL_MS = 5 * 60 * 1000;
 const RESEND_COOLDOWN_MS = 60 * 1000;
 const OTP_LENGTH = 6;
 const MAX_VERIFY_ATTEMPTS = 5;
+const MIN_PASSWORD_LENGTH = 8;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const pendingRegisterRateLimiter = rateLimit({
   windowMs: 10 * 60 * 1000,
@@ -109,6 +111,20 @@ router.post('/register', pendingRegisterRateLimiter, async (req, res) => {
     }
 
     const normalizedEmail = email.toLowerCase().trim();
+    const trimmedName = name.trim();
+
+    if (!trimmedName) {
+      return res.status(400).json({ success: false, error: 'Name is required' });
+    }
+
+    if (!EMAIL_REGEX.test(normalizedEmail)) {
+      return res.status(400).json({ success: false, error: 'Please enter a valid email address' });
+    }
+
+    if (password.length < MIN_PASSWORD_LENGTH) {
+      return res.status(400).json({ success: false, error: `Password must be at least ${MIN_PASSWORD_LENGTH} characters` });
+    }
+
     const existingUser = await User.findOne({ email: normalizedEmail });
 
     if (existingUser) {
@@ -117,7 +133,7 @@ router.post('/register', pendingRegisterRateLimiter, async (req, res) => {
 
     const passwordHash = await bcrypt.hash(password, BCRYPT_ROUNDS);
     const user = await User.create({
-      name: name.trim(),
+      name: trimmedName,
       email: normalizedEmail,
       password: passwordHash,
       role: 'student',

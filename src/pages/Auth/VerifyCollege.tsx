@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { saveAuthSession } from '../../utils/rbacAuth';
+import { getStoredUserProfile } from '../../utils/userProfile';
 import { motion } from 'framer-motion';
 import { Upload, CheckCircle2, Info, ChevronRight } from 'lucide-react';
 
@@ -10,7 +12,17 @@ export const VerifyCollege = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const completeVerification = () => {
-    localStorage.setItem('eduroute:is-authenticated', 'true');
+    const storedProfile = getStoredUserProfile();
+    const token = localStorage.getItem('eduroute:auth-token') || 'pending-verification-session';
+
+    saveAuthSession(token, {
+      id: storedProfile?.email ? `pending-${storedProfile.email}` : `pending-${Date.now()}`,
+      name: storedProfile?.name || 'Student',
+      email: storedProfile?.email || 'student@eduroute.app',
+      role: 'student',
+      verificationStatus: 'pending',
+    });
+
     navigate('/dashboard');
   };
 
