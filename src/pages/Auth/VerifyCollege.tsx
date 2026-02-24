@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { saveAuthSession } from '../../utils/rbacAuth';
+import { getStoredUserProfile } from '../../utils/userProfile';
 import { motion } from 'framer-motion';
 import { Upload, CheckCircle2, Info, ChevronRight } from 'lucide-react';
 
@@ -10,7 +12,18 @@ export const VerifyCollege = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const completeVerification = () => {
-    navigate('/');
+    const storedProfile = getStoredUserProfile();
+    const token = localStorage.getItem('eduroute:auth-token') || 'pending-verification-session';
+
+    saveAuthSession(token, {
+      id: storedProfile?.email ? `pending-${storedProfile.email}` : `pending-${Date.now()}`,
+      name: storedProfile?.name || 'Student',
+      email: storedProfile?.email || 'student@eduroute.app',
+      role: 'student',
+      verificationStatus: 'pending',
+    });
+
+    navigate('/dashboard');
   };
 
   const handleUpload = (event: React.FormEvent) => {
@@ -106,7 +119,7 @@ export const VerifyCollege = () => {
                 onClick={completeVerification}
                 className="inline-flex items-center px-8 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-all group"
               >
-                Go to Home <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                Go to Dashboard <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           )}
