@@ -1,11 +1,22 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { Mail, Lock, User, ShieldCheck, ArrowRight } from 'lucide-react';
-import { parseGoogleCredential, saveUserProfile } from '../../utils/userProfile';
+import { ArrowRight, Lock, Mail, Sparkles, User } from 'lucide-react';
 import { apiRegisterUser, apiSendOtp } from '../../utils/authApi';
+import { saveAuthSession } from '../../utils/rbacAuth';
+import { parseGoogleCredential, saveUserProfile } from '../../utils/userProfile';
 
 const GOOGLE_CLIENT_SCRIPT_ID = 'google-identity-services';
+const MIN_PASSWORD_LENGTH = 8;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+type SignupForm = {
+  name: string;
+  email: string;
+  password: string;
+};
+
+type FormErrors = Partial<Record<keyof SignupForm, string>>;
 
 const loadGoogleScript = () => {
   if (document.getElementById(GOOGLE_CLIENT_SCRIPT_ID)) {
@@ -24,11 +35,34 @@ const loadGoogleScript = () => {
   });
 };
 
+const validateForm = (formData: SignupForm): FormErrors => {
+  const errors: FormErrors = {};
+
+  if (!formData.name.trim()) {
+    errors.name = 'Full name is required.';
+  }
+
+  if (!formData.email.trim()) {
+    errors.email = 'Email is required.';
+  } else if (!EMAIL_REGEX.test(formData.email.trim())) {
+    errors.email = 'Please enter a valid email address.';
+  }
+
+  if (!formData.password) {
+    errors.password = 'Password is required.';
+  } else if (formData.password.length < MIN_PASSWORD_LENGTH) {
+    errors.password = `Password must be at least ${MIN_PASSWORD_LENGTH} characters.`;
+  }
+
+  return errors;
+};
+
 export const Signup = () => {
   const navigate = useNavigate();
-  const [formData, setFormData] = useState({ name: '', email: '', password: '' });
-  const [googleError, setGoogleError] = useState<string | null>(null);
+  const [formData, setFormData] = useState<SignupForm>({ name: '', email: '', password: '' });
+  const [formErrors, setFormErrors] = useState<FormErrors>({});
   const [apiError, setApiError] = useState<string | null>(null);
+  const [googleError, setGoogleError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const googleButtonRef = useRef<HTMLDivElement | null>(null);
   const googleClientId = useMemo(
@@ -61,11 +95,21 @@ export const Signup = () => {
             }
 
             const googleProfile = parseGoogleCredential(credential);
-            if (googleProfile) {
-              saveUserProfile(googleProfile);
+            if (!googleProfile) {
+              setGoogleError('Unable to read your Google profile. Please use email sign up.');
+              return;
             }
 
-            localStorage.setItem('eduroute:is-authenticated', 'true');
+            saveUserProfile(googleProfile);
+            saveAuthSession(credential, {
+              id: `google-${googleProfile.email}`,
+              name: googleProfile.name,
+              email: googleProfile.email,
+              role: 'student',
+              verificationStatus: 'verified',
+            });
+
+            console.log('[Signup] Google sign-up success, redirecting to /dashboard');
             navigate('/dashboard');
           },
         });
@@ -77,10 +121,11 @@ export const Signup = () => {
           shape: 'pill',
           text: 'signup_with',
           width: 320,
-          theme: 'outline',
+          theme: 'filled_black',
           logo_alignment: 'left',
         });
-      } catch {
+      } catch (error) {
+        console.error('[Signup] Google button setup failed:', error);
         if (isMounted) {
           setGoogleError('Unable to load Google sign up right now. Please use email sign up.');
         }
@@ -94,27 +139,45 @@ export const Signup = () => {
     };
   }, [googleClientId, navigate]);
 
+  const handleInputChange = (field: keyof SignupForm, value: string) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+    setFormErrors((prev) => ({ ...prev, [field]: undefined }));
+    setApiError(null);
+  };
+
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setApiError(null);
+
+    const errors = validateForm(formData);
+    setFormErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      console.warn('[Signup] Form validation failed:', errors);
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
       const payload = {
         name: formData.name.trim(),
-        email: formData.email.trim(),
+        email: formData.email.trim().toLowerCase(),
         password: formData.password,
       };
 
+      console.log('[Signup] Register request started for:', payload.email);
       const registerResponse = await apiRegisterUser(payload);
-      localStorage.setItem('eduroute:auth-token', registerResponse.token);
 
+      saveAuthSession(registerResponse.token, registerResponse.user);
       saveUserProfile({ name: payload.name, email: payload.email });
 
       await apiSendOtp(payload.email);
 
+      console.log('[Signup] Registration successful, redirecting to /verify-otp');
       navigate('/verify-otp', { state: { email: payload.email } });
     } catch (error) {
+      console.error('[Signup] Registration failed:', error);
       setApiError(error instanceof Error ? error.message : 'Signup failed. Please try again.');
     } finally {
       setIsSubmitting(false);
@@ -122,107 +185,101 @@ export const Signup = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md">
-        <Link to="/" className="flex justify-center items-center gap-2">
-          <div className="h-12 w-12 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-2xl shadow-lg">E</div>
-          <span className="text-2xl font-bold text-slate-900 tracking-tight">EDUROUTE</span>
-        </Link>
-        <h2 className="mt-6 text-center text-3xl font-extrabold text-slate-900">Create your account</h2>
-        <p className="mt-2 text-center text-sm text-slate-600">
-          Or{' '}
-          <Link to="/login" className="font-medium text-indigo-600 hover:text-indigo-500">
-            sign in to your existing account
-          </Link>
-        </p>
-      </div>
+    <div className="relative min-h-screen overflow-hidden bg-slate-950 px-4 py-10 font-['Inter',sans-serif] sm:px-6">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.24),transparent_38%),radial-gradient(circle_at_bottom,_rgba(139,92,246,0.26),transparent_45%)]" />
+      <div className="pointer-events-none absolute inset-0 opacity-30 [background-image:linear-gradient(rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:36px_36px]" />
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+      <div className="relative mx-auto flex min-h-[calc(100vh-5rem)] max-w-md items-center justify-center">
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white py-8 px-4 shadow-xl shadow-slate-200/50 sm:rounded-3xl sm:px-10 border border-slate-100"
+          className="w-full rounded-[2rem] border border-white/20 bg-white/10 p-7 shadow-[0_20px_70px_rgba(8,47,73,0.45)] backdrop-blur-xl sm:p-9"
         >
-          <form className="space-y-6" onSubmit={handleSubmit}>
+          <Link to="/" className="mb-8 flex items-center justify-center gap-3">
+            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-cyan-400 to-violet-500 text-lg font-black text-slate-900 shadow-[0_0_28px_rgba(56,189,248,0.45)]">E</div>
+            <span className="text-xl font-semibold tracking-[0.2em] text-white">EDUROUTE</span>
+          </Link>
+
+          <p className="text-center text-sm text-cyan-200">Create Account Today</p>
+          <h1 className="mt-2 text-center text-3xl font-semibold text-white">Start your learning journey</h1>
+
+          <form className="mt-8 space-y-4" onSubmit={handleSubmit} noValidate>
             <div>
-              <label className="block text-sm font-medium text-slate-700">Full Name</label>
-              <div className="mt-1 relative">
-                <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-slate-300">Name</label>
+              <div className="relative">
+                <User className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
-                  required
-                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="John Doe"
                   value={formData.name}
-                  onChange={(event) => setFormData({ ...formData, name: event.target.value })}
+                  onChange={(event) => handleInputChange('name', event.target.value)}
+                  placeholder="Enter full name"
+                  className="w-full rounded-2xl border border-white/15 bg-slate-900/60 py-3 pl-11 pr-4 text-sm text-white placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
                 />
               </div>
+              {formErrors.name ? <p className="mt-1 text-xs text-rose-300">{formErrors.name}</p> : null}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700">Email address</label>
-              <div className="mt-1 relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-slate-300">Email</label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   type="email"
-                  required
-                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="you@example.com"
                   value={formData.email}
-                  onChange={(event) => setFormData({ ...formData, email: event.target.value })}
+                  onChange={(event) => handleInputChange('email', event.target.value)}
+                  placeholder="Enter email"
+                  className="w-full rounded-2xl border border-white/15 bg-slate-900/60 py-3 pl-11 pr-4 text-sm text-white placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
                 />
               </div>
+              {formErrors.email ? <p className="mt-1 text-xs text-rose-300">{formErrors.email}</p> : null}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-slate-700">Password</label>
-              <div className="mt-1 relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
+              <label className="mb-2 block text-xs font-medium uppercase tracking-wide text-slate-300">Password</label>
+              <div className="relative">
+                <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
                 <input
                   type="password"
-                  required
-                  className="appearance-none block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-xl shadow-sm placeholder-slate-400 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  placeholder="••••••••"
                   value={formData.password}
-                  onChange={(event) => setFormData({ ...formData, password: event.target.value })}
+                  onChange={(event) => handleInputChange('password', event.target.value)}
+                  placeholder="Enter password"
+                  className="w-full rounded-2xl border border-white/15 bg-slate-900/60 py-3 pl-11 pr-4 text-sm text-white placeholder:text-slate-400 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/30"
                 />
               </div>
+              {formErrors.password ? <p className="mt-1 text-xs text-rose-300">{formErrors.password}</p> : null}
             </div>
 
-            <div className="flex items-start gap-3 p-4 bg-indigo-50 rounded-xl">
-              <ShieldCheck className="h-5 w-5 text-indigo-600 mt-0.5 shrink-0" />
-              <p className="text-xs text-indigo-700">
-                Verify your email with a one-time password for account security.
-              </p>
-            </div>
+            {apiError ? <p className="rounded-xl border border-rose-300/40 bg-rose-500/10 px-3 py-2 text-sm text-rose-200">{apiError}</p> : null}
 
-            {apiError ? <p className="text-sm text-red-600">{apiError}</p> : null}
-
-            <div>
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full flex justify-center py-3 px-4 border border-transparent rounded-xl shadow-lg text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:bg-indigo-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all active:scale-95"
-              >
-                {isSubmitting ? 'Creating account...' : 'Sign up'} <ArrowRight className="ml-2 h-4 w-4" />
-              </button>
-            </div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="group mt-2 flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-400 to-violet-500 px-4 py-3.5 text-sm font-semibold text-slate-900 shadow-[0_8px_30px_rgba(56,189,248,0.4)] transition-all hover:scale-[1.01] hover:shadow-[0_10px_34px_rgba(139,92,246,0.45)] disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {isSubmitting ? 'Creating account...' : 'Sign Up'}
+              <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+            </button>
           </form>
 
-          <div className="mt-6">
-            <div className="relative">
-              <div className="absolute inset-0 flex items-center">
-                <div className="w-full border-t border-slate-200" />
-              </div>
-              <div className="relative flex justify-center text-sm">
-                <span className="px-2 bg-white text-slate-500">Or continue with</span>
-              </div>
-            </div>
+          <div className="my-6 flex items-center gap-3 text-xs text-slate-400">
+            <div className="h-px flex-1 bg-white/20" />
+            or continue with
+            <div className="h-px flex-1 bg-white/20" />
+          </div>
 
-            <div className="mt-6 flex justify-center">
-              <div ref={googleButtonRef} aria-label="Google sign up" />
-            </div>
-            {googleError ? <p className="mt-3 text-center text-xs text-amber-600">{googleError}</p> : null}
+          <div ref={googleButtonRef} aria-label="Google sign up" className="flex justify-center" />
+          {googleError ? <p className="mt-3 text-center text-xs text-amber-200">{googleError}</p> : null}
+
+          <div className="mt-6 text-center text-sm text-slate-300">
+            Already have an account?{' '}
+            <Link to="/login" className="font-semibold text-cyan-300 transition-colors hover:text-cyan-200">
+              Sign in
+            </Link>
+          </div>
+
+          <div className="mt-5 flex items-center justify-center gap-2 text-xs text-slate-400">
+            <Sparkles className="h-4 w-4" />
+            Secure OTP verification after signup
           </div>
         </motion.div>
       </div>
