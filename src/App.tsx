@@ -1,6 +1,7 @@
 import { Suspense, lazy, type ReactElement } from 'react';
-import { BrowserRouter as Router, Navigate, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { getAuthUser, isAuthenticated } from './utils/rbacAuth';
+import { ThemeToggle } from './components/ThemeToggle';
 
 const ProtectedRoute = ({ children }: { children: ReactElement }) => {
   if (!isAuthenticated()) {
@@ -54,12 +55,29 @@ const CompanyDetail = lazy(() => import('./pages/Career/CompanyDetail').then((mo
 const Events = lazy(() => import('./pages/Growth/Events').then((module) => ({ default: module.Events })));
 const SoftSkills = lazy(() => import('./pages/Growth/SoftSkills').then((module) => ({ default: module.SoftSkills })));
 const AdminDashboard = lazy(() => import('./pages/Admin/AdminDashboard').then((module) => ({ default: module.AdminDashboard })));
+const ProfileDashboard = lazy(() => import('./pages/Profile/ProfileDashboard').then((module) => ({ default: module.ProfileDashboard })));
 
 const PageLoader = () => <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500 font-semibold">Loading...</div>;
+
+const DASHBOARD_ROUTES = ['/dashboard', '/courses', '/browse', '/course/', '/paths', '/roadmaps', '/assessments', '/buddy', '/leaderboard', '/rewards', '/internships', '/events', '/soft-skills', '/admin', '/profile'];
+
+const GlobalThemeButton = () => {
+  const location = useLocation();
+  const isDashboardArea = DASHBOARD_ROUTES.some((route) => location.pathname === route || location.pathname.startsWith(route));
+
+  if (isDashboardArea) return null;
+
+  return (
+    <div className="fixed right-5 top-5 z-[80]">
+      <ThemeToggle />
+    </div>
+  );
+};
 
 export function App() {
   return (
     <Router>
+      <GlobalThemeButton />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<LandingPage />} />
@@ -84,6 +102,7 @@ export function App() {
             <Route path="/companies/:id" element={<RoleRoute role="student"><CompanyDetail /></RoleRoute>} />
             <Route path="/events" element={<RoleRoute role="student"><Events /></RoleRoute>} />
             <Route path="/soft-skills" element={<RoleRoute role="student"><SoftSkills /></RoleRoute>} />
+            <Route path="/profile" element={<RoleRoute role="student"><ProfileDashboard /></RoleRoute>} />
             <Route path="/admin" element={<RoleRoute role="admin"><AdminDashboard /></RoleRoute>} />
           </Route>
 

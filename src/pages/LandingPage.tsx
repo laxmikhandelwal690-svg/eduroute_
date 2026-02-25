@@ -1,12 +1,27 @@
 import { useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Rocket, Target, BookOpen, ChevronRight, Play, Sparkles, Trophy, Briefcase, Linkedin } from 'lucide-react';
+import { Rocket, Target, BookOpen, ChevronRight, Play, Sparkles, Trophy, Briefcase, Linkedin, Instagram, Mail, Phone, MessageCircle } from 'lucide-react';
 import { AuthModal } from '../components/AuthModal';
 
 export const LandingPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const demoSectionRef = useRef<HTMLElement | null>(null);
-  const linkedinUrl = 'https://www.linkedin.com/in/vansh-khandelwal-22636a373';
+const teamMembers = [
+  {
+    name: 'Vansh Khandelwal',
+    role: 'Founder, EduRoutee',
+    profileUrl: 'https://www.linkedin.com/in/vansh-khandelwal-22636a373',
+    instagram: 'https://www.instagram.com/vanshkhandelwal28/',
+    whatsapp: 'https://wa.link/9mfubu',
+    email: 'vanshkhandelwal777@gmail.com',
+    phone: '+91 7898140600'
+  },
+  {
+    name: 'Deepesh Chauhan',
+    role: 'Co-Founder, EduRoutee',
+    profileUrl: 'https://www.linkedin.com/in/deepesh-chauhan-a12413382'
+  }
+];
   const teamMembers = [
     {
       name: 'Vansh Khandelwal',
@@ -21,7 +36,7 @@ export const LandingPage = () => {
   ];
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-slate-100">
+    <div id="home" className="relative min-h-screen overflow-hidden bg-slate-100">
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
 
       <header className="relative z-20 border-b border-white/60 bg-white/65 backdrop-blur-xl">
@@ -175,7 +190,33 @@ export const LandingPage = () => {
          </div>
       </section>
 
-      <section className="relative py-20">
+      <section id="about-eduroutee" className="relative py-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-[40px] border border-white/60 bg-white/65 p-8 shadow-xl shadow-slate-200/60 backdrop-blur-xl sm:p-12">
+            <h2 className="mb-5 text-4xl font-black text-slate-900">About EduRoutee</h2>
+            <p className="text-lg font-medium leading-relaxed text-slate-600">
+              EduRoutee is a smart learning roadmap platform designed to help students plan, track, and optimize their
+              learning journey. Students waste time because they don’t know what to learn and in what order. EduRoutee
+              provides structured roadmaps, AI guidance, and progress tracking in one platform to help students build
+              skills efficiently and achieve career success.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="problem-statement" className="relative pb-20">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-[40px] border border-white/60 bg-white/65 p-8 shadow-xl shadow-slate-200/60 backdrop-blur-xl sm:p-12">
+            <h2 className="mb-5 text-4xl font-black text-slate-900">Problem Statement</h2>
+            <p className="text-lg font-medium leading-relaxed text-slate-600">
+              Students waste time because they don’t know what to learn and in what order. EduRoutee solves this by
+              providing structured learning roadmaps, AI-based guidance, and progress tracking in one platform.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section id="team" className="relative py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 text-center">
             <h2 className="mb-3 text-4xl font-black text-slate-900">About the Team</h2>
@@ -208,18 +249,74 @@ export const LandingPage = () => {
         </div>
       </section>
 
-      <footer className="relative border-t border-white/60 bg-white/65 py-10 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 sm:flex-row sm:px-6 lg:px-8">
-          <p className="text-sm font-semibold text-slate-500">© {new Date().getFullYear()} Eduroute. All rights reserved.</p>
-          <a
-            href={linkedinUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/30 bg-[#0A66C2] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#0A66C2]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#004182]"
-          >
-            <Linkedin className="h-4 w-4" />
-            Connect on LinkedIn
-          </a>
+      <footer className="relative border-t border-white/60 bg-white/65 py-14 backdrop-blur-xl">
+        <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
+          <div className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg shadow-slate-200/50">
+            <p className="mb-4 text-lg font-black text-slate-900">EduRoutee</p>
+            <p className="text-sm font-medium leading-relaxed text-slate-500">
+              A smart roadmap platform helping students learn in the right order and reach career goals faster.
+            </p>
+          </div>
+
+          <div className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg shadow-slate-200/50">
+            <h3 className="mb-4 text-lg font-black text-slate-900">Contact Us</h3>
+            <div className="space-y-3 text-sm font-medium text-slate-600">
+              <a href={`mailto:${contactEmail}`} className="flex items-center gap-2 transition-colors hover:text-emerald-700">
+                <Mail className="h-4 w-4" />
+                {contactEmail}
+              </a>
+              <a href={`tel:${contactPhone.replace(/\s/g, '')}`} className="flex items-center gap-2 transition-colors hover:text-emerald-700">
+                <Phone className="h-4 w-4" />
+                {contactPhone}
+              </a>
+              <a href={instagramUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 transition-colors hover:text-emerald-700">
+                <Instagram className="h-4 w-4" />
+                Instagram Profile
+              </a>
+              <a href={whatsappUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 transition-colors hover:text-emerald-700">
+                <MessageCircle className="h-4 w-4" />
+                WhatsApp Chat
+              </a>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg shadow-slate-200/50">
+            <h3 className="mb-4 text-lg font-black text-slate-900">Quick Links</h3>
+            <div className="grid gap-3 text-sm font-semibold text-slate-600">
+              <a href="/" className="transition-colors hover:text-emerald-700">Home</a>
+              <a href="#about-eduroutee" className="transition-colors hover:text-emerald-700">About</a>
+              <a href="/roadmaps" className="transition-colors hover:text-emerald-700">Roadmaps</a>
+              <a href="/dashboard" className="transition-colors hover:text-emerald-700">Dashboard</a>
+              <a href="#team" className="transition-colors hover:text-emerald-700">Team</a>
+            </div>
+          </div>
+
+          <div className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg shadow-slate-200/50">
+            <h3 className="mb-4 text-lg font-black text-slate-900">Follow Us</h3>
+            <div className="flex flex-wrap items-center gap-3">
+              {[
+                { icon: Instagram, label: 'Instagram', href: instagramUrl },
+                { icon: Mail, label: 'Email', href: `mailto:${contactEmail}` },
+                { icon: Phone, label: 'Phone', href: `tel:${contactPhone.replace(/\s/g, '')}` },
+                { icon: MessageCircle, label: 'WhatsApp', href: whatsappUrl },
+              ].map((social) => (
+                <a
+                  key={social.label}
+                  href={social.href}
+                  target={social.href.startsWith('http') ? '_blank' : undefined}
+                  rel={social.href.startsWith('http') ? 'noreferrer' : undefined}
+                  aria-label={social.label}
+                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/80 bg-white text-slate-700 shadow-md shadow-slate-200/60 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:text-emerald-700"
+                >
+                  <social.icon className="h-5 w-5" />
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+
+        <div className="mx-auto mt-8 max-w-7xl border-t border-white/60 px-4 pt-6 text-center sm:px-6 lg:px-8">
+          <p className="text-sm font-semibold text-slate-500">© {new Date().getFullYear()} EduRoutee. All rights reserved.</p>
         </div>
       </footer>
     </div>
