@@ -8,6 +8,18 @@ export const LandingPage = () => {
   const demoSectionRef = useRef<HTMLElement | null>(null);
   const founderLinkedinUrl = 'https://www.linkedin.com/in/vansh-khandelwal-22636a373/';
   const coFounderLinkedinUrl = 'https://www.linkedin.com/in/deepesh-chauhan-a12413382';
+  const teamMembers = [
+    {
+      name: 'Vansh Khandelwal',
+      role: 'Founder, Eduroute',
+      profileUrl: founderLinkedinUrl,
+    },
+    {
+      name: 'Deepesh Chauhan',
+      role: 'Co-Founder, Eduroute',
+      profileUrl: coFounderLinkedinUrl,
+    },
+  ];
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-slate-100">
@@ -172,39 +184,27 @@ export const LandingPage = () => {
           </div>
 
           <div className="mx-auto grid w-full max-w-4xl gap-6 md:grid-cols-2">
-            <div className="rounded-3xl border border-white/70 bg-white/70 p-6 text-center shadow-xl shadow-slate-200/60 backdrop-blur-xl">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#0A66C2] text-white">
-                <Linkedin className="h-6 w-6" />
-              </div>
-              <h3 className="text-2xl font-black text-slate-900">Vansh Khandelwal</h3>
-              <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-slate-500">Founder, Eduroute</p>
-              <a
-                href={founderLinkedinUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/30 bg-[#0A66C2] px-6 py-3 font-bold text-white shadow-lg shadow-[#0A66C2]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#004182]"
+            {teamMembers.map((member) => (
+              <div
+                key={member.name}
+                className="rounded-3xl border border-white/70 bg-white/70 p-6 text-center shadow-xl shadow-slate-200/60 backdrop-blur-xl"
               >
-                <Linkedin className="h-5 w-5" />
-                Connect on LinkedIn
-              </a>
-            </div>
-
-            <div className="rounded-3xl border border-white/70 bg-white/70 p-6 text-center shadow-xl shadow-slate-200/60 backdrop-blur-xl">
-              <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#0A66C2] text-white">
-                <Linkedin className="h-6 w-6" />
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#0A66C2] text-white">
+                  <Linkedin className="h-6 w-6" />
+                </div>
+                <h3 className="text-2xl font-black text-slate-900">{member.name}</h3>
+                <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-slate-500">{member.role}</p>
+                <a
+                  href={member.profileUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/30 bg-[#0A66C2] px-6 py-3 font-bold text-white shadow-lg shadow-[#0A66C2]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#004182]"
+                >
+                  <Linkedin className="h-5 w-5" />
+                  Connect on LinkedIn
+                </a>
               </div>
-              <h3 className="text-2xl font-black text-slate-900">Deepesh Chauhan</h3>
-              <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-slate-500">Co-Founder, Eduroute</p>
-              <a
-                href={coFounderLinkedinUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/30 bg-[#0A66C2] px-6 py-3 font-bold text-white shadow-lg shadow-[#0A66C2]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#004182]"
-              >
-                <Linkedin className="h-5 w-5" />
-                Connect on LinkedIn
-              </a>
-            </div>
+            ))}
           </div>
         </div>
       </section>
