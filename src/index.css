@@ -1,9 +1,39 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap");
 @import "tailwindcss";
 
+:root {
+  color-scheme: light;
+  --bg-primary: #f8fafc;
+  --bg-secondary: #eef2ff;
+  --surface-nav: rgba(255, 255, 255, 0.95);
+  --surface-card: rgba(255, 255, 255, 0.76);
+  --surface-input: #ffffff;
+  --text-primary: #0f172a;
+  --text-secondary: #475569;
+  --border-default: rgba(148, 163, 184, 0.26);
+  --shadow-soft: 0 14px 36px rgba(15, 23, 42, 0.12);
+  --accent-gradient: linear-gradient(120deg, #4f46e5, #7c3aed, #2563eb);
+  --accent-neon: 0 0 0 1px rgba(99, 102, 241, 0.34), 0 0 24px rgba(99, 102, 241, 0.28);
+}
+
+html[data-theme='dark'] {
+  color-scheme: dark;
+  --bg-primary: #0f172a;
+  --bg-secondary: #111827;
+  --surface-nav: rgba(15, 23, 42, 0.84);
+  --surface-card: rgba(30, 41, 59, 0.5);
+  --surface-input: rgba(15, 23, 42, 0.9);
+  --text-primary: #e2e8f0;
+  --text-secondary: #94a3b8;
+  --border-default: rgba(148, 163, 184, 0.2);
+  --shadow-soft: 0 22px 50px rgba(2, 6, 23, 0.62);
+}
+
 @layer base {
   body {
-    @apply bg-slate-50 text-slate-900 antialiased;
+    @apply antialiased;
+    background: radial-gradient(circle at 10% 10%, var(--bg-secondary), var(--bg-primary));
+    color: var(--text-primary);
     font-family: "Inter", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     line-height: 1.6;
   }
@@ -77,8 +107,58 @@
 
 * {
   transition-property: color, background-color, border-color, box-shadow, transform, opacity;
-  transition-duration: 200ms;
+  transition-duration: 300ms;
   transition-timing-function: ease;
+}
+
+.theme-toggle {
+  background: var(--accent-gradient);
+  box-shadow: var(--accent-neon);
+}
+
+html[data-theme='dark'] .glass,
+html[data-theme='dark'] .bg-white,
+html[data-theme='dark'] .bg-slate-50,
+html[data-theme='dark'] .bg-slate-100 {
+  background: var(--surface-card) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+html[data-theme='dark'] .text-slate-900,
+html[data-theme='dark'] .text-slate-800,
+html[data-theme='dark'] .text-slate-700,
+html[data-theme='dark'] .text-slate-600,
+html[data-theme='dark'] .text-slate-500,
+html[data-theme='dark'] .text-slate-400 {
+  color: var(--text-primary) !important;
+}
+
+html[data-theme='dark'] .border-slate-50,
+html[data-theme='dark'] .border-slate-100,
+html[data-theme='dark'] .border-slate-200,
+html[data-theme='dark'] .border-slate-300 {
+  border-color: var(--border-default) !important;
+}
+
+html[data-theme='dark'] .active-nav,
+html[data-theme='dark'] button.bg-indigo-600 {
+  background-image: var(--accent-gradient) !important;
+  box-shadow: var(--accent-neon) !important;
+}
+
+html[data-theme='dark'] input,
+html[data-theme='dark'] textarea,
+html[data-theme='dark'] select,
+html[data-theme='dark'] .modal,
+html[data-theme='dark'] [role='dialog'] {
+  background: var(--surface-input);
+  border-color: var(--border-default);
+  color: var(--text-primary);
+}
+
+html[data-theme='dark'] ::-webkit-scrollbar-thumb {
+  background: #334155;
 }
 
 ::-webkit-scrollbar {
