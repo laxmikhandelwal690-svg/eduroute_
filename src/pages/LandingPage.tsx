@@ -22,18 +22,6 @@ const teamMembers = [
     profileUrl: 'https://www.linkedin.com/in/deepesh-chauhan-a12413382'
   }
 ];
-  const teamMembers = [
-    {
-      name: 'Vansh Khandelwal',
-      role: 'Founder, EduRoutee',
-      profileUrl: 'https://www.linkedin.com/in/vansh-khandelwal-22636a373/',
-    },
-    {
-      name: 'Deepesh Chauhan',
-      role: 'Co-Founder, EduRoutee',
-      profileUrl: 'https://www.linkedin.com/in/deepesh-chauhan-a12413382/',
-    },
-  ];
 
   return (
     <div id="home" className="relative min-h-screen overflow-hidden bg-slate-100">
