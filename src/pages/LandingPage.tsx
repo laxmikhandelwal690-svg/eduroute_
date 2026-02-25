@@ -6,7 +6,7 @@ import { AuthModal } from '../components/AuthModal';
 export const LandingPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const demoSectionRef = useRef<HTMLElement | null>(null);
-  const founderLinkedinUrl = 'https://www.linkedin.com/in/vansh-khandelwal-22636a373';
+  const founderLinkedinUrl = 'https://www.linkedin.com/in/vansh-khandelwal-22636a373/';
   const coFounderLinkedinUrl = 'https://www.linkedin.com/in/deepesh-chauhan-a12413382';
 
   return (
