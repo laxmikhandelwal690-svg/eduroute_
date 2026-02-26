@@ -12,6 +12,26 @@ type SoundContextValue = {
 
 const SoundContext = createContext<SoundContextValue | null>(null);
 
+const readMutedPreference = () => {
+  if (typeof window === 'undefined') return false;
+
+  try {
+    return window.localStorage.getItem(SOUND_STORAGE_KEY) === 'true';
+  } catch {
+    return false;
+  }
+};
+
+const writeMutedPreference = (isMuted: boolean) => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.localStorage.setItem(SOUND_STORAGE_KEY, String(isMuted));
+  } catch {
+    // Ignore storage write errors
+  }
+};
+
 const createTone = (
   context: AudioContext,
   config: { frequency: number; duration: number; type: OscillatorType; gain: number; delay?: number }
@@ -35,7 +55,7 @@ const createTone = (
 };
 
 export const SoundProvider = ({ children }: { children: React.ReactNode }) => {
-  const [isMuted, setIsMuted] = useState(() => localStorage.getItem(SOUND_STORAGE_KEY) === 'true');
+  const [isMuted, setIsMuted] = useState(readMutedPreference);
   const audioContextRef = useRef<AudioContext | null>(null);
   const lastClickSoundRef = useRef(0);
 
@@ -97,7 +117,7 @@ export const SoundProvider = ({ children }: { children: React.ReactNode }) => {
   const toggleMuted = useCallback(() => {
     setIsMuted((prev) => {
       const next = !prev;
-      localStorage.setItem(SOUND_STORAGE_KEY, String(next));
+      writeMutedPreference(next);
       return next;
     });
   }, []);
