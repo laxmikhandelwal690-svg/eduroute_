@@ -13,19 +13,33 @@ const STORAGE_KEY = 'eduroute-theme';
 
 const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
+const readThemeStorage = (): Theme | null => {
+  if (typeof window === 'undefined') return null;
+
+  try {
+    const savedTheme = window.localStorage.getItem(STORAGE_KEY);
+    return savedTheme === 'dark' || savedTheme === 'light' ? savedTheme : null;
+  } catch {
+    return null;
+  }
+};
+
+const writeThemeStorage = (theme: Theme) => {
+  if (typeof window === 'undefined') return;
+
+  try {
+    window.localStorage.setItem(STORAGE_KEY, theme);
+  } catch {
+    // Ignore storage write errors
+  }
+};
+
 const getSystemTheme = (): Theme => {
   if (typeof window === 'undefined') return 'light';
   return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 };
 
-const getInitialTheme = (): Theme => {
-  if (typeof window === 'undefined') return 'light';
-  const savedTheme = window.localStorage.getItem(STORAGE_KEY);
-  if (savedTheme === 'dark' || savedTheme === 'light') {
-    return savedTheme;
-  }
-  return getSystemTheme();
-};
+const getInitialTheme = (): Theme => readThemeStorage() ?? getSystemTheme();
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setThemeState] = useState<Theme>(getInitialTheme);
@@ -34,14 +48,14 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     const root = document.documentElement;
     root.setAttribute('data-theme', theme);
     root.classList.toggle('dark', theme === 'dark');
-    window.localStorage.setItem(STORAGE_KEY, theme);
+    writeThemeStorage(theme);
   }, [theme]);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
 
     const onSystemThemeChange = (event: MediaQueryListEvent) => {
-      const savedTheme = window.localStorage.getItem(STORAGE_KEY);
+      const savedTheme = readThemeStorage();
       if (!savedTheme) {
         setThemeState(event.matches ? 'dark' : 'light');
       }
@@ -71,4 +85,3 @@ export const useTheme = () => {
   }
   return context;
 };
-
