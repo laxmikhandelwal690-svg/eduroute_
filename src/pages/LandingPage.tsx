@@ -6,23 +6,22 @@ import { AuthModal } from '../components/AuthModal';
 export const LandingPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const demoSectionRef = useRef<HTMLElement | null>(null);
-  const linkedinUrl = 'https://www.linkedin.com/in/deepesh-chauhan-a12413382';
-  const instagramUrl = 'https://www.instagram.com/vanshkhandelwal28/';
-  const whatsappUrl = 'https://wa.link/9mfubu';
-  const contactEmail = 'vanshkhandelwal777@gmail.com';
-  const contactPhone = '+91 7898140600';
-  const teamMembers = [
-    {
-      name: 'Vansh Khandelwal',
-      role: 'Founder, EduRoutee',
-      profileUrl: 'https://www.linkedin.com/',
-    },
-    {
-      name: 'Deepesh Chauhan',
-      role: 'Co-Founder, EduRoutee',
-      profileUrl: 'https://www.linkedin.com/in/deepesh-chauhan-a12413382/',
-    },
-  ];
+const teamMembers = [
+  {
+    name: 'Vansh Khandelwal',
+    role: 'Founder, EduRoute',
+    profileUrl: 'https://www.linkedin.com/in/vansh-khandelwal-22636a373',
+    instagram: 'https://www.instagram.com/vanshkhandelwal28/',
+    whatsapp: 'https://wa.link/9mfubu',
+    email: 'vanshkhandelwal777@gmail.com',
+    phone: '+91 7898140600'
+  },
+  {
+    name: 'Deepesh Chauhan',
+    role: 'Co-Founder, EduRoute',
+    profileUrl: 'https://www.linkedin.com/in/deepesh-chauhan-a12413382'
+  }
+];
 
   return (
     <div id="home" className="relative min-h-screen overflow-hidden bg-slate-100">
