@@ -9,7 +9,7 @@ export const LandingPage = () => {
 const teamMembers = [
   {
     name: 'Vansh Khandelwal',
-    role: 'Founder, EduRoutee',
+    role: 'Founder, EduRoute',
     profileUrl: 'https://www.linkedin.com/in/vansh-khandelwal-22636a373',
     instagram: 'https://www.instagram.com/vanshkhandelwal28/',
     whatsapp: 'https://wa.link/9mfubu',
@@ -18,7 +18,7 @@ const teamMembers = [
   },
   {
     name: 'Deepesh Chauhan',
-    role: 'Co-Founder, EduRoutee',
+    role: 'Co-Founder, EduRoute',
     profileUrl: 'https://www.linkedin.com/in/deepesh-chauhan-a12413382'
   }
 ];
