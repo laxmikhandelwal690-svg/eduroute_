@@ -6,7 +6,7 @@ import { AuthModal } from '../components/AuthModal';
 export const LandingPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const demoSectionRef = useRef<HTMLElement | null>(null);
-  const linkedinUrl = 'https://www.linkedin.com/in/deepesh-chauhan-a12413382';
+  const linkedinUrl = 'https://www.linkedin.com/in/vansh-khandelwal-22636a373/';
   const instagramUrl = 'https://www.instagram.com/vanshkhandelwal28/';
   const whatsappUrl = 'https://wa.link/9mfubu';
   const contactEmail = 'vanshkhandelwal777@gmail.com';
@@ -15,7 +15,7 @@ export const LandingPage = () => {
     {
       name: 'Vansh Khandelwal',
       role: 'Founder, EduRoutee',
-      profileUrl: 'https://www.linkedin.com/',
+      profileUrl: 'https://www.linkedin.com/in/vansh-khandelwal-22636a373/',
     },
     {
       name: 'Deepesh Chauhan',
