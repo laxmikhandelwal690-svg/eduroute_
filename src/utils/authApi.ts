@@ -19,6 +19,7 @@ const resolveApiBaseUrl = () => {
 };
 
 const API_BASE_URL = resolveApiBaseUrl();
+const ADMIN_SECRET = import.meta.env.VITE_ADMIN_SECRET?.trim();
 
 type ApiResponse<T> = {
   success?: boolean;
@@ -49,6 +50,7 @@ const apiRequest = async <T>(path: string, options: RequestInit = {}): Promise<T
       headers: {
         'Content-Type': 'application/json',
         ...(getAuthToken() ? { Authorization: `Bearer ${getAuthToken()}` } : {}),
+        ...(ADMIN_SECRET ? { 'x-admin-secret': ADMIN_SECRET } : {}),
         ...(options.headers || {}),
       },
     });
@@ -91,8 +93,8 @@ export const apiVerifyOtp = async (payload: { email: string; otp: string }) => a
 
 export const apiGetCourses = () => apiRequest<{ data: any[] }>('/courses');
 export const apiCreateCourse = (payload: Record<string, unknown>) => apiRequest<{ data: any }>('/courses', { method: 'POST', body: JSON.stringify(payload) });
-export const apiUpdateCourse = (id: string, payload: Record<string, unknown>) => apiRequest<{ data: any }>(`/courses/${id}`, { method: 'PUT', body: JSON.stringify(payload) });
-export const apiDeleteCourse = (id: string) => apiRequest<{ message: string }>(`/courses/${id}`, { method: 'DELETE' });
+export const apiUpdateCourse = (id: string, payload: Record<string, unknown>) => apiRequest<{ data: any }>(`/courses?id=${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(payload) });
+export const apiDeleteCourse = (id: string) => apiRequest<{ message: string }>(`/courses?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
 
 export const apiGetPendingStudents = () => apiRequest<{ data: any[] }>('/students/pending');
 export const apiVerifyStudent = (id: string, action: 'approve' | 'reject') => apiRequest<{ data: any }>(`/students/${id}/verification`, {

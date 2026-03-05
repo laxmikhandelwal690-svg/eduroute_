@@ -40,6 +40,35 @@ router.post('/courses', authMiddleware, adminMiddleware, async (req: Authenticat
   return res.status(201).json({ success: true, data: course });
 });
 
+
+router.put('/courses', authMiddleware, adminMiddleware, async (req, res) => {
+  const courseId = typeof req.query.id === 'string' ? req.query.id : '';
+  if (!courseId) {
+    return res.status(400).json({ success: false, error: 'id query parameter is required' });
+  }
+
+  const updatedCourse = await Course.findByIdAndUpdate(courseId, req.body, { new: true });
+  if (!updatedCourse) {
+    return res.status(404).json({ success: false, error: 'Course not found' });
+  }
+
+  return res.json({ success: true, data: updatedCourse });
+});
+
+router.delete('/courses', authMiddleware, adminMiddleware, async (req, res) => {
+  const courseId = typeof req.query.id === 'string' ? req.query.id : '';
+  if (!courseId) {
+    return res.status(400).json({ success: false, error: 'id query parameter is required' });
+  }
+
+  const deletedCourse = await Course.findByIdAndDelete(courseId);
+  if (!deletedCourse) {
+    return res.status(404).json({ success: false, error: 'Course not found' });
+  }
+
+  return res.json({ success: true, message: 'Course deleted successfully' });
+});
+
 router.put('/courses/:id', authMiddleware, adminMiddleware, async (req, res) => {
   const updatedCourse = await Course.findByIdAndUpdate(req.params.id, req.body, { new: true });
   if (!updatedCourse) {

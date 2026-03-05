@@ -17,6 +17,7 @@ eduroute_
 │       ├── buddy-chat.js                # AI response + chat history + XP update
 │       ├── buddy-progress.js            # User progress + skill-gap persistence
 │       ├── admin-roadmaps.js            # Admin CRUD-like roadmap update endpoint
+│       ├── courses.js                   # Course catalog CRUD endpoint (MongoDB-backed)
 │       └── _lib/
 │           ├── aiClient.js              # OpenAI/Gemini adapter + safety system prompt
 │           └── database.js              # MongoDB models and DB connection cache
@@ -78,7 +79,8 @@ Set these variables in **Netlify Site Settings → Environment Variables**:
 - `OPENAI_MODEL` (default: `gpt-4o-mini`)
 - `GEMINI_API_KEY` (required only if `AI_PROVIDER=gemini`)
 - `GEMINI_MODEL` (default: `gemini-1.5-flash`)
-- `ADMIN_SECRET` (protects admin roadmap API)
+- `ADMIN_SECRET` (protects admin roadmap API and course write operations)
+- `VITE_ADMIN_SECRET` (frontend header for admin writes when using Netlify functions)
 - `CORS_ORIGIN` (for cross-origin control)
 
 ---
@@ -113,6 +115,7 @@ netlify dev
 - `/api/buddy-chat`
 - `/api/buddy-progress`
 - `/api/admin-roadmaps`
+- `/api/courses`
 
 ---
 
