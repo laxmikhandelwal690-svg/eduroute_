@@ -10,7 +10,6 @@ import {
   Gift,
   Briefcase,
   TrendingUp,
-  Settings,
   LogOut,
   Menu,
   X
@@ -85,11 +84,11 @@ export const MainLayout = () => {
 
         <div className="p-4 border-t border-[var(--border-default)] space-y-2">
           <Link
-            to="/admin"
+            to="/admin-login"
             className="flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm text-[var(--text-secondary)] hover:bg-white/60 transition-all"
           >
-            <Settings className="h-5 w-5" />
-            Settings
+            <span className="h-5 w-5 inline-flex items-center justify-center font-black">A</span>
+            Admin
           </Link>
           <button
             onClick={() => window.location.href = '/'}
@@ -148,6 +147,14 @@ export const MainLayout = () => {
                 </Link>
               );
             })}
+            <Link
+              to="/admin-login"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm text-[var(--text-secondary)] hover:bg-white/70 transition-all"
+            >
+              <span className="h-5 w-5 inline-flex items-center justify-center font-black">A</span>
+              Admin
+            </Link>
           </nav>
         </div>
       )}
