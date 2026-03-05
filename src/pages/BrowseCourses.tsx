@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Search, Clock, ChevronDown } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { apiGetCourses } from '../utils/authApi';
+import { getManagedCourses } from '../utils/courseManagerStorage';
 
 const categories = ['All', 'Development', 'Design', 'Data Science', 'Business'];
 
@@ -11,7 +12,29 @@ export const BrowseCourses = () => {
   const [courses, setCourses] = useState<any[]>([]);
 
   useEffect(() => {
-    apiGetCourses().then((response) => setCourses(response.data)).catch(() => setCourses([]));
+    apiGetCourses()
+      .then((response) => {
+        const localCourses = getManagedCourses().map((course) => ({
+          _id: course.id,
+          title: course.title,
+          description: course.description,
+          category: course.category,
+          level: 'Beginner',
+          duration: `${course.content.length} resources`,
+        }));
+        setCourses([...localCourses, ...response.data]);
+      })
+      .catch(() => {
+        const localCourses = getManagedCourses().map((course) => ({
+          _id: course.id,
+          title: course.title,
+          description: course.description,
+          category: course.category,
+          level: 'Beginner',
+          duration: `${course.content.length} resources`,
+        }));
+        setCourses(localCourses);
+      });
   }, []);
 
   const filteredCourses = courses.filter((course) => selectedCategory === 'All' || course.category === selectedCategory);
