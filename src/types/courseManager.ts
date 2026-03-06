@@ -1,5 +1,8 @@
 export type CourseContentType = 'video' | 'document';
+<<<<<<< codex/add-admin-course-manager-feature-gbmr6s
 export type CoursePublishTarget = 'dashboard' | 'roadmap' | 'both';
+=======
+>>>>>>> main
 
 export type CourseContentItem = {
   id: string;
@@ -15,7 +18,10 @@ export type ManagedCourse = {
   description: string;
   category: string;
   thumbnailUrl: string;
+<<<<<<< codex/add-admin-course-manager-feature-gbmr6s
   publishTarget: CoursePublishTarget;
+=======
+>>>>>>> main
   content: CourseContentItem[];
   createdAt: string;
   updatedAt: string;
@@ -26,7 +32,10 @@ export type CourseFormState = {
   description: string;
   category: string;
   thumbnailUrl: string;
+<<<<<<< codex/add-admin-course-manager-feature-gbmr6s
   publishTarget: CoursePublishTarget;
+=======
+>>>>>>> main
 };
 
 export type ContentFormState = {
