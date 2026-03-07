@@ -1,5 +1,6 @@
 import { Suspense, lazy, type ReactElement } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { isAdminSessionActive } from './utils/adminSession';
 import { getAuthUser, isAuthenticated } from './utils/rbacAuth';
 import { ThemeToggle } from './components/ThemeToggle';
 
@@ -28,6 +29,14 @@ const PublicOnlyRoute = ({ children }: { children: ReactElement }) => {
   if (isAuthenticated()) {
     const user = getAuthUser();
     return <Navigate to={user?.role === 'admin' ? '/admin' : '/dashboard'} replace />;
+  }
+
+  return children;
+};
+
+const AdminSessionRoute = ({ children }: { children: ReactElement }) => {
+  if (!isAdminSessionActive()) {
+    return <Navigate to="/admin-login" replace />;
   }
 
   return children;
@@ -87,8 +96,8 @@ export function App() {
           <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
           <Route path="/verify-otp" element={<PublicOnlyRoute><VerifyOTP /></PublicOnlyRoute>} />
           <Route path="/verify-college" element={<PublicOnlyRoute><VerifyCollege /></PublicOnlyRoute>} />
-          <Route path="/admin-login" element={<ProtectedRoute><AdminLogin /></ProtectedRoute>} />
-          <Route path="/course-manager" element={<ProtectedRoute><CourseManager /></ProtectedRoute>} />
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/course-manager" element={<AdminSessionRoute><CourseManager /></AdminSessionRoute>} />
 
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<RoleRoute role="student"><Dashboard /></RoleRoute>} />
