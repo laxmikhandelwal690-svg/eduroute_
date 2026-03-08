@@ -3,9 +3,9 @@ import { Trophy, Medal, Crown, TrendingUp, Search, User, Award } from 'lucide-re
 import { getCurrentUser } from '../../utils/userProfile';
 
 const TOP_THREE = [
-  { rank: 2, name: 'Deepesh chauhan', points: 8420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=dep', college: 'IIT Bombay' },
-  { rank: 1, name: 'Vansh Khandelwal', points: 9250, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Vansh', college: 'BITS Pilani',isUser : true },
-  { rank: 3, name: 'Naksh Shrivastava', points: 7980, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Naksh', college: 'NIT Trichy' },
+  { rank: 2, name: 'Deepesh chauhan', points: 8420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=hero1', college: 'IIT Bombay' },
+  { rank: 1, name: 'Vansh Khandelwal', points: 9250, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=hero', college: 'BITS Pilani',isUser : true },
+  { rank: 3, name: 'Naksh Shrivastava', points: 7980, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=super', college: 'NIT Trichy' },
 ];
 
 const LEADERBOARD_LIST = [
