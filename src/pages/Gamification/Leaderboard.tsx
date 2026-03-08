@@ -3,14 +3,14 @@ import { Trophy, Medal, Crown, TrendingUp, Search, User, Award } from 'lucide-re
 import { getCurrentUser } from '../../utils/userProfile';
 
 const TOP_THREE = [
-  { rank: 2, name: 'Siddharth M.', points: 8420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Sid', college: 'IIT Bombay' },
-  { rank: 1, name: 'Ananya Sharma', points: 9250, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Ananya', college: 'BITS Pilani' },
-  { rank: 3, name: 'Rahul Varma', points: 7980, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Rahul', college: 'NIT Trichy' },
+  { rank: 2, name: 'Deepesh chauhan', points: 8420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=dep', college: 'IIT Bombay' },
+  { rank: 1, name: 'Vansh Khandelwal', points: 9250, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Vansh', college: 'BITS Pilani',isUser : true },
+  { rank: 3, name: 'Naksh Shrivastava', points: 7980, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Naksh', college: 'NIT Trichy' },
 ];
 
 const LEADERBOARD_LIST = [
-  { rank: 4, name: 'Arjun Gupta', points: 7650, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun', college: 'DTU' },
-  { rank: 5, name: 'Vansh Rivera', points: 7420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Vansh', college: 'IIT Jodhpur', isUser: true },
+  { rank: 4, name: 'Yash Pant', points: 7650, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yash', college: 'DTU' },
+  { rank: 5, name: 'Arjun Gupta', points: 7420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun', college: 'IIT Jodhpur' },
   { rank: 6, name: 'Priya Das', points: 7100, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya', college: 'VIT Vellore' },
   { rank: 7, name: 'Kabir Singh', points: 6850, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kabir', college: 'SRM University' },
   { rank: 8, name: 'Zoya Khan', points: 6420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Zoya', college: 'MSU Baroda' },
