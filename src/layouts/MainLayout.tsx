@@ -133,7 +133,7 @@ export const MainLayout = () => {
           <span className="text-lg font-black text-white">EDUROUTE</span>
         </Link>
         <div className="flex items-center gap-2">
-          <ThemeToggle className="h-9 w-[70px]" />
+          <ThemeToggle />
           <Link to="/profile" className="h-9 w-9 overflow-hidden rounded-full border border-white/15 bg-[var(--accent-gradient)] text-white flex items-center justify-center font-bold" aria-label="Open profile dashboard">
             {profileIdentity.photo ? <img src={profileIdentity.photo} alt={profileIdentity.name} className="h-full w-full object-cover" /> : profileIdentity.initial}
           </Link>

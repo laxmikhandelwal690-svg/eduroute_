@@ -142,8 +142,8 @@ html[data-theme='dark'] {
 }
 
 .theme-toggle {
-  background: var(--accent-gradient);
-  box-shadow: var(--accent-neon);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
 }
 
 html[data-theme='dark'] .glass,

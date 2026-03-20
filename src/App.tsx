@@ -81,7 +81,7 @@ const GlobalThemeButton = () => {
   if (isDashboardArea) return null;
 
   return (
-    <div className="fixed right-5 top-5 z-[80]">
+    <div className="fixed right-4 top-4 z-[80] sm:right-5 sm:top-5">
       <ThemeToggle />
     </div>
   );
@@ -138,4 +138,3 @@ export function App() {
     </Router>
   );
 }
-
