@@ -1,10 +1,13 @@
-import { useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Rocket, Target, BookOpen, ChevronRight, Play, Sparkles, Trophy, Briefcase, Linkedin, Instagram, Mail, Phone, MessageCircle } from 'lucide-react';
+import { Rocket, Target, BookOpen, ChevronRight, Play, Sparkles, Trophy, Briefcase, Linkedin, Instagram, Mail, Phone, MessageCircle, ArrowUpRight, Zap } from 'lucide-react';
 import { AuthModal } from '../components/AuthModal';
+import { Hero3D } from '../components/Hero3D';
+import { TiltCard } from '../components/TiltCard';
 
 export const LandingPage = () => {
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [mousePosition, setMousePosition] = useState({ x: 50, y: 20 });
   const demoSectionRef = useRef<HTMLElement | null>(null);
   const linkedinUrl = 'https://www.linkedin.com/in/vansh-khandelwal-22636a373/';
   const instagramUrl = 'https://www.instagram.com/vanshkhandelwal28/';
@@ -24,290 +27,239 @@ export const LandingPage = () => {
     },
   ];
 
+  useEffect(() => {
+    const handleMove = (event: MouseEvent) => {
+      setMousePosition({
+        x: (event.clientX / window.innerWidth) * 100,
+        y: (event.clientY / window.innerHeight) * 100,
+      });
+    };
+
+    window.addEventListener('mousemove', handleMove);
+    return () => window.removeEventListener('mousemove', handleMove);
+  }, []);
+
+  const heroStats = useMemo(() => ([
+    { label: 'Learners', value: '45k+' },
+    { label: 'Roadmaps', value: '80+' },
+    { label: 'Hiring Partners', value: '120+' },
+  ]), []);
+
   return (
-    <div id="home" className="relative min-h-screen overflow-hidden bg-slate-100">
+    <div
+      id="home"
+      className="relative min-h-screen overflow-hidden bg-[#050816] text-white"
+      style={{
+        backgroundImage: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(56,189,248,0.16), transparent 16%), radial-gradient(circle at 18% 18%, rgba(99,102,241,0.22), transparent 28%), linear-gradient(135deg, #020617 0%, #0b1120 42%, #111827 100%)`,
+      }}
+    >
       <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
 
-      <header className="relative z-20 border-b border-white/60 bg-white/65 backdrop-blur-xl">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="blob absolute left-[-8%] top-12 h-72 w-72 rounded-full bg-fuchsia-500/25 blur-3xl" />
+        <div className="blob absolute right-[-4%] top-24 h-80 w-80 rounded-full bg-sky-400/20 blur-3xl [animation-delay:2s]" />
+        <div className="blob absolute bottom-20 left-[30%] h-64 w-64 rounded-full bg-cyan-400/15 blur-3xl [animation-delay:4s]" />
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:120px_120px] opacity-20" />
+      </div>
+
+      <header className="relative z-20 border-b border-white/10 bg-white/5 backdrop-blur-2xl">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
-          <div className="text-xl font-black tracking-tight text-slate-900">EDUROUTE</div>
-          <a
-            href={linkedinUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/30 bg-[#0A66C2] px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-[#0A66C2]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#004182]"
-          >
-            <Linkedin className="h-4 w-4" />
-            Connect on LinkedIn
+          <div className="flex items-center gap-3">
+            <div className="gradient-border-box h-12 w-12 rounded-2xl"><div className="flex h-full w-full items-center justify-center rounded-[inherit] bg-slate-950 text-xl font-black">E</div></div>
+            <div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.35em] text-white/50">Career OS</div>
+              <div className="text-xl font-black tracking-tight text-white">EDUROUTE</div>
+            </div>
+          </div>
+          <a href={linkedinUrl} target="_blank" rel="noreferrer" className="glow-button inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white">
+            <Linkedin className="h-4 w-4" /> Connect on LinkedIn
           </a>
         </div>
       </header>
 
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_12%_20%,rgba(167,243,208,0.7),transparent_45%),radial-gradient(circle_at_85%_18%,rgba(186,230,253,0.65),transparent_42%),radial-gradient(circle_at_65%_74%,rgba(253,186,116,0.45),transparent_48%),linear-gradient(135deg,rgba(240,253,250,0.95),rgba(239,246,255,0.9)_45%,rgba(255,247,237,0.88))]" />
-      <div className="pointer-events-none absolute -top-16 left-16 h-72 w-72 rounded-full bg-emerald-200/35 blur-3xl" />
-      <div className="pointer-events-none absolute top-20 right-12 h-80 w-80 rounded-full bg-sky-200/40 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-10 right-1/4 h-72 w-72 rounded-full bg-orange-200/30 blur-3xl" />
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-24 pb-16">
-        <div className="grid gap-12 lg:grid-cols-2 items-center">
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeOut" }}
-          >
-            <div className="inline-flex items-center gap-2 px-4 py-2 mb-8 rounded-2xl border border-white/50 bg-white/45 text-emerald-800 shadow-lg shadow-sky-100/50 backdrop-blur-xl">
-               <span className="relative flex h-2 w-2">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-700"></span>
+      <div className="relative mx-auto max-w-7xl px-4 pb-16 pt-20 sm:px-6 lg:px-8 lg:pt-24">
+        <div className="grid items-center gap-12 lg:grid-cols-[1.1fr,0.9fr]">
+          <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, ease: 'easeOut' }} className="relative z-10">
+            <motion.div animate={{ y: [0, -8, 0] }} transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }} className="mb-8 inline-flex items-center gap-2 rounded-2xl border border-white/12 bg-white/10 px-4 py-2 text-emerald-200 shadow-2xl shadow-cyan-950/30 backdrop-blur-xl">
+              <span className="relative flex h-2 w-2">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-300"></span>
               </span>
-              <span className="text-sm font-bold uppercase tracking-widest">AI Career Platform for Every Student</span>
-            </div>
+              <span className="text-sm font-bold uppercase tracking-[0.3em]">AI Career Platform for Every Student</span>
+            </motion.div>
 
-            <h1 className="text-4xl sm:text-6xl md:text-8xl font-black text-slate-900 leading-[0.9] mb-8 drop-shadow-[0_6px_24px_rgba(148,163,184,0.25)]">
+            <h1 className="max-w-4xl text-5xl font-black leading-[0.92] text-white sm:text-6xl md:text-7xl xl:text-[5.5rem]">
               Build Skills. <br />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-700 via-amber-500 to-orange-500">
-                Get Hired.
-              </span>
+              <span className="text-gradient">Get Hired.</span>
             </h1>
 
-            <p className="text-xl text-slate-500 font-medium leading-relaxed max-w-lg mb-12">
+            <p className="mt-8 max-w-2xl text-lg font-medium leading-relaxed text-slate-300 md:text-xl">
               EDUROUTE maps each career role into step-by-step levels from Beginner to Pro, with AI Buddy guidance,
               assessments, internships, and direct hiring opportunities—designed for students from every city and town.
             </p>
 
-            <div className="flex flex-col sm:flex-row items-center gap-6">
-              <button
-                onClick={() => setIsAuthOpen(true)}
-                className="w-full sm:w-auto px-10 py-5 rounded-[24px] border border-white/60 bg-white/70 text-slate-900 font-black text-lg shadow-2xl shadow-slate-200/60 backdrop-blur-xl transition-all hover:scale-105 hover:bg-white/85 active:scale-95 flex items-center justify-center gap-3"
-              >
-                Start Your Roadmap <Rocket className="h-6 w-6" />
+            <div className="mt-10 flex flex-col gap-4 sm:flex-row sm:items-center">
+              <button onClick={() => setIsAuthOpen(true)} className="glow-button w-full rounded-[24px] px-8 py-4 text-lg font-black text-white sm:w-auto">
+                <span className="flex items-center justify-center gap-3">Start Your Roadmap <Rocket className="h-6 w-6" /></span>
               </button>
-              <button
-                onClick={() => demoSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })}
-                className="flex items-center gap-3 text-slate-900 font-bold hover:text-emerald-700 transition-colors"
-              >
-                 <div className="h-14 w-14 rounded-full border border-white/70 flex items-center justify-center bg-white/65 shadow-lg backdrop-blur-lg">
-                    <Play className="h-5 w-5 fill-current" />
-                 </div>
-                 Watch Demo
+              <button onClick={() => demoSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })} className="group inline-flex items-center gap-3 rounded-[24px] border border-white/12 bg-white/10 px-6 py-4 font-bold text-white/90 backdrop-blur-xl hover:border-white/20 hover:bg-white/10">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full border border-white/15 bg-white/10">
+                  <Play className="h-5 w-5 fill-current" />
+                </div>
+                Watch Demo
+                <ArrowUpRight className="h-4 w-4 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
               </button>
+            </div>
+
+            <div className="mt-12 grid gap-4 sm:grid-cols-3">
+              {heroStats.map((stat, index) => (
+                <motion.div key={stat.label} initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 * index + 0.5 }} className="premium-border floaty rounded-[28px] bg-white/10 p-5 backdrop-blur-2xl">
+                  <div className="text-3xl font-black text-white">{stat.value}</div>
+                  <div className="mt-2 text-xs font-bold uppercase tracking-[0.28em] text-slate-400">{stat.label}</div>
+                </motion.div>
+              ))}
             </div>
           </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1, duration: 1 }}
-            className="mt-24 grid grid-cols-3 gap-8 rounded-3xl border border-white/55 bg-white/40 p-8 shadow-lg shadow-slate-200/60 backdrop-blur-xl"
-          >
-              {[
-              { label: 'Learners', value: '45k+' },
-              { label: 'Roadmaps', value: '80+' },
-              { label: 'Hiring Partners', value: '120+' },
-            ].map((stat, i) => (
-              <div key={i}>
-                <div className="text-3xl font-black text-slate-900">{stat.value}</div>
-                <div className="text-sm font-bold text-slate-400 uppercase tracking-widest">{stat.label}</div>
-              </div>
-            ))}
-          </motion.div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.9 }}
-            className="space-y-4"
-          >
-            {[
-              {
-                icon: Sparkles,
-                title: 'AI Buddy in English, Hindi & Hinglish',
-                desc: '24/7 personalized guidance for roadmap planning, interview prep, and doubts.',
-              },
-              {
-                icon: Trophy,
-                title: 'Gamified Progress + Leaderboards',
-                desc: 'Complete tasks, earn points, unlock rewards, and stand out to recruiters.',
-              },
-              {
-                icon: Briefcase,
-                title: 'Internships & Direct Company Hiring',
-                desc: 'Apply for skill-based roles and discover company culture through short videos.',
-              },
-            ].map((item, index) => (
-              <div key={index} className="rounded-3xl border border-white/50 bg-white/50 p-6 shadow-lg shadow-slate-200/40 backdrop-blur-xl">
-                <item.icon className="h-7 w-7 text-emerald-700 mb-4" />
-                <h3 className="text-xl font-black text-slate-900 mb-2">{item.title}</h3>
-                <p className="text-slate-600">{item.desc}</p>
-              </div>
-            ))}
+          <motion.div initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.9, delay: 0.15 }} className="relative min-h-[540px]">
+            <div className="absolute inset-0 rounded-[2rem] border border-white/10 bg-white/5 backdrop-blur-2xl shadow-[0_30px_120px_rgba(14,165,233,0.16)] lg:rounded-[3rem]" />
+            <Hero3D />
+            <div className="pointer-events-none absolute inset-x-8 bottom-8 grid gap-4 md:grid-cols-2">
+              <TiltCard glowClassName="bg-cyan-400/30">
+                <div className="premium-border floaty rounded-[28px] bg-slate-950/70 p-5 backdrop-blur-2xl">
+                  <div className="flex items-center justify-between text-sm text-slate-300">
+                    <span className="font-bold uppercase tracking-[0.25em] text-cyan-200">Live Guidance</span>
+                    <Zap className="h-4 w-4 text-cyan-300" />
+                  </div>
+                  <h3 className="mt-3 text-xl font-black">AI Buddy in English, Hindi & Hinglish</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-400">24/7 personalized guidance for roadmap planning, interview prep, and doubts.</p>
+                </div>
+              </TiltCard>
+              <TiltCard glowClassName="bg-fuchsia-500/30">
+                <div className="premium-border floaty rounded-[28px] bg-slate-950/70 p-5 backdrop-blur-2xl [animation-delay:1.2s]">
+                  <div className="flex items-center justify-between text-sm text-slate-300">
+                    <span className="font-bold uppercase tracking-[0.25em] text-fuchsia-200">Career Lift-off</span>
+                    <Briefcase className="h-4 w-4 text-fuchsia-300" />
+                  </div>
+                  <h3 className="mt-3 text-xl font-black">Internships & direct company hiring</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-slate-400">Top performers get discovered by verified employers through premium student showcases.</p>
+                </div>
+              </TiltCard>
+            </div>
           </motion.div>
         </div>
       </div>
-      
-      {/* Featured Section */}
-      <section ref={demoSectionRef} className="relative py-20 sm:py-32">
-         <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-white/15 via-sky-50/40 to-orange-50/35" />
-         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-20">
-               <h2 className="text-4xl font-black text-slate-900 mb-4">Everything You Need to Succeed</h2>
-               <p className="text-slate-500 font-medium text-lg">From zero to your first high-paying internship.</p>
-            </div>
-            <div className="grid md:grid-cols-3 gap-12">
-               <div className="rounded-[40px] border border-white/55 bg-white/55 p-10 shadow-lg shadow-slate-200/45 backdrop-blur-xl transition-all hover:shadow-2xl">
-                  <div className="h-16 w-16 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 mb-8">
-                     <Target className="h-8 w-8" />
+
+      <section ref={demoSectionRef} className="relative py-20 sm:py-28">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} className="mb-16 text-center">
+            <h2 className="text-4xl font-black text-white">Everything You Need to Succeed</h2>
+            <p className="mt-4 text-lg font-medium text-slate-400">From zero to your first high-paying internship.</p>
+          </motion.div>
+          <div className="grid gap-8 md:grid-cols-3">
+            {[
+              { icon: Target, title: 'AI Roadmaps', desc: 'Dynamic paths that adjust based on your speed and performance.' },
+              { icon: BookOpen, title: 'Skill Tests', desc: 'Weekly assessments to keep your skills sharp and points high.' },
+              { icon: ChevronRight, title: 'Direct Hiring', desc: 'Top performers get fast-tracked into verified internships.' },
+            ].map((item, index) => (
+              <motion.div key={item.title} initial={{ opacity: 0, y: 28 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ delay: index * 0.08 }}>
+                <TiltCard glowClassName="bg-indigo-500/20">
+                  <div className="premium-border rounded-[32px] bg-white/10 p-8 backdrop-blur-2xl">
+                    <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-white/10 bg-white/10 text-indigo-200 shadow-lg shadow-indigo-950/20">
+                      <item.icon className="h-8 w-8" />
+                    </div>
+                    <h3 className="text-2xl font-black text-white">{item.title}</h3>
+                    <p className="mt-4 text-slate-400">{item.desc}</p>
                   </div>
-                  <h3 className="text-2xl font-black text-slate-900 mb-4">AI Roadmaps</h3>
-                  <p className="text-slate-500 font-medium leading-relaxed">Dynamic paths that adjust based on your speed and performance.</p>
-               </div>
-               <div className="rounded-[40px] border border-white/55 bg-white/55 p-10 shadow-lg shadow-slate-200/45 backdrop-blur-xl transition-all hover:shadow-2xl">
-                  <div className="h-16 w-16 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 mb-8">
-                     <BookOpen className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-2xl font-black text-slate-900 mb-4">Skill Tests</h3>
-                  <p className="text-slate-500 font-medium leading-relaxed">Weekly assessments to keep your skills sharp and points high.</p>
-               </div>
-               <div className="rounded-[40px] border border-white/55 bg-white/55 p-10 shadow-lg shadow-slate-200/45 backdrop-blur-xl transition-all hover:shadow-2xl">
-                  <div className="h-16 w-16 bg-orange-50 rounded-2xl flex items-center justify-center text-orange-600 mb-8">
-                     <ChevronRight className="h-8 w-8" />
-                  </div>
-                  <h3 className="text-2xl font-black text-slate-900 mb-4">Direct Hiring</h3>
-                  <p className="text-slate-500 font-medium leading-relaxed">Top performers get fast-tracked into verified internships.</p>
-               </div>
-            </div>
-         </div>
+                </TiltCard>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </section>
 
       <section id="about-eduroutee" className="relative py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-[40px] border border-white/60 bg-white/65 p-8 shadow-xl shadow-slate-200/60 backdrop-blur-xl sm:p-12">
-            <h2 className="mb-5 text-4xl font-black text-slate-900">About EduRoutee</h2>
-            <p className="text-lg font-medium leading-relaxed text-slate-600">
-              EduRoutee is a smart learning roadmap platform designed to help students plan, track, and optimize their
-              learning journey. Students waste time because they don’t know what to learn and in what order. EduRoutee
-              provides structured roadmaps, AI guidance, and progress tracking in one platform to help students build
-              skills efficiently and achieve career success.
-            </p>
-          </div>
+          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} className="premium-border rounded-[40px] bg-white/10 p-8 shadow-xl shadow-slate-950/20 backdrop-blur-2xl sm:p-12">
+            <h2 className="mb-5 text-4xl font-black text-white">About EduRoutee</h2>
+            <p className="text-lg font-medium leading-relaxed text-slate-300">EduRoutee is a smart learning roadmap platform designed to help students plan, track, and optimize their learning journey. Students waste time because they don’t know what to learn and in what order. EduRoutee provides structured roadmaps, AI guidance, and progress tracking in one platform to help students build skills efficiently and achieve career success.</p>
+          </motion.div>
         </div>
       </section>
 
       <section id="problem-statement" className="relative pb-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="rounded-[40px] border border-white/60 bg-white/65 p-8 shadow-xl shadow-slate-200/60 backdrop-blur-xl sm:p-12">
-            <h2 className="mb-5 text-4xl font-black text-slate-900">Problem Statement</h2>
-            <p className="text-lg font-medium leading-relaxed text-slate-600">
-              Students waste time because they don’t know what to learn and in what order. EduRoutee solves this by
-              providing structured learning roadmaps, AI-based guidance, and progress tracking in one platform.
-            </p>
-          </div>
+          <motion.div initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} className="premium-border rounded-[40px] bg-white/10 p-8 shadow-xl shadow-slate-950/20 backdrop-blur-2xl sm:p-12">
+            <h2 className="mb-5 text-4xl font-black text-white">Problem Statement</h2>
+            <p className="text-lg font-medium leading-relaxed text-slate-300">Students waste time because they don’t know what to learn and in what order. EduRoutee solves this by providing structured learning roadmaps, AI-based guidance, and progress tracking in one platform.</p>
+          </motion.div>
         </div>
       </section>
 
       <section id="team" className="relative py-20">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mb-10 text-center">
-            <h2 className="mb-3 text-4xl font-black text-slate-900">About the Team</h2>
-            <p className="text-lg font-medium text-slate-500">Meet the founders behind EduRoutee.</p>
+            <h2 className="mb-3 text-4xl font-black text-white">About the Team</h2>
+            <p className="text-lg font-medium text-slate-400">Meet the founders behind EduRoutee.</p>
           </div>
 
           <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
-            {teamMembers.map((member) => (
-              <div
-                key={member.name}
-                className="rounded-3xl border border-white/70 bg-white/70 p-6 text-center shadow-xl shadow-slate-200/60 backdrop-blur-xl"
-              >
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#0A66C2] text-white">
-                  <Linkedin className="h-6 w-6" />
-                </div>
-                <h3 className="text-2xl font-black text-slate-900">{member.name}</h3>
-                <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-slate-500">{member.role}</p>
-                <a
-                  href={member.profileUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex items-center gap-2 rounded-full border border-[#0A66C2]/30 bg-[#0A66C2] px-6 py-3 font-bold text-white shadow-lg shadow-[#0A66C2]/25 transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#004182]"
-                >
-                  <Linkedin className="h-5 w-5" />
-                  Connect on LinkedIn
-                </a>
-              </div>
+            {teamMembers.map((member, index) => (
+              <motion.div key={member.name} initial={{ opacity: 0, y: 24 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, amount: 0.25 }} transition={{ delay: index * 0.08 }}>
+                <TiltCard glowClassName="bg-sky-400/25">
+                  <div className="premium-border rounded-3xl bg-white/10 p-6 text-center backdrop-blur-2xl">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#0A66C2] text-white shadow-lg shadow-[#0A66C2]/30">
+                      <Linkedin className="h-6 w-6" />
+                    </div>
+                    <h3 className="text-2xl font-black text-white">{member.name}</h3>
+                    <p className="mb-5 text-sm font-semibold uppercase tracking-wider text-slate-400">{member.role}</p>
+                    <a href={member.profileUrl} target="_blank" rel="noreferrer" className="glow-button inline-flex items-center gap-2 rounded-full px-6 py-3 font-bold text-white">
+                      <Linkedin className="h-5 w-5" /> Connect on LinkedIn
+                    </a>
+                  </div>
+                </TiltCard>
+              </motion.div>
             ))}
           </div>
         </div>
       </section>
 
-      <footer className="relative border-t border-white/60 bg-white/65 py-14 backdrop-blur-xl">
+      <footer className="relative border-t border-white/10 bg-white/5 py-14 backdrop-blur-xl">
         <div className="mx-auto grid max-w-7xl gap-8 px-4 sm:px-6 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
-          <div className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg shadow-slate-200/50">
-            <p className="mb-4 text-lg font-black text-slate-900">EduRoutee</p>
-            <p className="text-sm font-medium leading-relaxed text-slate-500">
-              A smart roadmap platform helping students learn in the right order and reach career goals faster.
-            </p>
+          <div className="premium-border rounded-3xl bg-white/10 p-6 shadow-lg shadow-slate-950/20">
+            <p className="mb-4 text-lg font-black text-white">EduRoutee</p>
+            <p className="text-sm font-medium leading-relaxed text-slate-400">A smart roadmap platform helping students learn in the right order and reach career goals faster.</p>
           </div>
 
-          <div className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg shadow-slate-200/50">
-            <h3 className="mb-4 text-lg font-black text-slate-900">Contact Us</h3>
-            <div className="space-y-3 text-sm font-medium text-slate-600">
-              <a href={`mailto:${contactEmail}`} className="flex items-center gap-2 transition-colors hover:text-emerald-700">
-                <Mail className="h-4 w-4" />
-                {contactEmail}
-              </a>
-              <a href={`tel:${contactPhone.replace(/\s/g, '')}`} className="flex items-center gap-2 transition-colors hover:text-emerald-700">
-                <Phone className="h-4 w-4" />
-                {contactPhone}
-              </a>
-              <a href={instagramUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 transition-colors hover:text-emerald-700">
-                <Instagram className="h-4 w-4" />
-                Instagram Profile
-              </a>
-              <a href={whatsappUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 transition-colors hover:text-emerald-700">
-                <MessageCircle className="h-4 w-4" />
-                WhatsApp Chat
-              </a>
+          <div className="premium-border rounded-3xl bg-white/10 p-6 shadow-lg shadow-slate-950/20">
+            <h3 className="mb-4 text-lg font-black text-white">Contact Us</h3>
+            <div className="space-y-3 text-sm font-medium text-slate-300">
+              <a href={`mailto:${contactEmail}`} className="flex items-center gap-2 transition-colors hover:text-cyan-300"><Mail className="h-4 w-4" />{contactEmail}</a>
+              <a href={`tel:${contactPhone.replace(/\s/g, '')}`} className="flex items-center gap-2 transition-colors hover:text-cyan-300"><Phone className="h-4 w-4" />{contactPhone}</a>
+              <a href={whatsappUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 transition-colors hover:text-cyan-300"><MessageCircle className="h-4 w-4" />WhatsApp</a>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg shadow-slate-200/50">
-            <h3 className="mb-4 text-lg font-black text-slate-900">Quick Links</h3>
-            <div className="grid gap-3 text-sm font-semibold text-slate-600">
-              <a href="/" className="transition-colors hover:text-emerald-700">Home</a>
-              <a href="#about-eduroutee" className="transition-colors hover:text-emerald-700">About</a>
-              <a href="/roadmaps" className="transition-colors hover:text-emerald-700">Roadmaps</a>
-              <a href="/dashboard" className="transition-colors hover:text-emerald-700">Dashboard</a>
-              <a href="#team" className="transition-colors hover:text-emerald-700">Team</a>
+          <div className="premium-border rounded-3xl bg-white/10 p-6 shadow-lg shadow-slate-950/20">
+            <h3 className="mb-4 text-lg font-black text-white">Social</h3>
+            <div className="space-y-3 text-sm font-medium text-slate-300">
+              <a href={linkedinUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 transition-colors hover:text-cyan-300"><Linkedin className="h-4 w-4" />LinkedIn</a>
+              <a href={instagramUrl} target="_blank" rel="noreferrer" className="flex items-center gap-2 transition-colors hover:text-cyan-300"><Instagram className="h-4 w-4" />Instagram</a>
             </div>
           </div>
 
-          <div className="rounded-3xl border border-white/70 bg-white/70 p-6 shadow-lg shadow-slate-200/50">
-            <h3 className="mb-4 text-lg font-black text-slate-900">Follow Us</h3>
-            <div className="flex flex-wrap items-center gap-3">
-              {[
-                { icon: Instagram, label: 'Instagram', href: instagramUrl },
-                { icon: Mail, label: 'Email', href: `mailto:${contactEmail}` },
-                { icon: Phone, label: 'Phone', href: `tel:${contactPhone.replace(/\s/g, '')}` },
-                { icon: MessageCircle, label: 'WhatsApp', href: whatsappUrl },
-              ].map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target={social.href.startsWith('http') ? '_blank' : undefined}
-                  rel={social.href.startsWith('http') ? 'noreferrer' : undefined}
-                  aria-label={social.label}
-                  className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-white/80 bg-white text-slate-700 shadow-md shadow-slate-200/60 transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-200 hover:text-emerald-700"
-                >
-                  <social.icon className="h-5 w-5" />
-                </a>
-              ))}
+          <div className="premium-border rounded-3xl bg-white/10 p-6 shadow-lg shadow-slate-950/20">
+            <h3 className="mb-4 text-lg font-black text-white">Highlights</h3>
+            <div className="space-y-3 text-sm font-medium text-slate-300">
+              <div className="flex items-center gap-2"><Sparkles className="h-4 w-4 text-cyan-300" />AI guidance for every learner</div>
+              <div className="flex items-center gap-2"><Trophy className="h-4 w-4 text-cyan-300" />Gamified growth & rewards</div>
+              <div className="flex items-center gap-2"><Briefcase className="h-4 w-4 text-cyan-300" />Internships and direct hiring</div>
             </div>
           </div>
-        </div>
-
-        <div className="mx-auto mt-8 max-w-7xl border-t border-white/60 px-4 pt-6 text-center sm:px-6 lg:px-8">
-          <p className="text-sm font-semibold text-slate-500">© {new Date().getFullYear()} EduRoutee. All rights reserved.</p>
         </div>
       </footer>
     </div>
   );
 };
+
+export default LandingPage;
