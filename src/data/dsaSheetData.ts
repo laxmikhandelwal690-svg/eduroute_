@@ -2,7 +2,8 @@ export type DsaQuestion = {
   id: number;
   title: string;
   difficulty: 'Easy';
-  resourceUrl: string;
+  gfgUrl: string;
+  codingNinjaUrl: string;
   videoUrl: string;
 };
 
@@ -15,11 +16,14 @@ const createQuestions = (topic: string, titles: string[], startId: number): DsaT
   topic,
   questions: titles.map((title, index) => {
     const id = startId + index;
+    const query = encodeURIComponent(`${title} ${topic} dsa`);
+
     return {
       id,
       title,
       difficulty: 'Easy',
-      resourceUrl: `https://takeuforward.org/data-structure/${encodeURIComponent(title.toLowerCase().replace(/\s+/g, '-'))}`,
+      gfgUrl: `https://www.geeksforgeeks.org/?s=${query}`,
+      codingNinjaUrl: `https://www.naukri.com/code360/problem-lists?search=${query}`,
       videoUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(`${title} dsa`)}`,
     };
   }),

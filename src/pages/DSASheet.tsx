@@ -6,7 +6,6 @@ import {
   ExternalLink,
   FileText,
   PlayCircle,
-  Plus,
   Search,
   Sparkles,
   Star,
@@ -144,7 +143,6 @@ export const DSASheet = () => {
                           <th className="px-4 py-3 text-left">Difficulty</th>
                           <th className="px-4 py-3 text-left">Resource</th>
                           <th className="px-4 py-3 text-left">Practice</th>
-                          <th className="px-4 py-3 text-left">Notes</th>
                           <th className="px-4 py-3 text-left">Revision</th>
                         </tr>
                       </thead>
@@ -169,8 +167,11 @@ export const DSASheet = () => {
                               </td>
                               <td className="px-4 py-3">
                                 <div className="flex items-center gap-2">
-                                  <a href={question.resourceUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-white/10 p-2 text-slate-200 transition hover:bg-white/20" title="Article">
+                                  <a href={question.gfgUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-white/10 p-2 text-slate-200 transition hover:bg-white/20" title="GeeksforGeeks">
                                     <FileText className="h-4 w-4" />
+                                  </a>
+                                  <a href={question.codingNinjaUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-white/10 p-2 text-slate-200 transition hover:bg-white/20" title="Coding Ninjas">
+                                    <span className="text-[10px] font-black">CN</span>
                                   </a>
                                   <a href={question.videoUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-white/10 p-2 text-slate-200 transition hover:bg-white/20" title="Video">
                                     <PlayCircle className="h-4 w-4" />
@@ -178,14 +179,9 @@ export const DSASheet = () => {
                                 </div>
                               </td>
                               <td className="px-4 py-3">
-                                <a href={question.resourceUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg bg-indigo-500 px-3 py-1.5 text-xs font-bold text-white shadow-md shadow-indigo-500/40 transition hover:bg-indigo-400">
+                                <a href={question.gfgUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg bg-indigo-500 px-3 py-1.5 text-xs font-bold text-white shadow-md shadow-indigo-500/40 transition hover:bg-indigo-400">
                                   Solve <ExternalLink className="h-3.5 w-3.5" />
                                 </a>
-                              </td>
-                              <td className="px-4 py-3">
-                                <button className="rounded-lg bg-white/10 p-2 text-slate-200 transition hover:bg-white/20" title="Add notes">
-                                  <Plus className="h-4 w-4" />
-                                </button>
                               </td>
                               <td className="px-4 py-3">
                                 <button className="rounded-lg bg-white/10 p-2 text-amber-300 transition hover:bg-white/20" title="Mark revision">
