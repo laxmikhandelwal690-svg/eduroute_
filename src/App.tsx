@@ -1,7 +1,5 @@
 import { Suspense, lazy, type ReactElement } from 'react';
-import { AnimatePresence } from 'framer-motion';
 import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { PageTransition } from './components/PageTransition';
 import { isAdminSessionActive } from './utils/adminSession';
 import { getAuthUser, isAuthenticated } from './utils/rbacAuth';
 import { ThemeToggle } from './components/ThemeToggle';
@@ -70,7 +68,7 @@ const AdminLogin = lazy(() => import('./pages/Admin/AdminLogin').then((module) =
 const CourseManager = lazy(() => import('./pages/Admin/CourseManager').then((module) => ({ default: module.CourseManager })));
 const ProfileDashboard = lazy(() => import('./pages/Profile/ProfileDashboard').then((module) => ({ default: module.ProfileDashboard })));
 
-const PageLoader = () => <div className="min-h-screen flex items-center justify-center bg-[var(--bg-primary)] text-[var(--text-secondary)] font-semibold">Loading...</div>;
+const PageLoader = () => <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500 font-semibold">Loading...</div>;
 
 const DASHBOARD_ROUTES = ['/dashboard', '/courses', '/browse', '/course/', '/paths', '/roadmaps', '/assessments', '/buddy', '/leaderboard', '/rewards', '/internships', '/events', '/soft-skills', '/admin', '/profile'];
 
@@ -87,55 +85,43 @@ const GlobalThemeButton = () => {
   );
 };
 
-
-const AnimatedRoutes = () => {
-  const location = useLocation();
-
-  return (
-    <Suspense fallback={<PageLoader />}>
-      <AnimatePresence mode="wait">
-        <Routes location={location} key={location.pathname}>
-          <Route path="/" element={<PageTransition><LandingPage /></PageTransition>} />
-          <Route path="/signup" element={<PublicOnlyRoute><PageTransition><Signup /></PageTransition></PublicOnlyRoute>} />
-          <Route path="/login" element={<PublicOnlyRoute><PageTransition><Login /></PageTransition></PublicOnlyRoute>} />
-          <Route path="/verify-otp" element={<PublicOnlyRoute><PageTransition><VerifyOTP /></PageTransition></PublicOnlyRoute>} />
-          <Route path="/verify-college" element={<PublicOnlyRoute><PageTransition><VerifyCollege /></PageTransition></PublicOnlyRoute>} />
-          <Route path="/admin-login" element={<PageTransition><AdminLogin /></PageTransition>} />
-          <Route path="/course-manager" element={<AdminSessionRoute><PageTransition><CourseManager /></PageTransition></AdminSessionRoute>} />
-
-          <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
-            <Route path="/dashboard" element={<RoleRoute role="student"><PageTransition><Dashboard /></PageTransition></RoleRoute>} />
-            <Route path="/courses" element={<RoleRoute role="student"><PageTransition><MyCourses /></PageTransition></RoleRoute>} />
-            <Route path="/browse" element={<RoleRoute role="student"><PageTransition><BrowseCourses /></PageTransition></RoleRoute>} />
-            <Route path="/course/:id" element={<RoleRoute role="student"><PageTransition><CourseDetails /></PageTransition></RoleRoute>} />
-            <Route path="/paths" element={<RoleRoute role="student"><PageTransition><Pathways /></PageTransition></RoleRoute>} />
-            <Route path="/roadmaps" element={<RoleRoute role="student"><PageTransition><RoadmapList /></PageTransition></RoleRoute>} />
-            <Route path="/roadmaps/:role" element={<RoleRoute role="student"><PageTransition><RoadmapDetail /></PageTransition></RoleRoute>} />
-            <Route path="/assessments" element={<RoleRoute role="student"><PageTransition><Assessments /></PageTransition></RoleRoute>} />
-            <Route path="/buddy" element={<RoleRoute role="student"><PageTransition><BuddyChat /></PageTransition></RoleRoute>} />
-            <Route path="/leaderboard" element={<RoleRoute role="student"><PageTransition><Leaderboard /></PageTransition></RoleRoute>} />
-            <Route path="/rewards" element={<RoleRoute role="student"><PageTransition><Rewards /></PageTransition></RoleRoute>} />
-            <Route path="/internships" element={<RoleRoute role="student"><PageTransition><Internships /></PageTransition></RoleRoute>} />
-            <Route path="/companies/:id" element={<RoleRoute role="student"><PageTransition><CompanyDetail /></PageTransition></RoleRoute>} />
-            <Route path="/events" element={<RoleRoute role="student"><PageTransition><Events /></PageTransition></RoleRoute>} />
-            <Route path="/soft-skills" element={<RoleRoute role="student"><PageTransition><SoftSkills /></PageTransition></RoleRoute>} />
-            <Route path="/profile" element={<RoleRoute role="student"><PageTransition><ProfileDashboard /></PageTransition></RoleRoute>} />
-            <Route path="/admin" element={<RoleRoute role="admin"><PageTransition><AdminDashboard /></PageTransition></RoleRoute>} />
-          </Route>
-
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </AnimatePresence>
-    </Suspense>
-  );
-};
-
 export function App() {
   return (
     <Router>
       <GlobalThemeButton />
-      <AnimatedRoutes />
+      <Suspense fallback={<PageLoader />}>
+        <Routes>
+          <Route path="/" element={<LandingPage />} />
+          <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
+          <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
+          <Route path="/verify-otp" element={<PublicOnlyRoute><VerifyOTP /></PublicOnlyRoute>} />
+          <Route path="/verify-college" element={<PublicOnlyRoute><VerifyCollege /></PublicOnlyRoute>} />
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/course-manager" element={<AdminSessionRoute><CourseManager /></AdminSessionRoute>} />
+
+          <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
+            <Route path="/dashboard" element={<RoleRoute role="student"><Dashboard /></RoleRoute>} />
+            <Route path="/courses" element={<RoleRoute role="student"><MyCourses /></RoleRoute>} />
+            <Route path="/browse" element={<RoleRoute role="student"><BrowseCourses /></RoleRoute>} />
+            <Route path="/course/:id" element={<RoleRoute role="student"><CourseDetails /></RoleRoute>} />
+            <Route path="/paths" element={<RoleRoute role="student"><Pathways /></RoleRoute>} />
+            <Route path="/roadmaps" element={<RoleRoute role="student"><RoadmapList /></RoleRoute>} />
+            <Route path="/roadmaps/:role" element={<RoleRoute role="student"><RoadmapDetail /></RoleRoute>} />
+            <Route path="/assessments" element={<RoleRoute role="student"><Assessments /></RoleRoute>} />
+            <Route path="/buddy" element={<RoleRoute role="student"><BuddyChat /></RoleRoute>} />
+            <Route path="/leaderboard" element={<RoleRoute role="student"><Leaderboard /></RoleRoute>} />
+            <Route path="/rewards" element={<RoleRoute role="student"><Rewards /></RoleRoute>} />
+            <Route path="/internships" element={<RoleRoute role="student"><Internships /></RoleRoute>} />
+            <Route path="/companies/:id" element={<RoleRoute role="student"><CompanyDetail /></RoleRoute>} />
+            <Route path="/events" element={<RoleRoute role="student"><Events /></RoleRoute>} />
+            <Route path="/soft-skills" element={<RoleRoute role="student"><SoftSkills /></RoleRoute>} />
+            <Route path="/profile" element={<RoleRoute role="student"><ProfileDashboard /></RoleRoute>} />
+            <Route path="/admin" element={<RoleRoute role="admin"><AdminDashboard /></RoleRoute>} />
+          </Route>
+
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </Suspense>
     </Router>
   );
 }
-
