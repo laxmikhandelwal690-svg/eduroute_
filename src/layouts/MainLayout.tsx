@@ -14,10 +14,8 @@ import {
   Menu,
   X
 } from 'lucide-react';
-import { useEffect, useMemo, useState } from 'react';
-import { motion } from 'framer-motion';
+import { useMemo, useState } from 'react';
 import { ThemeToggle } from '../components/ThemeToggle';
-import { cn } from '../utils/cn';
 
 const NAVIGATION = [
   { name: 'Dashboard', path: '/dashboard', icon: LayoutDashboard },
@@ -33,19 +31,6 @@ const NAVIGATION = [
 export const MainLayout = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 50, y: 18 });
-
-  useEffect(() => {
-    const handleMove = (event: MouseEvent) => {
-      setMousePosition({
-        x: (event.clientX / window.innerWidth) * 100,
-        y: (event.clientY / window.innerHeight) * 100,
-      });
-    };
-
-    window.addEventListener('mousemove', handleMove);
-    return () => window.removeEventListener('mousemove', handleMove);
-  }, []);
 
   const profileIdentity = useMemo(() => {
     const authUser = getAuthUser();
@@ -61,108 +46,121 @@ export const MainLayout = () => {
     };
   }, []);
 
-  const navLinkClass = (isActive: boolean) => cn(
-    'group relative overflow-hidden rounded-2xl border px-4 py-3 text-sm font-bold transition-all duration-300',
-    isActive
-      ? 'active-nav border-white/20 bg-white/15 text-white shadow-[0_12px_40px_rgba(79,70,229,0.42)]'
-      : 'border-white/10 bg-white/5 text-[var(--text-secondary)] hover:border-white/20 hover:bg-white/10 hover:text-[var(--text-primary)] hover:shadow-[0_12px_34px_rgba(15,23,42,0.18)]'
-  );
-
   return (
-    <div
-      className="relative flex h-screen overflow-hidden bg-[var(--bg-primary)] text-[var(--text-primary)]"
-      style={{
-        backgroundImage: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(99,102,241,0.18), transparent 18%), radial-gradient(circle at 15% 15%, rgba(56,189,248,0.18), transparent 20%), linear-gradient(135deg, rgba(2,6,23,0.03), transparent 55%)`,
-      }}
-    >
-      <div className="pointer-events-none absolute inset-0 opacity-80">
-        <div className="absolute left-[10%] top-[10%] h-56 w-56 rounded-full bg-fuchsia-500/10 blur-3xl" />
-        <div className="absolute bottom-[12%] right-[14%] h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
-      </div>
-
-      <aside className="relative hidden w-72 shrink-0 flex-col border-r border-white/10 bg-[linear-gradient(180deg,rgba(15,23,42,0.88),rgba(15,23,42,0.78))] px-4 py-5 shadow-2xl shadow-slate-950/20 backdrop-blur-2xl lg:flex">
-        <div className="absolute inset-0 rounded-r-[2rem] border-r border-white/10 bg-[radial-gradient(circle_at_top,rgba(129,140,248,0.22),transparent_30%)]" />
-        <div className="relative mb-5 flex items-center justify-between gap-2 rounded-[28px] border border-white/10 bg-white/10 p-4 backdrop-blur-xl">
+    <div className="flex h-screen bg-[var(--bg-primary)] text-[var(--text-primary)]">
+      {/* Sidebar Desktop */}
+      <aside className="hidden lg:flex w-72 flex-col border-r border-[var(--border-default)] bg-[var(--surface-nav)] backdrop-blur-xl">
+        <div className="p-6 border-b border-[var(--border-default)] flex items-center justify-between gap-2">
           <Link to="/dashboard" className="flex items-center gap-3">
-            <div className="gradient-border-box h-12 w-12 rounded-2xl">
-              <div className="flex h-full w-full items-center justify-center rounded-[inherit] bg-slate-950 text-xl font-black text-white">E</div>
-            </div>
-            <div>
-              <span className="block text-xs font-semibold uppercase tracking-[0.35em] text-white/50">Premium</span>
-              <span className="text-xl font-black text-white">EDUROUTE</span>
-            </div>
+            <div className="h-10 w-10 rounded-xl bg-indigo-600 flex items-center justify-center text-white font-bold text-xl">E</div>
+            <span className="text-xl font-bold text-[var(--text-primary)]">EDUROUTE</span>
           </Link>
           <Link to="/profile" className="group" aria-label="Open profile dashboard">
-            <div className="h-11 w-11 overflow-hidden rounded-full border border-white/15 bg-[var(--accent-gradient)] text-white flex items-center justify-center font-bold shadow-[0_10px_30px_rgba(79,70,229,0.35)] group-hover:scale-105">
+            <div className="h-10 w-10 overflow-hidden rounded-full border border-slate-200 bg-indigo-600 text-white flex items-center justify-center font-bold shadow-sm group-hover:scale-105">
               {profileIdentity.photo ? <img src={profileIdentity.photo} alt={profileIdentity.name} className="h-full w-full object-cover" /> : profileIdentity.initial}
             </div>
           </Link>
         </div>
 
-        <nav className="relative flex-1 space-y-2 overflow-y-auto px-1 py-3">
+        <nav className="flex-1 overflow-y-auto p-4 space-y-2">
           {NAVIGATION.map((item) => {
             const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
             return (
-              <Link key={item.path} to={item.path} className={navLinkClass(isActive)}>
-                <span className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.18),transparent_58%)] opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                <span className="relative flex items-center gap-3">
-                  <item.icon className={cn('h-5 w-5', isActive ? 'text-white' : 'text-white/80 group-hover:text-white')} />
-                  {item.name}
-                </span>
+              <Link
+                key={item.path}
+                to={item.path}
+                className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
+                  isActive
+                    ? 'active-nav bg-indigo-600 text-white shadow-lg shadow-indigo-200'
+                    : 'text-[var(--text-secondary)] hover:bg-white/60'
+                }`}
+              >
+                <item.icon className="h-5 w-5" />
+                {item.name}
               </Link>
             );
           })}
         </nav>
 
-        <div className="relative space-y-2 border-t border-white/10 pt-4">
-          <Link to="/admin-login" className={navLinkClass(false)}>
-            <span className="relative flex items-center gap-3"><span className="inline-flex h-5 w-5 items-center justify-center font-black">A</span>Admin</span>
+        <div className="p-4 border-t border-[var(--border-default)] space-y-2">
+          <Link
+            to="/admin-login"
+            className="flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm text-[var(--text-secondary)] hover:bg-white/60 transition-all"
+          >
+            <span className="h-5 w-5 inline-flex items-center justify-center font-black">A</span>
+            Admin
           </Link>
           <button
             onClick={() => window.location.href = '/'}
-            className="w-full rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-left text-sm font-bold text-[var(--text-secondary)] hover:border-red-400/35 hover:bg-red-500/10 hover:text-red-200"
+            className="w-full flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm text-[var(--text-secondary)] hover:bg-red-500/10 hover:text-red-500 transition-all"
           >
-            <span className="flex items-center gap-3"><LogOut className="h-5 w-5" />Logout</span>
+            <LogOut className="h-5 w-5" />
+            Logout
           </button>
         </div>
       </aside>
 
-      <div className="fixed left-0 right-0 top-0 z-40 flex items-center justify-between border-b border-white/10 bg-[rgba(15,23,42,0.82)] px-4 py-3 shadow-lg shadow-slate-950/10 backdrop-blur-2xl lg:hidden">
+      {/* Mobile Header */}
+      <div className="lg:hidden fixed top-0 left-0 right-0 bg-[var(--surface-nav)] border-b border-[var(--border-default)] px-4 py-3 z-40 flex items-center justify-between">
         <Link to="/dashboard" className="flex items-center gap-2">
-          <div className="gradient-border-box h-9 w-9 rounded-xl"><div className="flex h-full w-full items-center justify-center rounded-[inherit] bg-slate-950 text-lg font-black text-white">E</div></div>
-          <span className="text-lg font-black text-white">EDUROUTE</span>
+          <div className="h-8 w-8 rounded-lg bg-indigo-600 flex items-center justify-center text-white font-bold text-lg">E</div>
+          <span className="text-lg font-bold text-[var(--text-primary)]">EDUROUTE</span>
         </Link>
         <div className="flex items-center gap-2">
           <ThemeToggle className="h-9 w-[70px]" />
-          <Link to="/profile" className="h-9 w-9 overflow-hidden rounded-full border border-white/15 bg-[var(--accent-gradient)] text-white flex items-center justify-center font-bold" aria-label="Open profile dashboard">
+          <Link to="/profile" className="h-9 w-9 overflow-hidden rounded-full border border-[var(--border-default)] bg-indigo-600 text-white flex items-center justify-center font-bold" aria-label="Open profile dashboard">
             {profileIdentity.photo ? <img src={profileIdentity.photo} alt={profileIdentity.name} className="h-full w-full object-cover" /> : profileIdentity.initial}
           </Link>
-          <button onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} className="rounded-xl border border-white/10 bg-white/5 p-2 text-white hover:bg-white/10">
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            className="p-2 hover:bg-white/70 rounded-xl transition-colors"
+          >
             {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
           </button>
         </div>
       </div>
 
+      {/* Desktop Top-right Theme Toggle */}
+      <div className="fixed right-5 top-5 z-30 hidden lg:block">
+        <ThemeToggle />
+      </div>
+
+      {/* Mobile Menu */}
       {isMobileMenuOpen && (
-        <motion.div initial={{ opacity: 0, y: -12 }} animate={{ opacity: 1, y: 0 }} className="fixed inset-0 z-30 overflow-y-auto bg-[rgba(2,6,23,0.92)] pt-20 backdrop-blur-2xl lg:hidden">
-          <nav className="space-y-2 p-4">
+        <div className="lg:hidden fixed inset-0 bg-[var(--surface-nav)] z-30 pt-16 overflow-y-auto">
+          <nav className="p-4 space-y-2">
             {NAVIGATION.map((item) => {
-              const isActive = location.pathname === item.path || location.pathname.startsWith(item.path + '/');
+              const isActive = location.pathname === item.path;
               return (
-                <Link key={item.path} to={item.path} onClick={() => setIsMobileMenuOpen(false)} className={navLinkClass(isActive)}>
-                  <span className="relative flex items-center gap-3"><item.icon className="h-5 w-5" />{item.name}</span>
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setIsMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm transition-all ${
+                    isActive
+                      ? 'active-nav bg-indigo-600 text-white'
+                      : 'text-[var(--text-secondary)] hover:bg-white/70'
+                  }`}
+                >
+                  <item.icon className="h-5 w-5" />
+                  {item.name}
                 </Link>
               );
             })}
-            <Link to="/admin-login" onClick={() => setIsMobileMenuOpen(false)} className={navLinkClass(false)}>
-              <span className="relative flex items-center gap-3"><span className="inline-flex h-5 w-5 items-center justify-center font-black">A</span>Admin</span>
+            <Link
+              to="/admin-login"
+              onClick={() => setIsMobileMenuOpen(false)}
+              className="flex items-center gap-3 px-4 py-3 rounded-2xl font-bold text-sm text-[var(--text-secondary)] hover:bg-white/70 transition-all"
+            >
+              <span className="h-5 w-5 inline-flex items-center justify-center font-black">A</span>
+              Admin
             </Link>
           </nav>
-        </motion.div>
+        </div>
       )}
 
-      <main className="relative flex-1 overflow-y-auto pt-16 lg:pt-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.08),transparent_35%)]" />
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto lg:pt-0 pt-16">
         <Outlet />
       </main>
     </div>
