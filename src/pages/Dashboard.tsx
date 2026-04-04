@@ -5,6 +5,7 @@ import { Course } from '../types';
 import { getCurrentUser, getDisplayFirstName } from '../utils/userProfile';
 
 export const Dashboard = () => {
+  const navigate = useNavigate();
   const currentUser = getCurrentUser();
   const enrolledCourses = COURSES.filter(c => currentUser.enrolledCourses.includes(c.id));
   const recommendedCourses = COURSES.filter(c => !currentUser.enrolledCourses.includes(c.id));
@@ -48,6 +49,7 @@ export const Dashboard = () => {
           <button className="text-sm font-bold text-indigo-600 hover:text-indigo-700">Explore</button>
         </div>
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+          <DSABeginnerCard onOpen={() => navigate('/dsa-sheet')} />
           {recommendedCourses.map((course) => (
             <CourseCard key={course.id} course={course} />
           ))}
@@ -107,6 +109,30 @@ const ContinueLearningCard = ({ course }: { course: Course }) => (
       </div>
     </div>
   </motion.div>
+);
+
+const DSABeginnerCard = ({ onOpen }: { onOpen: () => void }) => (
+  <TiltCard glowClassName="bg-emerald-400/20">
+    <motion.button
+      type="button"
+      onClick={onOpen}
+      whileHover={{ y: -8 }}
+      className="glass-panel premium-border group relative flex h-full w-full flex-col overflow-hidden rounded-[32px] p-8 text-left"
+    >
+      <div className="absolute -right-1 top-4 animate-pulse rounded-l-xl bg-gradient-to-r from-emerald-400 to-lime-300 px-4 py-1 text-xs font-black uppercase tracking-widest text-slate-900 shadow-[0_0_24px_rgba(74,222,128,0.65)]">
+        FREE
+      </div>
+      <div className="mt-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-400/20 text-emerald-200">
+        <Code2 className="h-7 w-7" />
+      </div>
+      <p className="mt-6 text-xs font-black uppercase tracking-[0.3em] text-emerald-200">100 Easy Questions</p>
+      <h3 className="mt-3 text-2xl font-black text-slate-100">DSA Beginner Sheet</h3>
+      <p className="mt-3 text-sm font-semibold text-slate-300">Start your DSA journey with structured problems</p>
+      <span className="mt-8 inline-flex w-fit items-center gap-2 rounded-xl bg-emerald-500/20 px-4 py-2 text-xs font-black uppercase tracking-widest text-emerald-100 transition group-hover:bg-emerald-500/30">
+        Open Sheet <ArrowRight className="h-4 w-4" />
+      </span>
+    </motion.button>
+  </TiltCard>
 );
 
 const CourseCard = ({ course }: { course: Course }) => (

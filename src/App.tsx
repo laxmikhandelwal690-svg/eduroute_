@@ -67,10 +67,11 @@ const AdminDashboard = lazy(() => import('./pages/Admin/AdminDashboard').then((m
 const AdminLogin = lazy(() => import('./pages/Admin/AdminLogin').then((module) => ({ default: module.AdminLogin })));
 const CourseManager = lazy(() => import('./pages/Admin/CourseManager').then((module) => ({ default: module.CourseManager })));
 const ProfileDashboard = lazy(() => import('./pages/Profile/ProfileDashboard').then((module) => ({ default: module.ProfileDashboard })));
+const DSASheet = lazy(() => import('./pages/DSASheet').then((module) => ({ default: module.DSASheet })));
 
 const PageLoader = () => <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500 font-semibold">Loading...</div>;
 
-const DASHBOARD_ROUTES = ['/dashboard', '/courses', '/browse', '/course/', '/paths', '/roadmaps', '/assessments', '/buddy', '/leaderboard', '/rewards', '/internships', '/events', '/soft-skills', '/admin', '/profile'];
+const DASHBOARD_ROUTES = ['/dashboard', '/courses', '/browse', '/course/', '/paths', '/roadmaps', '/assessments', '/buddy', '/leaderboard', '/rewards', '/internships', '/events', '/soft-skills', '/dsa-sheet', '/admin', '/profile'];
 
 const GlobalThemeButton = () => {
   const location = useLocation();
