@@ -3,12 +3,14 @@ import { PlayCircle, Clock, Star, Users, Trophy, ArrowRight, ShieldCheck } from 
 import { COURSES } from '../data/mockData';
 import { Course } from '../types';
 import { getCurrentUser, getDisplayFirstName } from '../utils/userProfile';
+import { getDashboardManagedCourses } from '../utils/courseManagerStorage';
 
 export const Dashboard = () => {
   const navigate = useNavigate();
   const currentUser = getCurrentUser();
   const enrolledCourses = COURSES.filter(c => currentUser.enrolledCourses.includes(c.id));
   const recommendedCourses = COURSES.filter(c => !currentUser.enrolledCourses.includes(c.id));
+  const uploadedDashboardCourses = getDashboardManagedCourses();
 
   return (
     <div className="flex-1 overflow-y-auto p-4 md:p-8">
@@ -55,6 +57,31 @@ export const Dashboard = () => {
           ))}
         </div>
       </section>
+
+
+      {uploadedDashboardCourses.length > 0 && (
+        <section className="mb-12">
+          <div className="mb-8 flex items-center justify-between">
+            <h2 className="text-2xl font-black text-slate-900">Uploaded to Dashboard</h2>
+          </div>
+          <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
+            {uploadedDashboardCourses.map((course) => (
+              <motion.article key={course.id} whileHover={{ y: -8 }} className="group overflow-hidden rounded-[32px] border border-slate-100 bg-white transition-all hover:shadow-2xl">
+                <div className="relative aspect-[16/10] overflow-hidden">
+                  <img src={course.thumbnailUrl} alt={course.title} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110" />
+                </div>
+                <div className="p-8">
+                  <div className="text-[11px] font-black text-indigo-600 uppercase tracking-widest">{course.category}</div>
+                  <h3 className="mt-3 line-clamp-2 text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors leading-snug h-14">
+                    {course.title}
+                  </h3>
+                  <p className="mt-2 text-sm text-slate-500 line-clamp-3">{course.description}</p>
+                </div>
+              </motion.article>
+            ))}
+          </div>
+        </section>
+      )}
 
       <section>
         <div className="rounded-[40px] bg-indigo-600 p-10 text-white shadow-2xl shadow-indigo-200">
