@@ -131,4 +131,3 @@ export function App() {
     </Router>
   );
 }
-
