@@ -174,4 +174,3 @@ const CourseCard = ({ course }: { course: Course }) => (
     </div>
   </motion.div>
 );
-
