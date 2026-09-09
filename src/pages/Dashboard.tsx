@@ -1,5 +1,7 @@
 import { motion } from 'framer-motion';
-import { PlayCircle, Clock, Star, Users, Trophy, ArrowRight, ShieldCheck } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { PlayCircle, Clock, Star, Users, Trophy, ArrowRight, ShieldCheck, Code2 } from 'lucide-react';
+import type { ReactNode } from 'react';
 import { COURSES } from '../data/mockData';
 import { Course } from '../types';
 import { getCurrentUser, getDisplayFirstName } from '../utils/userProfile';
@@ -111,6 +113,12 @@ const ContinueLearningCard = ({ course }: { course: Course }) => (
   </motion.div>
 );
 
+const TiltCard = ({ children, glowClassName }: { children: ReactNode; glowClassName: string }) => (
+  <div className={`relative overflow-hidden rounded-[32px] ${glowClassName}`}>
+    {children}
+  </div>
+);
+
 const DSABeginnerCard = ({ onOpen }: { onOpen: () => void }) => (
   <TiltCard glowClassName="bg-emerald-400/20">
     <motion.button
@@ -166,3 +174,4 @@ const CourseCard = ({ course }: { course: Course }) => (
     </div>
   </motion.div>
 );
+
