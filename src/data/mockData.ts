@@ -23,7 +23,7 @@ export const COURSES: Course[] = [
     category: 'Development',
     rating: 4.8,
     students: 15420,
-    price: 49.99,
+    price: 4999,
     modules: [
       {
         id: 'm1',
@@ -55,7 +55,7 @@ export const COURSES: Course[] = [
     category: 'Development',
     rating: 4.9,
     students: 12300,
-    price: 59.99,
+    price: 5999,
     modules: []
   },
   {
@@ -69,7 +69,7 @@ export const COURSES: Course[] = [
     category: 'Design',
     rating: 4.7,
     students: 9800,
-    price: 39.99,
+    price: 3999,
     modules: []
   },
   {
@@ -83,7 +83,7 @@ export const COURSES: Course[] = [
     category: 'Data Science',
     rating: 4.8,
     students: 18500,
-    price: 54.99,
+    price: 6999,
     modules: []
   }
 ];

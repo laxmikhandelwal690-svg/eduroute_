@@ -15,7 +15,7 @@ const EVENTS = [
     location: 'IIT Delhi / Hybrid',
     attendees: '2,500+',
     category: 'Technology',
-    image: 'https://images.unsplash.com/photo-1540575861501-7ad05823c9f5?w=800&auto=format&fit=crop&q=60'
+    image: './assets/web-summit.png'
   },
   {
     id: '2',
@@ -24,7 +24,7 @@ const EVENTS = [
     location: 'IIT Jodhpur (On-campus)',
     attendees: '400',
     category: 'Workshop',
-    image: 'https://images.unsplash.com/photo-1591115765373-520b7a217294?w=800&auto=format&fit=crop&q=60'
+    image: './assets/google-cloud.png'
   },
   {
     id: '3',
@@ -41,7 +41,7 @@ export const Events = () => {
   return (
     <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto">
       <header className="mb-12">
-        <h1 className="text-4xl font-black text-slate-900 mb-4">Growth Events</h1>
+        <h1 className="text-4xl font-black text-slate-900 mb-4 dark:text-white">Growth Events</h1>
         <p className="text-slate-500 text-lg max-w-2xl">
           Expand your network and learn from experts at our curated tech summits, workshops, and hackathons.
         </p>

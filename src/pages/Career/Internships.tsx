@@ -61,7 +61,7 @@ export const Internships = () => {
   return (
     <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto">
       <header className="mb-12">
-        <h1 className="text-4xl font-black text-slate-900 mb-4">Career Connect</h1>
+        <h1 className="text-4xl font-black text-slate-900 mb-4 dark:text-white">Career Connect</h1>
         <p className="text-slate-500 text-lg max-w-2xl">
           Exclusive internship opportunities for EDUROUTE learners. Apply to verified companies based on your roadmap progress.
         </p>

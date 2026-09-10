@@ -58,7 +58,7 @@ export const Rewards = () => {
           <div className="flex items-center gap-2 text-pink-600 font-bold mb-4">
              <Gift className="h-6 w-6" /> <span className="uppercase tracking-widest text-sm">Reward Store</span>
           </div>
-          <h1 className="text-4xl font-black text-slate-900 mb-4">Redeem Your Points</h1>
+          <h1 className="text-4xl font-black text-slate-900 mb-4 dark:text-white">Redeem Your Points</h1>
           <p className="text-slate-500 text-lg max-w-xl leading-relaxed">
             Your hard work pays off. Exchange your learning points for exclusive vouchers, courses, and perks.
           </p>

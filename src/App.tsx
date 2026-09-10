@@ -1,5 +1,6 @@
 import { Suspense, lazy, type ReactElement } from 'react';
 import { BrowserRouter as Router, Navigate, Route, Routes, useLocation } from 'react-router-dom';
+import { isAdminSessionActive } from './utils/adminSession';
 import { getAuthUser, isAuthenticated } from './utils/rbacAuth';
 import { ThemeToggle } from './components/ThemeToggle';
 
@@ -33,6 +34,14 @@ const PublicOnlyRoute = ({ children }: { children: ReactElement }) => {
   return children;
 };
 
+const AdminSessionRoute = ({ children }: { children: ReactElement }) => {
+  if (!isAdminSessionActive()) {
+    return <Navigate to="/admin-login" replace />;
+  }
+
+  return children;
+};
+
 const LandingPage = lazy(() => import('./pages/LandingPage').then((module) => ({ default: module.LandingPage })));
 const Dashboard = lazy(() => import('./pages/Dashboard').then((module) => ({ default: module.Dashboard })));
 const MyCourses = lazy(() => import('./pages/MyCourses').then((module) => ({ default: module.MyCourses })));
@@ -55,11 +64,14 @@ const CompanyDetail = lazy(() => import('./pages/Career/CompanyDetail').then((mo
 const Events = lazy(() => import('./pages/Growth/Events').then((module) => ({ default: module.Events })));
 const SoftSkills = lazy(() => import('./pages/Growth/SoftSkills').then((module) => ({ default: module.SoftSkills })));
 const AdminDashboard = lazy(() => import('./pages/Admin/AdminDashboard').then((module) => ({ default: module.AdminDashboard })));
+const AdminLogin = lazy(() => import('./pages/Admin/AdminLogin').then((module) => ({ default: module.AdminLogin })));
+const CourseManager = lazy(() => import('./pages/Admin/CourseManager').then((module) => ({ default: module.CourseManager })));
 const ProfileDashboard = lazy(() => import('./pages/Profile/ProfileDashboard').then((module) => ({ default: module.ProfileDashboard })));
+const DSASheet = lazy(() => import('./pages/DSASheet').then((module) => ({ default: module.DSASheet })));
 
 const PageLoader = () => <div className="min-h-screen flex items-center justify-center bg-slate-50 text-slate-500 font-semibold">Loading...</div>;
 
-const DASHBOARD_ROUTES = ['/dashboard', '/courses', '/browse', '/course/', '/paths', '/roadmaps', '/assessments', '/buddy', '/leaderboard', '/rewards', '/internships', '/events', '/soft-skills', '/admin', '/profile'];
+const DASHBOARD_ROUTES = ['/dashboard', '/courses', '/browse', '/course/', '/paths', '/roadmaps', '/assessments', '/buddy', '/leaderboard', '/rewards', '/internships', '/events', '/soft-skills', '/dsa-sheet', '/admin', '/profile'];
 
 const GlobalThemeButton = () => {
   const location = useLocation();
@@ -82,9 +94,15 @@ export function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/signup" element={<PublicOnlyRoute><Signup /></PublicOnlyRoute>} />
+          <Route path="/sign-up" element={<Navigate to="/signup" replace />} />
+          <Route path="/register" element={<Navigate to="/signup" replace />} />
           <Route path="/login" element={<PublicOnlyRoute><Login /></PublicOnlyRoute>} />
+          <Route path="/signin" element={<Navigate to="/login" replace />} />
+          <Route path="/sign-in" element={<Navigate to="/login" replace />} />
           <Route path="/verify-otp" element={<PublicOnlyRoute><VerifyOTP /></PublicOnlyRoute>} />
           <Route path="/verify-college" element={<PublicOnlyRoute><VerifyCollege /></PublicOnlyRoute>} />
+          <Route path="/admin-login" element={<AdminLogin />} />
+          <Route path="/course-manager" element={<AdminSessionRoute><CourseManager /></AdminSessionRoute>} />
 
           <Route element={<ProtectedRoute><MainLayout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<RoleRoute role="student"><Dashboard /></RoleRoute>} />
@@ -102,6 +120,7 @@ export function App() {
             <Route path="/companies/:id" element={<RoleRoute role="student"><CompanyDetail /></RoleRoute>} />
             <Route path="/events" element={<RoleRoute role="student"><Events /></RoleRoute>} />
             <Route path="/soft-skills" element={<RoleRoute role="student"><SoftSkills /></RoleRoute>} />
+            <Route path="/dsa-sheet" element={<RoleRoute role="student"><DSASheet /></RoleRoute>} />
             <Route path="/profile" element={<RoleRoute role="student"><ProfileDashboard /></RoleRoute>} />
             <Route path="/admin" element={<RoleRoute role="admin"><AdminDashboard /></RoleRoute>} />
           </Route>

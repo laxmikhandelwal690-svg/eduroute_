@@ -17,6 +17,7 @@ eduroute_
 │       ├── buddy-chat.js                # AI response + chat history + XP update
 │       ├── buddy-progress.js            # User progress + skill-gap persistence
 │       ├── admin-roadmaps.js            # Admin CRUD-like roadmap update endpoint
+│       ├── courses.js                   # Course catalog CRUD endpoint (MongoDB-backed)
 │       └── _lib/
 │           ├── aiClient.js              # OpenAI/Gemini adapter + safety system prompt
 │           └── database.js              # MySQL connection cache and schema helper
@@ -77,8 +78,9 @@ Set these variables in **Netlify Site Settings → Environment Variables**:
 - `AI_PROVIDER` = `openai` (default) or `gemini`
 - `OPENAI_MODEL` (default: `gpt-4o-mini`)
 - `GEMINI_API_KEY` (required only if `AI_PROVIDER=gemini`)
-      - Missing skills and Buddy chat history are stored in MySQL per user profile.
-- `ADMIN_SECRET` (protects admin roadmap API)
+- `GEMINI_MODEL` (default: `gemini-1.5-flash`)
+- `ADMIN_SECRET` (protects admin roadmap API and course write operations)
+- `VITE_ADMIN_SECRET` (frontend header for admin writes when using Netlify functions)
 - `CORS_ORIGIN` (for cross-origin control)
 
 ---
@@ -113,6 +115,7 @@ netlify dev
 - `/api/buddy-chat`
 - `/api/buddy-progress`
 - `/api/admin-roadmaps`
+- `/api/courses`
 
    - `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE` = MySQL connection settings
 

@@ -37,6 +37,20 @@ const userProgressSchema = new mongoose.Schema({
 const Roadmap = mongoose.models.Roadmap || mongoose.model('Roadmap', roadmapSchema);
 const UserProgress = mongoose.models.UserProgress || mongoose.model('UserProgress', userProgressSchema);
 
+const courseSchema = new mongoose.Schema({
+  title: { type: String, required: true },
+  description: { type: String, required: true },
+  category: { type: String, required: true },
+  level: { type: String, enum: ['Beginner', 'Intermediate', 'Advanced'], default: 'Beginner' },
+  duration: { type: String, required: true },
+  instructor: { type: String, required: true },
+  thumbnail: { type: String, default: '' },
+  createdBy: { type: String, default: 'admin' },
+  published: { type: Boolean, default: true },
+}, { timestamps: true });
+
+const Course = mongoose.models.Course || mongoose.model('Course', courseSchema);
+
 async function connectDatabase() {
   if (cachedConnection && mongoose.connection.readyState === 1) {
     return cachedConnection;
@@ -58,4 +72,5 @@ module.exports = {
   connectDatabase,
   Roadmap,
   UserProgress,
+  Course,
 };

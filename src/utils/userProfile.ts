@@ -9,9 +9,7 @@ export interface StoredUserProfile {
 const USER_PROFILE_KEY = 'eduroute:user-profile';
 
 const safeJsonParse = <T>(value: string | null): T | null => {
-  if (!value) {
-    return null;
-  }
+  if (!value) return null;
 
   try {
     return JSON.parse(value) as T;
@@ -20,24 +18,44 @@ const safeJsonParse = <T>(value: string | null): T | null => {
   }
 };
 
-const createAvatar = (name: string) => `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(name)}`;
+const createAvatar = (name: string) =>
+  `https://api.dicebear.com/7.x/avataaars/svg?seed=${encodeURIComponent(
+    name
+  )}`;
 
 export const saveUserProfile = (profile: StoredUserProfile) => {
-  localStorage.setItem(USER_PROFILE_KEY, JSON.stringify(profile));
+  try {
+    if (typeof window === 'undefined') return;
+
+    window.localStorage.setItem(
+      USER_PROFILE_KEY,
+      JSON.stringify(profile)
+    );
+  } catch {
+    console.warn('Unable to save user profile');
+  }
 };
 
 export const getStoredUserProfile = (): StoredUserProfile | null => {
-  const parsed = safeJsonParse<Partial<StoredUserProfile>>(localStorage.getItem(USER_PROFILE_KEY));
+  try {
+    if (typeof window === 'undefined') return null;
 
-  if (!parsed?.name || !parsed.email) {
+    const parsed = safeJsonParse<Partial<StoredUserProfile>>(
+      window.localStorage.getItem(USER_PROFILE_KEY)
+    );
+
+    if (!parsed?.name || !parsed.email) {
+      return null;
+    }
+
+    return {
+      name: parsed.name,
+      email: parsed.email,
+      avatar: parsed.avatar,
+    };
+  } catch {
     return null;
   }
-
-  return {
-    name: parsed.name,
-    email: parsed.email,
-    avatar: parsed.avatar,
-  };
 };
 
 export const getCurrentUser = () => {
@@ -51,27 +69,41 @@ export const getCurrentUser = () => {
     ...MOCK_USER,
     name: storedUser.name,
     email: storedUser.email,
-    avatar: storedUser.avatar || createAvatar(storedUser.name),
+    avatar:
+      storedUser.avatar || createAvatar(storedUser.name),
   };
 };
 
-export const getDisplayFirstName = () => getCurrentUser().name.trim().split(/\s+/)[0] || 'Learner';
+export const getDisplayFirstName = () => {
+  return (
+    getCurrentUser().name.trim().split(/\s+/)[0] ||
+    'Learner'
+  );
+};
 
 const parseBase64Url = (base64Url: string) => {
-  const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-  const padded = `${base64}${'='.repeat((4 - (base64.length % 4)) % 4)}`;
+  const base64 = base64Url
+    .replace(/-/g, '+')
+    .replace(/_/g, '/');
+
+  const padded =
+    base64 +
+    '='.repeat((4 - (base64.length % 4)) % 4);
+
   return atob(padded);
 };
 
 export const parseGoogleCredential = (credential: string) => {
-  const payloadSegment = credential.split('.')[1];
-
-  if (!payloadSegment) {
-    return null;
-  }
-
   try {
-    const payload = JSON.parse(parseBase64Url(payloadSegment)) as {
+    const parts = credential.split('.');
+
+    if (parts.length < 2) {
+      return null;
+    }
+
+    const payload = JSON.parse(
+      parseBase64Url(parts[1])
+    ) as {
       name?: string;
       email?: string;
       picture?: string;
