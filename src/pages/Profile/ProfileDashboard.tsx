@@ -32,11 +32,17 @@ export const ProfileDashboard = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      const payload = await getProfileDashboardData();
-      setProfileData(payload);
+      try {
+        const payload = await getProfileDashboardData();
+        setProfileData(payload);
+      } catch {
+        setProfileData(null);
+      }
     };
 
     void loadData();
+    window.addEventListener('focus', loadData);
+    return () => window.removeEventListener('focus', loadData);
   }, []);
 
   const progressPercent = useMemo(() => {

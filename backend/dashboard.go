@@ -235,3 +235,16 @@ func (s *Server) submitProblem(w http.ResponseWriter, r *http.Request) {
 	}
 	writeJSON(w, http.StatusOK, map[string]any{"success": true, "data": map[string]any{"problemKey": problemKey, "status": body.Status, "score": body.Score}})
 }
+
+func (s *Server) problemSubmissions(w http.ResponseWriter, r *http.Request) {
+	claims, ok := s.requireAuth(w, r)
+	if !ok {
+		return
+	}
+	rows, err := s.queryMaps("SELECT problem_key AS problemKey, status FROM user_problem_submissions WHERE user_id = ?", claims.ID)
+	if err != nil {
+		failure(w, http.StatusInternalServerError, "Unable to load problem submissions")
+		return
+	}
+	success(w, http.StatusOK, rows)
+}

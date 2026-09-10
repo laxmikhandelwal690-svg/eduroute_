@@ -12,13 +12,15 @@ import {
   Target,
 } from 'lucide-react';
 import { dsaSheet, TOTAL_DSA_QUESTIONS } from '../data/dsaSheetData';
+import { apiGetProblemSubmissions, apiSubmitProblem } from '../utils/authApi';
 
 type FilterType = 'all' | 'solved' | 'unsolved';
 
-const STORAGE_KEY = 'eduroute_dsa_sheet_progress_v1';
-
 export const DSASheet = () => {
   const [solvedQuestions, setSolvedQuestions] = useState<number[]>([]);
+  const [pendingQuestions, setPendingQuestions] = useState<number[]>([]);
+  const [isLoadingProgress, setIsLoadingProgress] = useState(true);
+  const [saveError, setSaveError] = useState('');
   const [expandedTopics, setExpandedTopics] = useState<Record<string, boolean>>(() =>
     Object.fromEntries(dsaSheet.map((section) => [section.topic, true])),
   );
@@ -26,20 +28,20 @@ export const DSASheet = () => {
   const [searchText, setSearchText] = useState('');
 
   useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
+    const loadSubmissions = async () => {
       try {
-        const parsed = JSON.parse(stored) as number[];
-        setSolvedQuestions(parsed);
-      } catch {
-        setSolvedQuestions([]);
+        const response = await apiGetProblemSubmissions();
+        const submissions = Array.isArray(response.data) ? response.data : [];
+        setSolvedQuestions(submissions.filter((submission) => submission.status === 'Accepted').map((submission) => Number(submission.problemKey)));
+      } catch (error) {
+        setSaveError(error instanceof Error ? error.message : 'Unable to load saved progress.');
+      } finally {
+        setIsLoadingProgress(false);
       }
-    }
-  }, []);
+    };
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(solvedQuestions));
-  }, [solvedQuestions]);
+    void loadSubmissions();
+  }, []);
 
   const solvedSet = useMemo(() => new Set(solvedQuestions), [solvedQuestions]);
 
@@ -65,13 +67,27 @@ export const DSASheet = () => {
   const totalSolved = solvedQuestions.length;
   const progress = Math.round((totalSolved / TOTAL_DSA_QUESTIONS) * 100);
 
-  const toggleSolved = (id: number) => {
-    setSolvedQuestions((prev) => (prev.includes(id) ? prev.filter((questionId) => questionId !== id) : [...prev, id]));
+  const toggleSolved = async (id: number, title: string) => {
+    if (pendingQuestions.includes(id)) return;
+    const solved = solvedSet.has(id);
+    setPendingQuestions((prev) => [...prev, id]);
+    setSaveError('');
+    try {
+      await apiSubmitProblem(String(id), { name: title, difficulty: 'Easy', status: solved ? 'Attempted' : 'Accepted' });
+      setSolvedQuestions((prev) => (solved ? prev.filter((questionId) => questionId !== id) : [...prev, id]));
+    } catch (error) {
+      setSaveError(error instanceof Error ? error.message : 'Unable to save this question.');
+    } finally {
+      setPendingQuestions((prev) => prev.filter((questionId) => questionId !== id));
+    }
   };
 
   const markAllComplete = () => {
     const ids = dsaSheet.flatMap((section) => section.questions.map((question) => question.id));
-    setSolvedQuestions(ids);
+    void Promise.all(ids.map((id) => {
+      const question = dsaSheet.flatMap((section) => section.questions).find((item) => item.id === id);
+      return question ? apiSubmitProblem(String(id), { name: question.title, difficulty: 'Easy', status: 'Accepted' }) : Promise.resolve();
+    })).then(() => setSolvedQuestions(ids));
   };
 
   return (
@@ -84,6 +100,7 @@ export const DSASheet = () => {
             </div>
             <h1 className="text-3xl font-black text-slate-900 md:text-4xl dark:text-white">DSA Sheet (Beginner - 100 Questions)</h1>
             <p className="mt-2 text-sm font-medium text-slate-600 md:text-base dark:text-slate-400">Practice consistently, track your solved count, and build your coding confidence one easy problem at a time.</p>
+            {saveError && <p className="mt-3 rounded-xl border border-rose-300/40 bg-rose-500/10 px-3 py-2 text-sm font-semibold text-rose-700 dark:text-rose-200">{saveError}</p>}
 
             <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="relative w-full md:max-w-md">
@@ -153,7 +170,8 @@ export const DSASheet = () => {
                             <tr key={question.id} className="border-t border-slate-200 transition hover:bg-indigo-500/10 hover:shadow-[inset_0_0_24px_rgba(99,102,241,0.15)] dark:border-white/5">
                               <td className="px-4 py-3">
                                 <button
-                                  onClick={() => toggleSolved(question.id)}
+                                  onClick={() => void toggleSolved(question.id, question.title)}
+                                  disabled={isLoadingProgress || pendingQuestions.includes(question.id)}
                                   className={`flex h-6 w-6 items-center justify-center rounded-md border transition ${
                                     solved ? 'border-emerald-300 bg-emerald-500 text-white' : 'border-slate-500 bg-transparent text-transparent hover:border-emerald-300'
                                   }`}
@@ -167,9 +185,16 @@ export const DSASheet = () => {
                               </td>
                               <td className="px-4 py-3">
                                 <div className="flex items-center gap-2">
-                                  <a href={question.gfgUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 p-2 text-slate-700 transition hover:bg-slate-200 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/20" title="GeeksforGeeks">
-                                    <FileText className="h-4 w-4" />
-                                  </a>
+                                  {question.gfgUrl && (
+                                    <a href={question.gfgUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 p-2 text-slate-700 transition hover:bg-slate-200 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/20" title="GeeksforGeeks">
+                                      <FileText className="h-4 w-4" />
+                                    </a>
+                                  )}
+                                  {question.leetcodeUrl && (
+                                    <a href={question.leetcodeUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 p-2 text-slate-700 transition hover:bg-slate-200 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/20" title="LeetCode">
+                                      <span className="text-[10px] font-black">LC</span>
+                                    </a>
+                                  )}
                                   <a href={question.codingNinjaUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 p-2 text-slate-700 transition hover:bg-slate-200 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/20" title="Coding Ninjas">
                                     <span className="text-[10px] font-black">CN</span>
                                   </a>
@@ -179,9 +204,11 @@ export const DSASheet = () => {
                                 </div>
                               </td>
                               <td className="px-4 py-3">
-                                <a href={question.gfgUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg bg-indigo-500 px-3 py-1.5 text-xs font-bold text-white shadow-md shadow-indigo-500/40 transition hover:bg-indigo-400">
-                                  Solve <ExternalLink className="h-3.5 w-3.5" />
-                                </a>
+                                {(question.gfgUrl || question.leetcodeUrl) && (
+                                  <a href={question.gfgUrl || question.leetcodeUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-lg bg-indigo-500 px-3 py-1.5 text-xs font-bold text-white shadow-md shadow-indigo-500/40 transition hover:bg-indigo-400">
+                                    Solve <ExternalLink className="h-3.5 w-3.5" />
+                                  </a>
+                                )}
                               </td>
                               <td className="px-4 py-3">
                                 <button className="rounded-lg bg-slate-100 p-2 text-amber-600 transition hover:bg-slate-200 dark:bg-white/10 dark:text-amber-300 dark:hover:bg-white/20" title="Mark revision">

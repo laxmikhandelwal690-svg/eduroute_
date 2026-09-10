@@ -92,6 +92,12 @@ export const apiVerifyOtp = async (payload: { email: string; otp: string }) => a
 });
 
 export const apiGetCourses = () => apiRequest<{ data: any[] }>('/courses');
+export const apiGetProfileDashboard = () => apiRequest<{ data: any }>('/profile/dashboard');
+export const apiGetProblemSubmissions = () => apiRequest<{ data: { problemKey: string; status: string }[] }>('/problems/submissions');
+export const apiSubmitProblem = (problemKey: string, payload: { name: string; difficulty: 'Easy' | 'Medium' | 'Hard'; status: 'Accepted' | 'Attempted' }) => apiRequest<{ data: any }>(`/problems/${encodeURIComponent(problemKey)}/submit`, {
+  method: 'POST',
+  body: JSON.stringify(payload),
+});
 export const apiCreateCourse = (payload: Record<string, unknown>) => apiRequest<{ data: any }>('/courses', { method: 'POST', body: JSON.stringify(payload) });
 export const apiUpdateCourse = (id: string, payload: Record<string, unknown>) => apiRequest<{ data: any }>(`/courses?id=${encodeURIComponent(id)}`, { method: 'PUT', body: JSON.stringify(payload) });
 export const apiDeleteCourse = (id: string) => apiRequest<{ message: string }>(`/courses?id=${encodeURIComponent(id)}`, { method: 'DELETE' });
