@@ -19,7 +19,7 @@ eduroute_
 │       ├── admin-roadmaps.js            # Admin CRUD-like roadmap update endpoint
 │       └── _lib/
 │           ├── aiClient.js              # OpenAI/Gemini adapter + safety system prompt
-│           └── database.js              # MongoDB models and DB connection cache
+│           └── database.js              # MySQL connection cache and schema helper
 ├── netlify.toml                         # Netlify build + functions routing
 └── package.json
 ```
@@ -32,7 +32,7 @@ eduroute_
 
 2. **Skill Gap Analyzer**
    - Buddy page includes quick yes/no skill assessment.
-   - Missing skills are stored in MongoDB per user profile.
+   - Missing skills and Buddy chat history are stored in MySQL per user profile.
 
 3. **Internship & Career Guidance**
    - Prompt templates and AI system prompt force career-focused responses.
@@ -64,20 +64,20 @@ Buddy now has graceful fallback behavior so the UI remains usable even when exte
 
 ---
 
-## Environment Configuration
+   │           └── database.js              # MySQL connection cache and schema helper
 
 Set these variables in **Netlify Site Settings → Environment Variables**:
 
 ### Required
-- `MONGODB_URI` = MongoDB connection string
+- `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE` = MySQL connection settings
 - `OPENAI_API_KEY` (if using OpenAI)
 
 ### Optional
-- `MONGODB_DB_NAME` (default: `eduroute`)
+- `MYSQL_URL` may be used instead of the individual MySQL settings
 - `AI_PROVIDER` = `openai` (default) or `gemini`
 - `OPENAI_MODEL` (default: `gpt-4o-mini`)
 - `GEMINI_API_KEY` (required only if `AI_PROVIDER=gemini`)
-- `GEMINI_MODEL` (default: `gemini-1.5-flash`)
+      - Missing skills and Buddy chat history are stored in MySQL per user profile.
 - `ADMIN_SECRET` (protects admin roadmap API)
 - `CORS_ORIGIN` (for cross-origin control)
 
@@ -114,7 +114,7 @@ netlify dev
 - `/api/buddy-progress`
 - `/api/admin-roadmaps`
 
----
+   - `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE` = MySQL connection settings
 
 ## API Summary
 

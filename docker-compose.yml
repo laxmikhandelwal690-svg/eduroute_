@@ -1,14 +1,19 @@
 services:
   api:
-    build: 
+    build:
       context: ./backend
     ports:
       - "5000:5000"
     environment:
-      - MONGODB_URI=mongodb://mongo:27017/eduroute
+      - MYSQL_HOST=mysql
+      - MYSQL_PORT=3306
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=eduroute_dev_password
+      - MYSQL_DATABASE=eduroute
       - JWT_SECRET=supersecret
     depends_on:
-      - mongo
+      mysql:
+        condition: service_healthy
 
   web:
     build:
@@ -18,12 +23,20 @@ services:
     environment:
       - VITE_API_URL=http://localhost:5000/api
 
-  mongo:
-    image: mongo:latest
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: eduroute_dev_password
+      MYSQL_DATABASE: eduroute
     ports:
-      - "27017:27017"
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-peduroute_dev_password"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
     volumes:
-      - mongo-data:/data/db
+      - mysql-data:/var/lib/mysql
 
 volumes:
-  mongo-data:
+  mysql-data:
