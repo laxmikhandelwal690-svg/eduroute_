@@ -24,9 +24,9 @@ src/
   App.tsx                     # Route-level role guards
 ```
 
-## Database Schema (MongoDB / Mongoose)
+## Database Schema (MySQL)
 
-### users collection
+### users table
 - `name: string`
 - `email: string (unique)`
 - `password: string (bcrypt hash)`
@@ -35,7 +35,7 @@ src/
 - `collegeVerified: 'none' | 'pending' | 'verified' | 'rejected'`
 - `createdAt/updatedAt: Date`
 
-### courses collection
+### courses table
 - `title: string`
 - `description: string`
 - `category: string`
@@ -72,7 +72,7 @@ src/
 ## Deployment Steps
 
 1. **Set environment variables**
-   - `MONGODB_URI`
+  - `MYSQL_HOST`, `MYSQL_PORT`, `MYSQL_USER`, `MYSQL_PASSWORD`, `MYSQL_DATABASE`
    - `JWT_SECRET`
    - Optional SMTP config: `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `SMTP_FROM`
    - Frontend API URL: `VITE_API_URL` (if backend is hosted on separate domain)
@@ -95,7 +95,7 @@ src/
 5. **Default staff/admin login**
    - Email: `vansh28@gmail.com`
    - Password: `timepass`
-   - Password is seeded and stored as bcrypt hash in MongoDB.
+  - Password is seeded and stored as a bcrypt hash in MySQL.
 
 6. **Production**
    - Deploy backend to Render/Railway/EC2 as Node service.
