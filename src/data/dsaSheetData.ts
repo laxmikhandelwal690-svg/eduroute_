@@ -3,6 +3,7 @@ export type DsaQuestion = {
   title: string;
   difficulty: 'Easy';
   gfgUrl: string;
+  leetcodeUrl: string;
   codingNinjaUrl: string;
   videoUrl: string;
 };
@@ -17,17 +18,62 @@ const createQuestions = (topic: string, titles: string[], startId: number): DsaT
   questions: titles.map((title, index) => {
     const id = startId + index;
     const query = encodeURIComponent(`${title} ${topic} dsa`);
+    const leetcodeSlug = leetcodeSlugs[title];
 
     return {
       id,
       title,
       difficulty: 'Easy',
-      gfgUrl: `https://www.geeksforgeeks.org/?s=${query}`,
+      gfgUrl: '',
+      leetcodeUrl: leetcodeSlug ? `https://leetcode.com/problems/${leetcodeSlug}/` : '',
       codingNinjaUrl: `https://www.naukri.com/code360/problem-lists?search=${query}`,
       videoUrl: `https://www.youtube.com/results?search_query=${encodeURIComponent(`${title} dsa`)}`,
     };
   }),
 });
+
+const leetcodeSlugs: Record<string, string> = {
+  'Two Sum problem': 'two-sum',
+  'Best time to buy and sell stock': 'best-time-to-buy-and-sell-stock',
+  'Valid anagram': 'valid-anagram',
+  'Longest common prefix': 'longest-common-prefix',
+  'Roman to integer': 'roman-to-integer',
+  'Valid parentheses string': 'valid-parentheses',
+  'Isomorphic strings': 'isomorphic-strings',
+  'Compare version numbers': 'compare-version-numbers',
+  'Find middle of linked list': 'middle-of-the-linked-list',
+  'Reverse linked list': 'reverse-linked-list',
+  'Detect cycle in linked list': 'linked-list-cycle',
+  'Merge two sorted linked lists': 'merge-two-sorted-lists',
+  'Remove nth node from end': 'remove-nth-node-from-end-of-list',
+  'Palindrome linked list': 'palindrome-linked-list',
+  'Valid parentheses using stack': 'valid-parentheses',
+  'Next greater element': 'next-greater-element-i',
+  'Sliding window maximum basic': 'sliding-window-maximum',
+  'Binary search iterative': 'binary-search',
+  'Search insert position': 'search-insert-position',
+  'First and last occurrence': 'find-first-and-last-position-of-element-in-sorted-array',
+  'Find peak element': 'find-peak-element',
+  'Maximum depth of binary tree': 'maximum-depth-of-binary-tree',
+  'Check balanced binary tree': 'balanced-binary-tree',
+  'Diameter of binary tree': 'diameter-of-binary-tree',
+  'Same tree check': 'same-tree',
+  'Symmetric tree': 'symmetric-tree',
+  'Lowest common ancestor basic': 'lowest-common-ancestor-of-a-binary-tree',
+  'Longest consecutive sequence': 'longest-consecutive-sequence',
+  'Subarray sum equals k': 'subarray-sum-equals-k',
+  'Two sum with hashmap': 'two-sum',
+  'Majority element': 'majority-element',
+  'Find duplicate number': 'find-the-duplicate-number',
+  'Intersection of two arrays': 'intersection-of-two-arrays',
+  'Group anagrams': 'group-anagrams',
+  'Happy number': 'happy-number',
+  'Contains duplicate': 'contains-duplicate',
+  'Top k frequent elements basic': 'top-k-frequent-elements',
+  'Permutations of string': 'permutations',
+  'Combination sum basic': 'combination-sum',
+  'Power function (x^n)': 'powx-n',
+};
 
 const topicTitles: Array<{ topic: string; titles: string[] }> = [
   {

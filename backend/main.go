@@ -416,6 +416,8 @@ func (s *Server) api(w http.ResponseWriter, r *http.Request) {
 	switch {
 	case path == "me" && r.Method == "GET":
 		s.me(w, r)
+	case path == "problems/submissions" && r.Method == "GET":
+		s.problemSubmissions(w, r)
 	case strings.HasPrefix(path, "problems/") && strings.HasSuffix(path, "/submit"):
 		s.submitProblem(w, r)
 	case path == "courses":

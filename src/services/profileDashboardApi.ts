@@ -1,6 +1,7 @@
-import { PROFILE_DASHBOARD_MOCK, type ProfileDashboardData } from '../data/profileMockData';
+import { apiGetProfileDashboard } from '../utils/authApi';
+import type { ProfileDashboardData } from '../data/profileMockData';
 
 export const getProfileDashboardData = async (): Promise<ProfileDashboardData> => {
-  await new Promise((resolve) => setTimeout(resolve, 120));
-  return PROFILE_DASHBOARD_MOCK;
+  const response = await apiGetProfileDashboard();
+  return response.data as ProfileDashboardData;
 };
