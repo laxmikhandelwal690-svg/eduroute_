@@ -6,6 +6,14 @@ const isBrowser = typeof window !== 'undefined';
 
 const createId = () => `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
+<<<<<<< codex/add-admin-course-manager-feature-gbmr6s
+const normalizeCourse = (course: ManagedCourse): ManagedCourse => ({
+  ...course,
+  publishTarget: course.publishTarget || 'dashboard',
+});
+
+=======
+>>>>>>> main
 const safelyParseCourses = (rawValue: string | null): ManagedCourse[] => {
   if (!rawValue) {
     return [];
@@ -16,7 +24,11 @@ const safelyParseCourses = (rawValue: string | null): ManagedCourse[] => {
     if (!Array.isArray(parsedValue)) {
       return [];
     }
+<<<<<<< codex/add-admin-course-manager-feature-gbmr6s
+    return parsedValue.map(normalizeCourse);
+=======
     return parsedValue;
+>>>>>>> main
   } catch {
     return [];
   }
@@ -38,6 +50,13 @@ export const getManagedCourses = (): ManagedCourse[] => {
   return safelyParseCourses(rawCourses);
 };
 
+<<<<<<< codex/add-admin-course-manager-feature-gbmr6s
+export const getRoadmapManagedCourses = () => getManagedCourses().filter((course) => course.publishTarget === 'roadmap' || course.publishTarget === 'both');
+
+export const getDashboardManagedCourses = () => getManagedCourses().filter((course) => course.publishTarget === 'dashboard' || course.publishTarget === 'both');
+
+=======
+>>>>>>> main
 export const createCourse = (payload: CourseFormState): ManagedCourse => {
   const courses = getManagedCourses();
   const now = new Date().toISOString();
@@ -47,6 +66,10 @@ export const createCourse = (payload: CourseFormState): ManagedCourse => {
     description: payload.description.trim(),
     category: payload.category.trim(),
     thumbnailUrl: payload.thumbnailUrl.trim(),
+<<<<<<< codex/add-admin-course-manager-feature-gbmr6s
+    publishTarget: payload.publishTarget,
+=======
+>>>>>>> main
     content: [],
     createdAt: now,
     updatedAt: now,
@@ -71,6 +94,10 @@ export const updateCourse = (courseId: string, payload: CourseFormState): Manage
       description: payload.description.trim(),
       category: payload.category.trim(),
       thumbnailUrl: payload.thumbnailUrl.trim(),
+<<<<<<< codex/add-admin-course-manager-feature-gbmr6s
+      publishTarget: payload.publishTarget,
+=======
+>>>>>>> main
       updatedAt: new Date().toISOString(),
     };
   });

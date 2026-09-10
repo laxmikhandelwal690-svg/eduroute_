@@ -18,6 +18,10 @@ const INITIAL_COURSE_FORM: CourseFormState = {
   description: '',
   category: '',
   thumbnailUrl: '',
+<<<<<<< codex/add-admin-course-manager-feature-gbmr6s
+  publishTarget: 'dashboard',
+=======
+>>>>>>> main
 };
 
 const INITIAL_CONTENT_FORM: ContentFormState = {
@@ -66,6 +70,10 @@ export const CourseManager = () => {
       description: course.description,
       category: course.category,
       thumbnailUrl: course.thumbnailUrl,
+<<<<<<< codex/add-admin-course-manager-feature-gbmr6s
+      publishTarget: course.publishTarget,
+=======
+>>>>>>> main
     });
   };
 
@@ -139,6 +147,14 @@ export const CourseManager = () => {
           <form onSubmit={handleCourseSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-3">
             <input className="rounded-xl border border-slate-300 px-3 py-2" placeholder="Course Title" required value={courseForm.title} onChange={(event) => setCourseForm({ ...courseForm, title: event.target.value })} />
             <input className="rounded-xl border border-slate-300 px-3 py-2" placeholder="Course Category" required value={courseForm.category} onChange={(event) => setCourseForm({ ...courseForm, category: event.target.value })} />
+<<<<<<< codex/add-admin-course-manager-feature-gbmr6s
+            <select className="rounded-xl border border-slate-300 px-3 py-2" value={courseForm.publishTarget} onChange={(event) => setCourseForm({ ...courseForm, publishTarget: event.target.value as CourseFormState['publishTarget'] })}>
+              <option value="dashboard">Show in Dashboard</option>
+              <option value="roadmap">Upload to Roadmap</option>
+              <option value="both">Dashboard + Roadmap</option>
+            </select>
+=======
+>>>>>>> main
             <input className="rounded-xl border border-slate-300 px-3 py-2 md:col-span-2" placeholder="Thumbnail Image URL" required value={courseForm.thumbnailUrl} onChange={(event) => setCourseForm({ ...courseForm, thumbnailUrl: event.target.value })} />
             <textarea className="rounded-xl border border-slate-300 px-3 py-2 md:col-span-2 min-h-[90px]" placeholder="Course Description" required value={courseForm.description} onChange={(event) => setCourseForm({ ...courseForm, description: event.target.value })} />
             <div className="md:col-span-2 flex gap-2">
@@ -153,6 +169,15 @@ export const CourseManager = () => {
         <section className="space-y-4">
           <h2 className="text-xl font-bold text-slate-900">Course Dashboard</h2>
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+<<<<<<< codex/add-admin-course-manager-feature-gbmr6s
+
+            {courses.length === 0 && (
+              <div className="rounded-2xl border border-dashed border-slate-300 bg-white p-8 text-center text-slate-500">
+                No courses yet. Add your first course from the form above.
+              </div>
+            )}
+=======
+>>>>>>> main
             {courses.map((course) => {
               const videoCount = course.content.filter((item) => item.type === 'video').length;
               const documentCount = course.content.filter((item) => item.type === 'document').length;
@@ -173,6 +198,10 @@ export const CourseManager = () => {
                       <div>
                         <h3 className="font-black text-lg text-slate-900">{course.title}</h3>
                         <p className="text-sm text-slate-500">{course.category}</p>
+<<<<<<< codex/add-admin-course-manager-feature-gbmr6s
+                        <p className="text-xs font-semibold text-indigo-600 mt-1">{course.publishTarget === 'both' ? 'Published: Dashboard + Roadmap' : course.publishTarget === 'roadmap' ? 'Published: Roadmap' : 'Published: Dashboard'}</p>
+=======
+>>>>>>> main
                       </div>
                       <div className="flex gap-2">
                         <button onClick={() => handleCourseEdit(course)} className="rounded-lg bg-amber-100 text-amber-700 px-3 py-2 text-sm font-semibold"><Pencil className="h-4 w-4 inline" /> Edit</button>
