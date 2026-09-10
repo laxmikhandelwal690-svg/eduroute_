@@ -5,11 +5,11 @@ import { getCurrentUser } from '../../utils/userProfile';
 const TOP_THREE = [
   { rank: 2, name: 'Deepesh chauhan', points: 8420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=hero1', college: 'IIT Bombay' },
   { rank: 1, name: 'Vansh Khandelwal', points: 9250, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=hero', college: 'BITS Pilani',isUser : true },
-  { rank: 3, name: 'Naksh Shrivastava', points: 7980, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=super', college: 'NIT Trichy' },
+  { rank: 3, name: 'Sarthak Sharma', points: 7980, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=super', college: 'NIT Trichy' },
 ];
 
 const LEADERBOARD_LIST = [
-  { rank: 4, name: 'Yash Pant', points: 7650, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yash', college: 'DTU' },
+  { rank: 4, name: 'Ajay Sharma', points: 7650, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=yash', college: 'DTU' },
   { rank: 5, name: 'Arjun Gupta', points: 7420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Arjun', college: 'IIT Jodhpur' },
   { rank: 6, name: 'Priya Das', points: 7100, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Priya', college: 'VIT Vellore' },
   { rank: 7, name: 'Kabir Singh', points: 6850, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Kabir', college: 'SRM University' },
@@ -34,8 +34,8 @@ export const Leaderboard = () => {
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-50 rounded-full text-amber-600 text-sm font-bold border border-amber-100 mb-4">
           <Trophy className="h-4 w-4" /> Global Ranking
         </div>
-        <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4">Hall of Fame</h1>
-        <p className="text-slate-500 max-w-xl mx-auto">Compete with learners across the globe. Higher ranks unlock exclusive internship opportunities and rewards.</p>
+        <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 dark:text-white">Hall of Fame</h1>
+        <p className="text-slate-500 max-w-xl mx-auto ">Compete with learners across the globe. Higher ranks unlock exclusive internship opportunities and rewards.</p>
       </header>
 
       {/* Podium */}
@@ -54,7 +54,7 @@ export const Leaderboard = () => {
             <div className="absolute -bottom-2 -right-2 h-10 w-10 bg-slate-400 border-4 border-white rounded-full flex items-center justify-center text-white font-black text-lg">2</div>
           </div>
           <div className="text-center mb-6">
-            <div className="font-bold text-slate-900">{TOP_THREE[0].name}</div>
+            <div className="font-bold text-slate-900 dark:text-white">{TOP_THREE[0].name}</div>
             <div className="text-xs font-bold text-slate-400 uppercase">{TOP_THREE[0].points} PTS</div>
           </div>
           <div className="w-full h-32 bg-slate-100 rounded-t-3xl border-x border-t border-slate-200 shadow-sm flex items-center justify-center">
@@ -76,7 +76,7 @@ export const Leaderboard = () => {
             <div className="absolute -bottom-2 -right-2 h-12 w-12 bg-amber-400 border-4 border-white rounded-full flex items-center justify-center text-white font-black text-xl">1</div>
           </div>
           <div className="text-center mb-6">
-            <div className="text-xl font-black text-slate-900">{TOP_THREE[1].name}</div>
+            <div className="text-xl font-black text-slate-900 dark:text-white">{TOP_THREE[1].name}</div>
             <div className="text-sm font-bold text-amber-600 uppercase tracking-widest">{TOP_THREE[1].points} PTS</div>
           </div>
           <div className="w-full h-48 bg-gradient-to-b from-amber-400 to-amber-500 rounded-t-[40px] shadow-2xl flex items-center justify-center">
@@ -98,7 +98,7 @@ export const Leaderboard = () => {
             <div className="absolute -bottom-2 -right-2 h-10 w-10 bg-orange-400 border-4 border-white rounded-full flex items-center justify-center text-white font-black text-lg">3</div>
           </div>
           <div className="text-center mb-6">
-            <div className="font-bold text-slate-900">{TOP_THREE[2].name}</div>
+            <div className="font-bold text-slate-900 dark:text-white">{TOP_THREE[2].name}</div>
             <div className="text-xs font-bold text-slate-400 uppercase">{TOP_THREE[2].points} PTS</div>
           </div>
           <div className="w-full h-24 bg-orange-50 rounded-t-3xl border-x border-t border-orange-100 shadow-sm flex items-center justify-center">

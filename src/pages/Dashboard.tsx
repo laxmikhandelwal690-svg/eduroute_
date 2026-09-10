@@ -16,8 +16,8 @@ export const Dashboard = () => {
     <div className="flex-1 overflow-y-auto p-4 md:p-8">
       <header className="mb-10 flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h1 className="text-3xl font-black text-slate-900">Welcome back, {getDisplayFirstName()}! 👋</h1>
-          <p className="mt-2 text-slate-500 font-medium">You've completed 45% of your current path. Keep it up!</p>
+          <h1 className="text-3xl font-black text-slate-900 dark:text-white">Welcome back, {getDisplayFirstName()}! 👋</h1>
+          <p className="mt-2 text-slate-500 font-medium dark:text-slate-300">You've completed 45% of your current path. Keep it up!</p>
         </div>
         <div className="flex items-center gap-4 rounded-[28px] bg-amber-50 p-6 border border-amber-200">
           <div className="rounded-2xl bg-amber-100 p-3 text-amber-600">
@@ -35,7 +35,7 @@ export const Dashboard = () => {
 
       <section className="mb-12">
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-black text-slate-900">Continue Learning</h2>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white">Continue Learning</h2>
           <button className="text-sm font-bold text-indigo-600 hover:text-indigo-700">View all</button>
         </div>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -47,7 +47,7 @@ export const Dashboard = () => {
 
       <section className="mb-12">
         <div className="mb-8 flex items-center justify-between">
-          <h2 className="text-2xl font-black text-slate-900">Recommended for You</h2>
+          <h2 className="text-2xl font-black text-slate-900 dark:text-white">Recommended for You</h2>
           <button className="text-sm font-bold text-indigo-600 hover:text-indigo-700">Explore</button>
         </div>
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-3">
@@ -62,7 +62,7 @@ export const Dashboard = () => {
         <div className="rounded-[40px] bg-indigo-600 p-10 text-white shadow-2xl shadow-indigo-200">
           <div className="flex flex-col items-center justify-between gap-12 md:flex-row">
             <div className="space-y-6">
-              <h2 className="text-3xl font-black">Weekly Goal Progress</h2>
+              <h2 className="text-3xl font-black dark:text-white">Weekly Goal Progress</h2>
               <div className="flex gap-6">
                 <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-white/20 backdrop-blur-md">
                   <Trophy className="h-8 w-8" />
@@ -120,27 +120,58 @@ const TiltCard = ({ children, glowClassName }: { children: ReactNode; glowClassN
 );
 
 const DSABeginnerCard = ({ onOpen }: { onOpen: () => void }) => (
-  <TiltCard glowClassName="bg-emerald-400/20">
-    <motion.button
-      type="button"
-      onClick={onOpen}
-      whileHover={{ y: -8 }}
-      className="glass-panel premium-border group relative flex h-full w-full flex-col overflow-hidden rounded-[32px] p-8 text-left"
-    >
-      <div className="absolute -right-1 top-4 animate-pulse rounded-l-xl bg-gradient-to-r from-emerald-400 to-lime-300 px-4 py-1 text-xs font-black uppercase tracking-widest text-slate-900 shadow-[0_0_24px_rgba(74,222,128,0.65)]">
+  <motion.div
+    whileHover={{ y: -8 }}
+    className="group overflow-hidden rounded-[32px] border border-slate-100 bg-white transition-all hover:shadow-2xl"
+  >
+    <div className="relative aspect-[16/10] overflow-hidden">
+      <img
+        src="./assets/dsa.png"
+        alt="DSA Beginner Sheet"
+        className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+      />
+      <div className="absolute inset-0 bg-black/20" />
+      <div className="absolute left-4 top-4 rounded-xl bg-white/90 px-3 py-1.5 text-[10px] font-black text-emerald-700 backdrop-blur-sm shadow-lg">
         FREE
       </div>
-      <div className="mt-8 flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-400/20 text-emerald-200">
-        <Code2 className="h-7 w-7" />
+      <div className="absolute inset-0 flex items-center justify-center">
+      
       </div>
-      <p className="mt-6 text-xs font-black uppercase tracking-[0.3em] text-emerald-200">100 Easy Questions</p>
-      <h3 className="mt-3 text-2xl font-black text-slate-100">DSA Beginner Sheet</h3>
-      <p className="mt-3 text-sm font-semibold text-slate-300">Start your DSA journey with structured problems</p>
-      <span className="mt-8 inline-flex w-fit items-center gap-2 rounded-xl bg-emerald-500/20 px-4 py-2 text-xs font-black uppercase tracking-widest text-emerald-100 transition group-hover:bg-emerald-500/30">
-        Open Sheet <ArrowRight className="h-4 w-4" />
-      </span>
-    </motion.button>
-  </TiltCard>
+    </div>
+
+    <div className="p-8">
+      <div className="flex items-center justify-between text-[11px] font-black uppercase tracking-widest text-slate-400">
+        <span className="flex items-center gap-1.5"><Clock className="h-4 w-4" /> 4 HOURS</span>
+        <span className="flex items-center gap-1.5"><Star className="h-4 w-4 fill-yellow-400 text-yellow-400" /> 4.9</span>
+      </div>
+
+      <h3 className="mt-4 line-clamp-2 text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors leading-snug h-14">
+        DSA Beginner Sheet
+      </h3>
+
+      <p className="mt-4 text-sm font-medium text-slate-500">
+        Start your DSA journey with structured problems and guided practice.
+      </p>
+
+      <div className="mt-8 flex items-center justify-between border-t border-slate-50 pt-6">
+        <div className="flex items-center gap-2">
+          <div className="h-8 w-8 rounded-full bg-emerald-100 flex items-center justify-center">
+            <Users className="h-4 w-4 text-emerald-600" />
+          </div>
+          <span className="text-xs font-bold text-slate-500">100 easy questions</span>
+        </div>
+
+        <motion.button
+          type="button"
+          onClick={onOpen}
+          whileHover={{ y: -2 }}
+          className="inline-flex items-center gap-2 rounded-xl bg-emerald-500 px-4 py-2 text-xs font-black uppercase tracking-widest text-white shadow-lg shadow-emerald-200 transition hover:bg-emerald-600"
+        >
+          Open Sheet <ArrowRight className="h-4 w-4" />
+        </motion.button>
+      </div>
+    </div>
+  </motion.div>
 );
 
 const CourseCard = ({ course }: { course: Course }) => (
@@ -169,7 +200,7 @@ const CourseCard = ({ course }: { course: Course }) => (
           </div>
           <span className="text-xs font-bold text-slate-500">{course.students.toLocaleString()} students</span>
         </div>
-        <div className="text-2xl font-black text-slate-900">${course.price}</div>
+        <div className="text-2xl font-black text-slate-900">₹{course.price}</div>
       </div>
     </div>
   </motion.div>

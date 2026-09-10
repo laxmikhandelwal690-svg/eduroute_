@@ -34,8 +34,8 @@ export const RoadmapList = () => {
           </div>
           <span className="text-sm font-black text-indigo-600 uppercase tracking-[0.2em]">Career Paths</span>
         </div>
-        <h1 className="text-5xl font-black text-slate-900 mb-6 leading-tight">Your Career Journey, <br />Visualized.</h1>
-        <p className="text-slate-500 text-xl max-w-2xl font-medium leading-relaxed">
+        <h1 className="text-5xl font-black text-slate-900 mb-6 leading-tight dark:text-white">Your Career Journey, <br />Visualized.</h1>
+        <p className="text-slate-500 text-xl max-w-2xl font-medium leading-relaxed ">
           Follow industry-standard paths designed to take you from absolute zero to a professional role. 
           Each step is verified by experts.
         </p>
@@ -56,7 +56,7 @@ export const RoadmapList = () => {
             key={role.id}
             whileHover={{ y: -8 }}
             onClick={() => navigate(`/roadmaps/${role.id}`)}
-            className="group relative h-full cursor-pointer bg-white rounded-[40px] border border-slate-50 p-10 shadow-sm hover:shadow-2xl hover:shadow-indigo-100 transition-all duration-300"
+            className="group relative h-full cursor-pointer rounded-[40px] border border-slate-200 bg-slate-50 p-10 shadow-sm transition-all duration-300 hover:shadow-2xl hover:shadow-indigo-100"
           >
             {role.trending && (
               <div className="absolute top-6 right-6 flex items-center gap-1.5 px-4 py-1.5 bg-amber-50 text-amber-600 rounded-full text-[10px] font-black tracking-widest border border-amber-100">
@@ -73,7 +73,7 @@ export const RoadmapList = () => {
               {role.description}
             </p>
 
-            <div className="flex items-center justify-between pt-8 border-t border-slate-50">
+            <div className="flex items-center justify-between border-t border-slate-200 pt-8">
               <div className="flex flex-col">
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Complexity</span>
                 <span className="text-xs font-bold text-slate-700 mt-1">{role.level}</span>

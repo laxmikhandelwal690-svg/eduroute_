@@ -105,6 +105,26 @@ html[data-theme="dark"] #root {
   background-color: #020617;
 }
 
+.glass-panel {
+  @apply border border-slate-200/80 bg-white/80 backdrop-blur-xl shadow-[0_18px_40px_rgba(15,23,42,0.08)];
+}
+
+.premium-border {
+  box-shadow:
+    inset 0 0 0 1px rgba(99, 102, 241, 0.18),
+    0 0 0 1px rgba(255, 255, 255, 0.12);
+}
+
+html[data-theme="dark"] .glass-panel {
+  @apply border border-slate-700/80 bg-slate-900/60 shadow-[0_22px_50px_rgba(0,0,0,0.45)];
+}
+
+html[data-theme="dark"] .premium-border {
+  box-shadow:
+    inset 0 0 0 1px rgba(99, 102, 241, 0.28),
+    0 0 0 1px rgba(148, 163, 184, 0.08);
+}
+
 /* =========================================================
    SMOOTH THEME TRANSITION
 

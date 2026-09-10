@@ -79,20 +79,20 @@ export const DSASheet = () => {
       <div className="mx-auto grid max-w-7xl gap-8 xl:grid-cols-[1fr,320px]">
         <section className="space-y-6">
           <div className="glass-panel premium-border rounded-3xl p-6 md:p-8">
-            <div className="mb-4 inline-flex animate-pulse items-center gap-2 rounded-full border border-emerald-300/50 bg-emerald-400/20 px-4 py-1.5 text-xs font-black uppercase tracking-[0.25em] text-emerald-200 shadow-lg shadow-emerald-400/20">
+            <div className="mb-4 inline-flex animate-pulse items-center gap-2 rounded-full border border-emerald-300/50 bg-emerald-400/20 px-4 py-1.5 text-xs font-black uppercase tracking-[0.25em] text-emerald-700 shadow-lg shadow-emerald-400/20 dark:text-emerald-200">
               <Sparkles className="h-4 w-4" /> Free
             </div>
-            <h1 className="text-3xl font-black text-slate-900 md:text-4xl">DSA Sheet (Beginner - 100 Questions)</h1>
-            <p className="mt-2 text-sm font-medium text-slate-400 md:text-base">Practice consistently, track your solved count, and build your coding confidence one easy problem at a time.</p>
+            <h1 className="text-3xl font-black text-slate-900 md:text-4xl dark:text-white">DSA Sheet (Beginner - 100 Questions)</h1>
+            <p className="mt-2 text-sm font-medium text-slate-600 md:text-base dark:text-slate-400">Practice consistently, track your solved count, and build your coding confidence one easy problem at a time.</p>
 
             <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="relative w-full md:max-w-md">
-                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-500 dark:text-slate-400" />
                 <input
                   value={searchText}
                   onChange={(event) => setSearchText(event.target.value)}
                   placeholder="Search questions..."
-                  className="w-full rounded-xl border border-white/10 bg-slate-900/30 py-2 pl-10 pr-3 text-sm text-slate-100 outline-none transition focus:border-indigo-400"
+                  className="w-full rounded-xl border border-slate-200 bg-slate-100 py-2 pl-10 pr-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-500 focus:border-indigo-400 dark:border-white/10 dark:bg-slate-900/30 dark:text-slate-100 dark:placeholder:text-slate-400"
                 />
               </div>
 
@@ -102,7 +102,7 @@ export const DSASheet = () => {
                     key={option}
                     onClick={() => setFilter(option)}
                     className={`rounded-xl px-3 py-2 text-xs font-bold uppercase tracking-widest transition ${
-                      filter === option ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'bg-white/5 text-slate-300 hover:bg-white/10'
+                      filter === option ? 'bg-indigo-500 text-white shadow-lg shadow-indigo-500/30' : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-white/5 dark:text-slate-300 dark:hover:bg-white/10'
                     }`}
                   >
                     {option}
@@ -127,16 +127,16 @@ export const DSASheet = () => {
                   className="flex w-full items-center justify-between border-b border-white/10 px-5 py-4 text-left"
                 >
                   <div>
-                    <h2 className="text-lg font-black text-slate-100">{section.topic}</h2>
-                    <p className="text-xs font-semibold uppercase tracking-widest text-indigo-200">{topicSolvedCount}/{totalQuestions} solved</p>
+                    <h2 className="text-lg font-black text-slate-900 dark:text-slate-100">{section.topic}</h2>
+                    <p className="text-xs font-semibold uppercase tracking-widest text-indigo-700 dark:text-indigo-200">{topicSolvedCount}/{totalQuestions} solved</p>
                   </div>
-                  <ChevronDown className={`h-5 w-5 text-slate-300 transition ${isExpanded ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`h-5 w-5 text-slate-600 transition dark:text-slate-300 ${isExpanded ? 'rotate-180' : ''}`} />
                 </button>
 
                 {isExpanded && (
                   <div className="overflow-x-auto">
                     <table className="w-full min-w-[860px] text-sm">
-                      <thead className="bg-slate-900/40 text-xs uppercase tracking-widest text-slate-400">
+                      <thead className="bg-slate-100 text-xs uppercase tracking-widest text-slate-500 dark:bg-slate-900/40 dark:text-slate-400">
                         <tr>
                           <th className="px-4 py-3 text-left">Status</th>
                           <th className="px-4 py-3 text-left">Problem Name</th>
@@ -150,7 +150,7 @@ export const DSASheet = () => {
                         {section.questions.map((question) => {
                           const solved = solvedSet.has(question.id);
                           return (
-                            <tr key={question.id} className="border-t border-white/5 transition hover:bg-indigo-500/10 hover:shadow-[inset_0_0_24px_rgba(99,102,241,0.15)]">
+                            <tr key={question.id} className="border-t border-slate-200 transition hover:bg-indigo-500/10 hover:shadow-[inset_0_0_24px_rgba(99,102,241,0.15)] dark:border-white/5">
                               <td className="px-4 py-3">
                                 <button
                                   onClick={() => toggleSolved(question.id)}
@@ -161,19 +161,19 @@ export const DSASheet = () => {
                                   <Check className="h-4 w-4" />
                                 </button>
                               </td>
-                              <td className="px-4 py-3 font-semibold text-slate-100">{question.title}</td>
+                              <td className="px-4 py-3 font-semibold text-slate-900 dark:text-slate-100">{question.title}</td>
                               <td className="px-4 py-3">
-                                <span className="rounded-full border border-emerald-300/30 bg-emerald-500/20 px-2 py-1 text-xs font-bold text-emerald-200">Easy</span>
+                                <span className="rounded-full border border-emerald-600/20 bg-emerald-100 px-2 py-1 text-xs font-bold text-emerald-800">Easy</span>
                               </td>
                               <td className="px-4 py-3">
                                 <div className="flex items-center gap-2">
-                                  <a href={question.gfgUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-white/10 p-2 text-slate-200 transition hover:bg-white/20" title="GeeksforGeeks">
+                                  <a href={question.gfgUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 p-2 text-slate-700 transition hover:bg-slate-200 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/20" title="GeeksforGeeks">
                                     <FileText className="h-4 w-4" />
                                   </a>
-                                  <a href={question.codingNinjaUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-white/10 p-2 text-slate-200 transition hover:bg-white/20" title="Coding Ninjas">
+                                  <a href={question.codingNinjaUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 p-2 text-slate-700 transition hover:bg-slate-200 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/20" title="Coding Ninjas">
                                     <span className="text-[10px] font-black">CN</span>
                                   </a>
-                                  <a href={question.videoUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-white/10 p-2 text-slate-200 transition hover:bg-white/20" title="Video">
+                                  <a href={question.videoUrl} target="_blank" rel="noreferrer" className="rounded-lg bg-slate-100 p-2 text-slate-700 transition hover:bg-slate-200 dark:bg-white/10 dark:text-slate-200 dark:hover:bg-white/20" title="Video">
                                     <PlayCircle className="h-4 w-4" />
                                   </a>
                                 </div>
@@ -184,7 +184,7 @@ export const DSASheet = () => {
                                 </a>
                               </td>
                               <td className="px-4 py-3">
-                                <button className="rounded-lg bg-white/10 p-2 text-amber-300 transition hover:bg-white/20" title="Mark revision">
+                                <button className="rounded-lg bg-slate-100 p-2 text-amber-600 transition hover:bg-slate-200 dark:bg-white/10 dark:text-amber-300 dark:hover:bg-white/20" title="Mark revision">
                                   <Star className="h-4 w-4" />
                                 </button>
                               </td>
@@ -202,8 +202,8 @@ export const DSASheet = () => {
 
         <aside className="space-y-6">
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} className="glass-panel premium-border sticky top-4 rounded-3xl p-6">
-            <h3 className="text-lg font-black text-slate-100">DSA Progress</h3>
-            <p className="text-sm text-slate-400">Track your easy questions completed out of 100.</p>
+            <h3 className="text-lg font-black text-slate-900 dark:text-slate-100">DSA Progress</h3>
+            <p className="text-sm text-slate-600 dark:text-slate-400">Track your easy questions completed out of 100.</p>
 
             <div className="mt-6 flex items-center justify-center">
               <div className="relative h-40 w-40">
@@ -221,21 +221,21 @@ export const DSASheet = () => {
                   />
                 </svg>
                 <div className="absolute inset-0 flex flex-col items-center justify-center">
-                  <span className="text-2xl font-black text-slate-100">{totalSolved}</span>
-                  <span className="text-xs uppercase tracking-widest text-slate-400">Solved</span>
+                  <span className="text-2xl font-black text-slate-900 dark:text-slate-100">{totalSolved}</span>
+                  <span className="text-xs uppercase tracking-widest text-slate-500 dark:text-slate-400">Solved</span>
                 </div>
               </div>
             </div>
 
-            <p className="mt-4 text-center text-base font-semibold text-emerald-200">{totalSolved} / {TOTAL_DSA_QUESTIONS} solved</p>
-            <p className="text-center text-xs text-slate-400">Easy: {totalSolved}/{TOTAL_DSA_QUESTIONS}</p>
+            <p className="mt-4 text-center text-base font-semibold text-emerald-700 dark:text-emerald-200">{totalSolved} / {TOTAL_DSA_QUESTIONS} solved</p>
+            <p className="text-center text-xs text-slate-600 dark:text-slate-400">Easy: {totalSolved}/{TOTAL_DSA_QUESTIONS}</p>
 
             <button className="mt-5 flex w-full items-center justify-center gap-2 rounded-2xl bg-indigo-500 py-3 text-sm font-black text-white shadow-xl shadow-indigo-500/30 transition hover:brightness-110">
               <Target className="h-4 w-4" /> Start Practice
             </button>
 
-            <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-3 py-2 text-center text-xs text-slate-300">
-              Day Streak: <span className="font-bold text-indigo-200">12 days</span>
+            <div className="mt-4 rounded-2xl border border-slate-200 bg-slate-100 px-3 py-2 text-center text-xs text-slate-700 dark:border-white/10 dark:bg-white/5 dark:text-slate-300">
+              Day Streak: <span className="font-bold text-indigo-700 dark:text-indigo-200">12 days</span>
             </div>
           </motion.div>
         </aside>
