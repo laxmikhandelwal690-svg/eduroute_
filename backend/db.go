@@ -11,7 +11,7 @@ func ensureSchema(db *sql.DB) error {
 	statements := []string{
 		`CREATE TABLE IF NOT EXISTS users (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(160) NOT NULL, email VARCHAR(255) NOT NULL UNIQUE, password VARCHAR(255) NOT NULL, role ENUM('student','admin') NOT NULL DEFAULT 'student', is_verified BOOLEAN NOT NULL DEFAULT FALSE, college_verified ENUM('none','pending','verified','rejected') NOT NULL DEFAULT 'none', points INT NOT NULL DEFAULT 0, language_preference ENUM('en','hi','hinglish') NOT NULL DEFAULT 'en', avatar VARCHAR(500) NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 		`CREATE TABLE IF NOT EXISTS otps (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, email VARCHAR(255) NOT NULL, code_hash VARCHAR(255) NOT NULL, expires_at DATETIME NOT NULL, attempt_count INT NOT NULL DEFAULT 0, last_sent_at DATETIME NOT NULL, locked_until DATETIME NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, INDEX idx_otps_email_created (email, created_at)) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
-		`CREATE TABLE IF NOT EXISTS college_verifications (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, user_id INT UNSIGNED NOT NULL, doc_url VARCHAR(1000) NOT NULL, status ENUM('pending','verified','rejected') NOT NULL DEFAULT 'pending', remarks TEXT NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
+		`CREATE TABLE IF NOT EXISTS college_verifications (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, user_id INT UNSIGNED NOT NULL, doc_url VARCHAR(1000) NOT NULL, file_name VARCHAR(255) NOT NULL, mime_type VARCHAR(100) NOT NULL, file_size BIGINT UNSIGNED NOT NULL, doc_data LONGBLOB NOT NULL, status ENUM('pending','verified','rejected') NOT NULL DEFAULT 'pending', remarks TEXT NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 		`CREATE TABLE IF NOT EXISTS roadmaps (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, name VARCHAR(160) NOT NULL, slug VARCHAR(160) NOT NULL UNIQUE, description TEXT NULL, icon VARCHAR(255) NULL, modules_json JSON NOT NULL, updated_by VARCHAR(160) NULL, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 		`CREATE TABLE IF NOT EXISTS user_roadmap_progress (id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY, user_id INT UNSIGNED NOT NULL, roadmap_id INT UNSIGNED NOT NULL, completed_tasks JSON NOT NULL, points_earned INT NOT NULL DEFAULT 0, UNIQUE KEY uq_user_roadmap (user_id, roadmap_id), FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE, FOREIGN KEY (roadmap_id) REFERENCES roadmaps(id) ON DELETE CASCADE) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
 		`CREATE TABLE IF NOT EXISTS assessments (id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY, title VARCHAR(255) NOT NULL, category VARCHAR(160) NOT NULL, questions_json JSON NOT NULL, points INT NOT NULL DEFAULT 100, created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4`,
@@ -41,6 +41,22 @@ func ensureSchema(db *sql.DB) error {
 		if count == 0 {
 			if _, err := db.Exec("ALTER TABLE courses ADD COLUMN " + column + " VARCHAR(1000) NULL"); err != nil {
 				return fmt.Errorf("add courses.%s: %w", column, err)
+			}
+		}
+	}
+	for column, definition := range map[string]string{
+		"file_name": "VARCHAR(255) NOT NULL DEFAULT ''",
+		"mime_type": "VARCHAR(100) NOT NULL DEFAULT 'application/octet-stream'",
+		"file_size": "BIGINT UNSIGNED NOT NULL DEFAULT 0",
+		"doc_data":  "LONGBLOB NULL",
+	} {
+		var count int
+		if err := db.QueryRow("SELECT COUNT(*) FROM information_schema.columns WHERE table_schema = DATABASE() AND table_name = 'college_verifications' AND column_name = ?", column).Scan(&count); err != nil {
+			return fmt.Errorf("check college_verifications.%s: %w", column, err)
+		}
+		if count == 0 {
+			if _, err := db.Exec("ALTER TABLE college_verifications ADD COLUMN " + column + " " + definition); err != nil {
+				return fmt.Errorf("add college_verifications.%s: %w", column, err)
 			}
 		}
 	}

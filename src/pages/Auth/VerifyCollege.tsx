@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { saveAuthSession } from '../../utils/rbacAuth';
 import { getStoredUserProfile } from '../../utils/userProfile';
+import { apiSubmitCollegeVerification } from '../../utils/authApi';
 import { motion } from 'framer-motion';
 import { Upload, CheckCircle2, Info, ChevronRight } from 'lucide-react';
 
@@ -9,6 +10,7 @@ export const VerifyCollege = () => {
   const navigate = useNavigate();
   const [file, setFile] = useState<File | null>(null);
   const [status, setStatus] = useState<'idle' | 'uploading' | 'pending'>('idle');
+  const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const completeVerification = () => {
@@ -26,11 +28,18 @@ export const VerifyCollege = () => {
     navigate('/dashboard');
   };
 
-  const handleUpload = (event: React.FormEvent) => {
+  const handleUpload = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!file) return;
+    setError('');
     setStatus('uploading');
-    setTimeout(() => setStatus('pending'), 2000);
+    try {
+      await apiSubmitCollegeVerification(file);
+      setStatus('pending');
+    } catch (uploadError) {
+      setStatus('idle');
+      setError(uploadError instanceof Error ? uploadError.message : 'Unable to upload document.');
+    }
   };
 
   return (
@@ -79,6 +88,7 @@ export const VerifyCollege = () => {
                   Verification usually takes 24-48 hours. You can still use the platform while we verify your ID.
                 </p>
               </div>
+              {error && <p className="text-sm text-rose-600" role="alert">{error}</p>}
 
               <div className="flex flex-col sm:flex-row gap-3">
                 <button
