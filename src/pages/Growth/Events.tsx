@@ -15,7 +15,7 @@ const EVENTS = [
     location: 'IIT Delhi / Hybrid',
     attendees: '2,500+',
     category: 'Technology',
-    image: './assets/web-summit.png'
+    image: 'https://images.unsplash.com/photo-1571645163064-77faa9676a46?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
   },
   {
     id: '2',
@@ -24,7 +24,7 @@ const EVENTS = [
     location: 'IIT Jodhpur (On-campus)',
     attendees: '400',
     category: 'Workshop',
-    image: './assets/google-cloud.png'
+    image: 'https://images.unsplash.com/photo-1616499535171-a3ca97f87a7d?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D'
   },
   {
     id: '3',
