@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"net/mail"
 	"net/smtp"
@@ -12,11 +13,86 @@ import (
 	"strings"
 )
 
+const maxCollegeDocumentSize = 10 << 20
+
+func (s *Server) submitCollegeVerification(w http.ResponseWriter, r *http.Request) {
+	claims, ok := s.requireAuth(w, r)
+	if !ok {
+		return
+	}
+	if claims.Role != "student" {
+		failure(w, http.StatusForbidden, "Only students can submit college verification")
+		return
+	}
+	r.Body = http.MaxBytesReader(w, r.Body, maxCollegeDocumentSize+1024)
+	if err := r.ParseMultipartForm(maxCollegeDocumentSize); err != nil {
+		failure(w, http.StatusBadRequest, "Document is required and must be 10 MB or smaller")
+		return
+	}
+	file, header, err := r.FormFile("document")
+	if err != nil {
+		failure(w, http.StatusBadRequest, "Document is required")
+		return
+	}
+	defer file.Close()
+	data, err := io.ReadAll(io.LimitReader(file, maxCollegeDocumentSize+1))
+	if err != nil || len(data) > maxCollegeDocumentSize {
+		failure(w, http.StatusBadRequest, "Document must be 10 MB or smaller")
+		return
+	}
+	mimeType := http.DetectContentType(data)
+	if mimeType != "application/pdf" && !strings.HasPrefix(mimeType, "image/") {
+		failure(w, http.StatusBadRequest, "Only PDF and image documents are allowed")
+		return
+	}
+
+	result, err := s.db.Exec("INSERT INTO college_verifications (user_id,doc_url,file_name,mime_type,file_size,doc_data,status) VALUES (?, '', ?, ?, ?, ?, 'pending')", claims.ID, header.Filename, mimeType, len(data), data)
+	if err != nil {
+		failure(w, http.StatusInternalServerError, "Unable to save verification document")
+		return
+	}
+	verificationID, err := result.LastInsertId()
+	if err != nil {
+		failure(w, http.StatusInternalServerError, "Unable to save verification document")
+		return
+	}
+	documentURL := "/api/admin/verifications/" + strconv.FormatInt(verificationID, 10) + "/document"
+	if _, err = s.db.Exec("UPDATE college_verifications SET doc_url = ? WHERE id = ?", documentURL, verificationID); err != nil {
+		failure(w, http.StatusInternalServerError, "Unable to save verification document")
+		return
+	}
+	if _, err = s.db.Exec("UPDATE users SET college_verified = 'pending' WHERE id = ?", claims.ID); err != nil {
+		failure(w, http.StatusInternalServerError, "Unable to update verification status")
+		return
+	}
+	success(w, http.StatusCreated, map[string]any{"id": strconv.FormatInt(verificationID, 10), "status": "pending", "fileName": header.Filename})
+}
+
+func (s *Server) collegeVerificationDocument(w http.ResponseWriter, r *http.Request) {
+	if _, ok := s.requireAdmin(w, r); !ok {
+		return
+	}
+	id := strings.TrimSuffix(strings.TrimPrefix(r.URL.Path, "/api/admin/verifications/"), "/document")
+	var fileName, mimeType string
+	var data []byte
+	if err := s.db.QueryRow("SELECT file_name,mime_type,doc_data FROM college_verifications WHERE id = ? LIMIT 1", id).Scan(&fileName, &mimeType, &data); err == sql.ErrNoRows {
+		failure(w, http.StatusNotFound, "Document not found")
+		return
+	} else if err != nil {
+		failure(w, http.StatusInternalServerError, "Unable to load document")
+		return
+	}
+	w.Header().Set("Content-Type", mimeType)
+	w.Header().Set("Content-Disposition", fmt.Sprintf("inline; filename=%q", fileName))
+	w.WriteHeader(http.StatusOK)
+	_, _ = w.Write(data)
+}
+
 func (s *Server) pendingStudents(w http.ResponseWriter, r *http.Request) {
 	if _, ok := s.requireAdmin(w, r); !ok {
 		return
 	}
-	rows, err := s.queryMaps("SELECT id,name,email,college_verified AS collegeVerified,created_at AS createdAt FROM users WHERE role = 'student' AND college_verified = 'pending' ORDER BY created_at DESC")
+	rows, err := s.queryMaps("SELECT u.id,u.name,u.email,u.college_verified AS collegeVerified,u.created_at AS createdAt,v.id AS verificationId,v.file_name AS fileName,v.mime_type AS mimeType,v.file_size AS fileSize,v.doc_url AS documentUrl,v.created_at AS documentCreatedAt FROM users u LEFT JOIN college_verifications v ON v.id = (SELECT latest.id FROM college_verifications latest WHERE latest.user_id = u.id ORDER BY latest.created_at DESC LIMIT 1) WHERE u.role = 'student' AND u.college_verified = 'pending' ORDER BY v.created_at DESC, u.created_at DESC")
 	if err != nil {
 		failure(w, 500, "Unable to load students")
 		return
@@ -41,6 +117,7 @@ func (s *Server) verifyStudent(w http.ResponseWriter, r *http.Request) {
 		failure(w, 500, "Unable to update student")
 		return
 	}
+	_, _ = s.db.Exec("UPDATE college_verifications SET status = ? WHERE user_id = ? AND status = 'pending'", map[bool]string{true: "verified", false: "rejected"}[body.Action == "approve"], id)
 	affected, _ := result.RowsAffected()
 	if affected == 0 {
 		failure(w, 404, "Student not found")

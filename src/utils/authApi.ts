@@ -48,7 +48,7 @@ const apiRequest = async <T>(path: string, options: RequestInit = {}): Promise<T
     response = await fetch(`${API_BASE_URL}${path}`, {
       ...options,
       headers: {
-        'Content-Type': 'application/json',
+        ...(options.body instanceof FormData ? {} : { 'Content-Type': 'application/json' }),
         ...(getAuthToken() ? { Authorization: `Bearer ${getAuthToken()}` } : {}),
         ...(ADMIN_SECRET ? { 'x-admin-secret': ADMIN_SECRET } : {}),
         ...(options.headers || {}),
@@ -107,3 +107,24 @@ export const apiVerifyStudent = (id: string, action: 'approve' | 'reject') => ap
   method: 'PATCH',
   body: JSON.stringify({ action }),
 });
+export const apiSubmitCollegeVerification = (file: File) => {
+  const formData = new FormData();
+  formData.append('document', file);
+  return apiRequest<{ data: { id: string; status: string; fileName: string } }>('/college-verification', {
+    method: 'POST',
+    body: formData,
+  });
+};
+
+export const apiFetchVerificationDocument = async (verificationId: string) => {
+  const response = await fetch(`${API_BASE_URL}/admin/verifications/${encodeURIComponent(verificationId)}/document`, {
+    headers: {
+      ...(getAuthToken() ? { Authorization: `Bearer ${getAuthToken()}` } : {}),
+      ...(ADMIN_SECRET ? { 'x-admin-secret': ADMIN_SECRET } : {}),
+    },
+  });
+  if (!response.ok) {
+    throw new Error('Unable to load verification document');
+  }
+  return response.blob();
+};

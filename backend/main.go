@@ -428,6 +428,10 @@ func (s *Server) api(w http.ResponseWriter, r *http.Request) {
 		s.courseByID(w, r, strings.TrimPrefix(path, "courses/"))
 	case path == "students/pending":
 		s.pendingStudents(w, r)
+	case path == "college-verification" && r.Method == "POST":
+		s.submitCollegeVerification(w, r)
+	case strings.HasPrefix(path, "admin/verifications/") && strings.HasSuffix(path, "/document") && r.Method == "GET":
+		s.collegeVerificationDocument(w, r)
 	case strings.HasPrefix(path, "students/") && strings.HasSuffix(path, "/verification"):
 		s.verifyStudent(w, r)
 	case path == "roadmaps" && r.Method == "GET":

@@ -5,6 +5,7 @@ import {
   apiDeleteCourse,
   apiGetCourses,
   apiGetPendingStudents,
+  apiFetchVerificationDocument,
   apiUpdateCourse,
   apiVerifyStudent,
 } from '../../utils/authApi';
@@ -33,6 +34,7 @@ export const AdminDashboard = () => {
   const [form, setForm] = useState<CourseForm>(INITIAL_FORM);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [message, setMessage] = useState('');
+  const [loadingDocumentId, setLoadingDocumentId] = useState<string | null>(null);
 
   const loadData = async () => {
     const [coursesResponse, studentsResponse] = await Promise.all([apiGetCourses(), apiGetPendingStudents()]);
@@ -83,6 +85,20 @@ export const AdminDashboard = () => {
     await loadData();
   };
 
+  const viewDocument = async (verificationId: string) => {
+    setLoadingDocumentId(verificationId);
+    try {
+      const blob = await apiFetchVerificationDocument(verificationId);
+      const documentUrl = URL.createObjectURL(blob);
+      window.open(documentUrl, '_blank', 'noopener,noreferrer');
+      window.setTimeout(() => URL.revokeObjectURL(documentUrl), 60_000);
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : 'Unable to load document.');
+    } finally {
+      setLoadingDocumentId(null);
+    }
+  };
+
   return (
     <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto space-y-8">
       <h1 className="text-3xl font-black text-slate-900">Admin Dashboard</h1>
@@ -128,14 +144,16 @@ export const AdminDashboard = () => {
         <h2 className="text-xl font-bold mb-4">Pending Student Verifications</h2>
         <div className="space-y-3">
           {pendingStudents.map((student) => (
-            <div key={student._id} className="border rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div key={student.id} className="border rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
               <div>
                 <p className="font-semibold">{student.name}</p>
                 <p className="text-sm text-slate-500">{student.email}</p>
+                <p className="text-xs text-slate-400 mt-1">{student.fileName || 'No document attached'}</p>
               </div>
               <div className="flex gap-2">
-                <button className="px-3 py-2 rounded bg-emerald-100 text-emerald-700" onClick={() => verifyStudent(student._id, 'approve')}><Check className="h-4 w-4 inline" /> Approve</button>
-                <button className="px-3 py-2 rounded bg-rose-100 text-rose-700" onClick={() => verifyStudent(student._id, 'reject')}><X className="h-4 w-4 inline" /> Reject</button>
+                {student.verificationId && <button className="px-3 py-2 rounded bg-slate-100 text-slate-700" disabled={loadingDocumentId === student.verificationId} onClick={() => viewDocument(student.verificationId)}>{loadingDocumentId === student.verificationId ? 'Loading...' : 'View document'}</button>}
+                <button className="px-3 py-2 rounded bg-emerald-100 text-emerald-700" onClick={() => verifyStudent(student.id, 'approve')}><Check className="h-4 w-4 inline" /> Approve</button>
+                <button className="px-3 py-2 rounded bg-rose-100 text-rose-700" onClick={() => verifyStudent(student.id, 'reject')}><X className="h-4 w-4 inline" /> Reject</button>
               </div>
             </div>
           ))}
