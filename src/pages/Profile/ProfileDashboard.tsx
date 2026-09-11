@@ -10,7 +10,9 @@ import {
 } from 'lucide-react';
 import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip as RechartsTooltip } from 'recharts';
 import { getProfileDashboardData } from '../../services/profileDashboardApi';
-import type { ProfileDashboardData } from '../../data/profileMockData';
+import { PROFILE_DASHBOARD_MOCK, type ProfileDashboardData } from '../../data/profileMockData';
+import { getAuthUser } from '../../utils/rbacAuth';
+import { getStoredUserProfile } from '../../utils/userProfile';
 
 const difficultyColors = {
   easy: '#22c55e',
@@ -31,12 +33,25 @@ export const ProfileDashboard = () => {
   const [profileData, setProfileData] = useState<ProfileDashboardData | null>(null);
 
   useEffect(() => {
+    const authUser = getAuthUser();
+    const storedProfile = getStoredUserProfile();
+    const userName = authUser?.name || storedProfile?.name;
+    const userEmail = authUser?.email || storedProfile?.email;
+    const userAvatar = storedProfile?.avatar;
+    const userIdentity = userName
+      ? {
+          fullName: userName,
+          username: userEmail?.split('@')[0] || userName.toLowerCase().replace(/\s+/g, ''),
+          profilePhoto: userAvatar,
+        }
+      : null;
+
     const loadData = async () => {
       try {
         const payload = await getProfileDashboardData();
-        setProfileData(payload);
+        setProfileData(userIdentity ? { ...payload, ...userIdentity } : payload);
       } catch {
-        setProfileData(null);
+        setProfileData(userIdentity ? { ...PROFILE_DASHBOARD_MOCK, ...userIdentity } : null);
       }
     };
 
@@ -73,7 +88,7 @@ export const ProfileDashboard = () => {
         <section className="rounded-3xl border border-white/10 bg-slate-900/80 p-6 shadow-2xl shadow-indigo-950/40 backdrop-blur md:p-8">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-4 md:gap-6">
-              <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-gradient-to-br from-indigo-500 to-violet-600 text-3xl font-black uppercase">
+              <div className="flex h-20 w-20 items-center justify-center overflow-hidden rounded-full border border-white/20 bg-linear-to-br from-indigo-500 to-violet-600 text-3xl font-black uppercase">
                 {profileData.profilePhoto ? (
                   <img src={profileData.profilePhoto} alt={profileData.username} className="h-full w-full object-cover" />
                 ) : (
@@ -100,7 +115,7 @@ export const ProfileDashboard = () => {
               <span className="text-xs font-bold text-slate-300">{profileData.xp.total} / {profileData.xp.nextLevelXp} XP</span>
             </div>
             <div className="h-3 overflow-hidden rounded-full bg-slate-800">
-              <div className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-500" style={{ width: `${progressPercent}%` }} />
+              <div className="h-full rounded-full bg-linear-to-r from-indigo-500 to-purple-500" style={{ width: `${progressPercent}%` }} />
             </div>
             <p className="mt-2 text-xs text-slate-400">{progressPercent}% to {levelTitles[Math.min(levelTitles.length - 1, profileData.xp.level)]}.</p>
           </div>
@@ -140,7 +155,7 @@ export const ProfileDashboard = () => {
                       <Cell key={entry.name} fill={entry.color} />
                     ))}
                   </Pie>
-                  <RechartsTooltip formatter={(value: number, name: string) => [`${value} solved`, name]} />
+                  <RechartsTooltip formatter={(value: number | undefined, name: string | undefined) => [`${value ?? 0} solved`, name ?? '']} />
                 </PieChart>
               </ResponsiveContainer>
             </div>
@@ -187,7 +202,7 @@ export const ProfileDashboard = () => {
                 return (
                   <div
                     key={cell.date}
-                    className={`h-4 w-4 rounded-[4px] ${tone}`}
+                    className={`h-4 w-4 rounded-sm ${tone}`}
                     title={`${cell.date}: ${cell.count} submissions`}
                   />
                 );
