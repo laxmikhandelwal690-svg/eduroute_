@@ -89,7 +89,7 @@ export const Dashboard = () => {
 const ContinueLearningCard = ({ course }: { course: Course }) => (
   <motion.div 
     whileHover={{ y: -4 }}
-    className="group flex flex-col gap-6 overflow-hidden rounded-[32px] border border-slate-100 bg-white p-6 transition-all hover:shadow-xl sm:flex-row"
+    className="group flex flex-col gap-7 overflow-hidden rounded-[32px] border border-slate-100 bg-white p-6 transition-all hover:shadow-xl sm:flex-row"
   >
     <div className="relative aspect-video w-full overflow-hidden rounded-[24px] sm:w-56">
       <img src={course.thumbnail} alt={course.title} className="h-full w-full object-cover transition-transform group-hover:scale-110" />
@@ -105,8 +105,8 @@ const ContinueLearningCard = ({ course }: { course: Course }) => (
         <span className="h-1 w-1 rounded-full bg-slate-300"></span>
         <span>40% Done</span>
       </div>
-      <h3 className="mt-2 text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors leading-tight">{course.title}</h3>
-      <div className="mt-6 h-2 w-full rounded-full bg-slate-100">
+      <h3 className="mt-6 text-xl font-bold text-slate-900 group-hover:text-indigo-600 transition-colors leading-tight">{course.title}</h3>
+      <div className="mt-4 h-2 w-full rounded-full bg-slate-100">
         <div className="h-full w-[40%] rounded-full bg-indigo-500 shadow-sm shadow-indigo-200"></div>
       </div>
     </div>
@@ -124,9 +124,9 @@ const DSABeginnerCard = ({ onOpen }: { onOpen: () => void }) => (
     whileHover={{ y: -8 }}
     className="group overflow-hidden rounded-[32px] border border-slate-100 bg-white transition-all hover:shadow-2xl"
   >
-    <div className="relative aspect-[16/10] overflow-hidden">
+    <div className="relative aspect-[16/7] overflow-hidden">
       <img
-        src="./assets/dsa.png"
+        src="https://images.unsplash.com/photo-1629904853893-c2c8981a1dc5?q=80&w=1170&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
         alt="DSA Beginner Sheet"
         className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
       />
