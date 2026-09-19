@@ -1,50 +1,65 @@
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { 
-  MessageSquare, 
   Users, 
-  Lightbulb, 
-  Play, 
-  CheckCircle2, 
-  Clock,
+  MessageSquare, 
+  Brain, 
+  Handshake, 
+  Presentation, 
+  Clock, 
+  Play,
   ChevronRight,
-  BrainCircuit,
+  CheckCircle2,
   Award
 } from 'lucide-react';
 
-const SKILLS = [
-  { id: '1', title: 'Professional Communication', modules: 5, duration: '2.5h', icon: MessageSquare, color: 'text-blue-600', bg: 'bg-blue-50' },
-  { id: '2', title: 'Emotional Intelligence', modules: 4, duration: '1.8h', icon: BrainCircuit, color: 'text-purple-600', bg: 'bg-purple-50' },
-  { id: '3', title: 'Team Leadership', modules: 6, duration: '3.2h', icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-  { id: '4', title: 'Creative Problem Solving', modules: 3, duration: '1.5h', icon: Lightbulb, color: 'text-amber-600', bg: 'bg-amber-50' },
+const SOFT_SKILLS = [
+  { id: '1', title: 'Effective Communication', icon: MessageSquare, color: 'bg-blue-500', duration: '2h 15m', modules: 5 },
+  { id: '2', title: 'Team Collaboration', icon: Users, color: 'bg-emerald-500', duration: '1h 45m', modules: 4 },
+  { id: '3', title: 'Critical Thinking', icon: Brain, color: 'bg-purple-500', duration: '3h 00m', modules: 6 },
+  { id: '4', title: 'Professional Networking', icon: Handshake, color: 'bg-orange-500', duration: '1h 30m', modules: 3 },
+  { id: '5', title: 'Public Speaking', icon: Presentation, color: 'bg-pink-500', duration: '2h 45m', modules: 5 },
 ];
 
 export const SoftSkills = () => {
   const navigate = useNavigate();
+
   return (
     <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto">
       <header className="mb-12">
-        <h1 className="text-4xl font-black text-slate-900 mb-4">Soft Skills & Personality</h1>
-        <p className="text-slate-500 text-lg max-w-2xl leading-relaxed">
-          Master the non-technical skills that will set you apart in the industry. From storytelling to team management.
+        <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 font-bold mb-4">
+          <Users className="h-6 w-6" /> <span className="uppercase tracking-widest text-sm">Growth Track</span>
+        </div>
+        <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-4">Soft Skills & Personality</h1>
+        <p className="text-slate-500 dark:text-slate-400 text-lg max-w-2xl leading-relaxed">
+          Technical skills get you the interview. Soft skills get you the job. Build the professional edge that sets you apart.
         </p>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
-        {SKILLS.map((skill) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+        {SOFT_SKILLS.map((skill, i) => (
           <motion.div
             key={skill.id}
-            whileHover={{ y: -8 }}
-            className="bg-white rounded-4xl border border-slate-100 p-8 shadow-sm hover:shadow-xl transition-all group"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+            className="bg-white dark:bg-slate-900 rounded-4xl border border-slate-100 dark:border-slate-800 p-8 shadow-sm hover:shadow-xl dark:shadow-black/30 transition-all group"
           >
-            <div className={`w-14 h-14 ${skill.bg} ${skill.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-               <skill.icon className="h-7 w-7" />
+            <div className={`w-14 h-14 ${skill.color} rounded-2xl flex items-center justify-center text-white mb-6 shadow-lg`}>
+              <skill.icon className="h-7 w-7" />
             </div>
-            <h3 className="text-lg font-bold text-slate-900 mb-2 leading-tight">{skill.title}</h3>
-            <div className="flex items-center gap-4 text-xs font-bold text-slate-400 uppercase tracking-widest mt-4">
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2 leading-tight">{skill.title}</h3>
+            <div className="flex items-center gap-4 text-xs font-bold text-slate-400 dark:text-slate-500 mb-6">
                <span className="flex items-center gap-1.5"><Clock className="h-3 w-3" /> {skill.duration}</span>
                <span className="flex items-center gap-1.5"><Play className="h-3 w-3" /> {skill.modules} Modules</span>
             </div>
+            <button
+              type="button"
+              onClick={() => navigate('/buddy')}
+              className="w-full py-3 rounded-2xl bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-bold text-sm group-hover:bg-indigo-600 group-hover:text-white transition-all"
+            >
+              Start Learning
+            </button>
           </motion.div>
         ))}
       </div>

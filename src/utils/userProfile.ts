@@ -1,4 +1,5 @@
 import { MOCK_USER } from '../data/mockData';
+import { getAuthUser } from './rbacAuth';
 
 export interface StoredUserProfile {
   name: string;
@@ -63,7 +64,19 @@ export const getStoredUserProfile = (): StoredUserProfile | null => {
 };
 
 export const getCurrentUser = () => {
+  const auth = getAuthUser();
   const storedUser = getStoredUserProfile();
+
+  if (auth?.name && auth?.email) {
+    return {
+      ...MOCK_USER,
+      id: auth.id || MOCK_USER.id,
+      name: auth.name,
+      email: auth.email,
+      avatar: auth.avatar || storedUser?.avatar || createAvatar(auth.name),
+      enrolledCourses: storedUser?.enrolledCourses || MOCK_USER.enrolledCourses,
+    };
+  }
 
   if (!storedUser) {
     return MOCK_USER;
@@ -98,10 +111,17 @@ export const updateEnrollment = (courseId: string) => {
 };
 
 export const getDisplayFirstName = () => {
-  return (
-    getCurrentUser().name.trim().split(/\s+/)[0] ||
-    'Learner'
-  );
+  // Prefer logged-in auth session (never fall back to mock "Alex")
+  const auth = getAuthUser();
+  if (auth?.name?.trim()) {
+    return auth.name.trim().split(/\s+/)[0] || 'Learner';
+  }
+  const stored = getStoredUserProfile();
+  if (stored?.name?.trim()) {
+    return stored.name.trim().split(/\s+/)[0] || 'Learner';
+  }
+  // Only use mock when nothing is signed in
+  return 'Learner';
 };
 
 const parseBase64Url = (base64Url: string) => {

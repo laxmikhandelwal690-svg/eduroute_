@@ -26,5 +26,14 @@ exports.handler = async (event) => {
     }
   }
 
+  // Prefer Go proxy only when configured; otherwise surface a clear config error
+  if (!process.env.GO_API_URL && !process.env.BACKEND_URL) {
+    return mysqlAuth.json(503, {
+      success: false,
+      error:
+        'Auth database not configured. In Netlify → Site settings → Environment variables, add MYSQL_URL (Railway MySQL connection string) or MYSQL_HOST, MYSQL_USER, MYSQL_PASSWORD, MYSQL_DATABASE. Optionally set JWT_SECRET.',
+    });
+  }
+
   return proxyToGo.forward(event, '/api/auth/login/staff');
 };

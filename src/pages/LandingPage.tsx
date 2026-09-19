@@ -1,1448 +1,422 @@
-import { useRef, useState } from "react";
-import { motion } from "framer-motion";
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import {
-  Rocket,
-  Target,
+  ArrowRight,
   BookOpen,
-  ChevronRight,
-  Play,
-  Sparkles,
-  Trophy,
   Briefcase,
+  Code2,
   Instagram,
   Mail,
-  Phone,
+  Map,
   MessageCircle,
-} from "lucide-react";
+  Trophy,
+  Users,
+} from 'lucide-react';
+import { AuthModal } from '../components/AuthModal';
+import { OfferStackSection } from '../components/OfferStackSection';
 
-import { AuthModal } from "../components/AuthModal";
+const HERO_VIDEO_CDN =
+  'https://videos.pexels.com/video-files/2278095/2278095-hd_1920_1080_30fps.mp4';
+const HERO_VIDEO_LOCAL = '/videos/hero-coding.mp4';
+
+const NAV = [
+  { label: 'Home', href: '#home' },
+  { label: 'Roadmaps', href: '#features' },
+  { label: 'Jobs & Internships', href: '#features' },
+  { label: 'Hackathons', href: '#features' },
+  { label: 'Resources', href: '#features' },
+  { label: 'Community', href: '#features' },
+];
+
+const STATS = [
+  { value: '45K+', label: 'Active Learners', icon: Users, color: 'bg-violet-100 text-violet-600 dark:bg-violet-500/20 dark:text-violet-300' },
+  { value: '80+', label: 'Roadmaps', icon: Map, color: 'bg-emerald-100 text-emerald-600 dark:bg-emerald-500/20 dark:text-emerald-300' },
+  { value: '500+', label: 'Job & Internship Opportunities', icon: Briefcase, color: 'bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-300' },
+  { value: '120+', label: 'Upcoming Hackathons', icon: Trophy, color: 'bg-amber-100 text-amber-600 dark:bg-amber-500/20 dark:text-amber-300' },
+];
+
+const JOURNEY = [
+  { title: 'Learn', desc: 'Explore curated roadmaps', icon: BookOpen, color: 'bg-violet-600' },
+  { title: 'Build', desc: 'Work on real projects and practice', icon: Code2, color: 'bg-emerald-500' },
+  { title: 'Compete', desc: 'Join hackathons and challenges', icon: Trophy, color: 'bg-pink-500' },
+  { title: 'Get Hired', desc: 'Land internships and full-time roles', icon: Briefcase, color: 'bg-blue-500' },
+];
+
+const QUICK_LINKS = [
+  { label: 'Home', href: '#home' },
+  { label: 'Roadmaps', href: '/roadmaps' },
+  { label: 'Jobs & Internships', href: '/internships' },
+  { label: 'Hackathons', href: '#features' },
+  { label: 'Resources', href: '#features' },
+  { label: 'Community', href: '#features' },
+];
+
+const COMPANY_LINKS = [
+  { label: 'About Us', href: '#contact' },
+  { label: 'Our Mission', href: '#features' },
+  { label: 'Contact Us', href: '#contact' },
+  { label: 'Privacy Policy', href: '#contact' },
+  { label: 'Terms & Conditions', href: '#contact' },
+];
 
 export const LandingPage = () => {
-  const [isAuthOpen, setIsAuthOpen] =
-    useState(false);
+  const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [newsletterEmail, setNewsletterEmail] = useState('');
 
-  const demoSectionRef =
-    useRef<HTMLElement | null>(null);
-
-  const instagramUrl =
-    "https://www.instagram.com/vanshkhandelwal28/";
-
-  const whatsappUrl =
-    "https://wa.link/9mfubu";
-
-  const contactEmail =
-    "vanshkhandelwal777@gmail.com";
-
-  const contactPhone =
-    "+91 7898140600";
+  const instagramUrl = 'https://www.instagram.com/vanshkhandelwal28/';
+  const whatsappUrl = 'https://wa.link/9mfubu';
+  const supportEmail = 'vanshkhandelwal777@gmail.com';
 
   return (
-    <div
-      id="home"
-      className="
-        relative min-h-screen overflow-hidden
-        bg-slate-100
-        text-slate-900
-        dark:bg-slate-950
-        dark:text-slate-100
-      "
-    >
-      {/* ===================================================
-          AUTH MODAL
-      =================================================== */}
+    <div id="home" className="min-h-screen bg-white text-slate-900 dark:bg-slate-950 dark:text-slate-100">
+      <AuthModal isOpen={isAuthOpen} onClose={() => setIsAuthOpen(false)} />
 
-      <AuthModal
-        isOpen={isAuthOpen}
-        onClose={() => setIsAuthOpen(false)}
-      />
+      <header className="sticky top-0 z-50 border-b border-slate-200/80 bg-white/90 backdrop-blur-md dark:border-slate-800 dark:bg-slate-950/90">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-3.5 sm:px-6 lg:px-8">
+          <a href="#home" className="flex items-center gap-2.5">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 text-sm font-black text-white shadow-md shadow-violet-200/50 dark:shadow-violet-900/40">
+              E
+            </span>
+            <span className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
+              EDU<span className="text-violet-600 dark:text-violet-400">ROUTE</span>
+            </span>
+          </a>
 
-      {/* ===================================================
-          HEADER
-      =================================================== */}
-
-      <header
-        className="
-          relative z-20
-          border-b border-white/60
-          bg-white/65
-          backdrop-blur-xl
-
-          dark:border-slate-700/60
-          dark:bg-slate-900/85
-        "
-      >
-        <div
-          className="
-            mx-auto flex max-w-7xl
-            items-center justify-between
-            px-4 py-4
-            sm:px-6
-            lg:px-8
-          "
-        >
-          <div
-            className="
-              text-2xl font-black tracking-tight
-              text-slate-900
-              dark:text-white
-            "
-          >
-            EDUROUTE
-          </div>
-        </div>
-      </header>
-
-      {/* ===================================================
-          HERO BACKGROUND
-      =================================================== */}
-
-      <div
-        className="
-          pointer-events-none
-          absolute inset-0
-
-          bg-[radial-gradient(circle_at_12%_20%,rgba(167,243,208,0.7),transparent_45%),radial-gradient(circle_at_85%_18%,rgba(186,230,253,0.65),transparent_42%),radial-gradient(circle_at_65%_74%,rgba(253,186,116,0.45),transparent_48%),linear-gradient(135deg,rgba(240,253,250,0.95),rgba(239,246,255,0.9)_45%,rgba(255,247,237,0.88))]
-
-          dark:bg-[radial-gradient(circle_at_12%_20%,rgba(30,64,175,0.32),transparent_45%),radial-gradient(circle_at_85%_18%,rgba(79,70,229,0.28),transparent_42%),radial-gradient(circle_at_65%_74%,rgba(124,58,237,0.2),transparent_48%),linear-gradient(135deg,#020617,#0f172a_48%,#111827)]
-        "
-      />
-
-      {/* ===================================================
-          DECORATIVE BLOBS
-      =================================================== */}
-
-      <div
-        className="
-          pointer-events-none
-          absolute -top-16 left-16
-          h-72 w-72
-          rounded-full
-          bg-emerald-200/35
-          blur-3xl
-
-          dark:bg-indigo-500/15
-        "
-      />
-
-      <div
-        className="
-          pointer-events-none
-          absolute top-20 right-12
-          h-80 w-80
-          rounded-full
-          bg-sky-200/40
-          blur-3xl
-
-          dark:bg-blue-500/15
-        "
-      />
-
-      <div
-        className="
-          pointer-events-none
-          absolute bottom-10 right-1/4
-          h-72 w-72
-          rounded-full
-          bg-orange-200/30
-          blur-3xl
-
-          dark:bg-purple-500/10
-        "
-      />
-
-      {/* ===================================================
-          HERO CONTENT
-      =================================================== */}
-
-      <div
-        className="
-          relative
-          mx-auto max-w-7xl
-          px-4
-          pt-24 pb-16
-          sm:px-6
-          lg:px-8
-        "
-      >
-        <div
-          className="
-            grid items-center gap-12
-            lg:grid-cols-2
-          "
-        >
-          {/* =================================================
-              HERO LEFT
-          ================================================= */}
-
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 30,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              duration: 0.8,
-              ease: "easeOut",
-            }}
-          >
-            {/* -----------------------------------------------
-                BADGE
-            ------------------------------------------------ */}
-
-            <div
-              className="
-                mb-8 inline-flex
-                items-center gap-2
-                rounded-2xl
-                border border-white/50
-                bg-white/45
-                px-4 py-2
-                text-emerald-800
-                shadow-lg shadow-sky-100/50
-                backdrop-blur-xl
-
-                dark:border-slate-700/70
-                dark:bg-slate-800/70
-                dark:text-emerald-400
-                dark:shadow-black/30
-              "
-            >
-              <span
-                className="
-                  relative flex h-2 w-2
-                "
+          <nav className="hidden items-center gap-1 lg:flex">
+            {NAV.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                className="rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 transition hover:bg-slate-50 hover:text-slate-900 dark:text-slate-300 dark:hover:bg-slate-800 dark:hover:text-white"
               >
-                <span
-                  className="
-                    absolute inline-flex
-                    h-full w-full
-                    animate-ping
-                    rounded-full
-                    bg-emerald-400
-                    opacity-75
-                  "
-                />
-
-                <span
-                  className="
-                    relative inline-flex
-                    h-2 w-2
-                    rounded-full
-                    bg-emerald-700
-
-                    dark:bg-emerald-400
-                  "
-                />
-              </span>
-
-              <span
-                className="
-                  text-sm font-bold
-                  uppercase tracking-widest
-                "
-              >
-                AI Career Platform for Every Student
-              </span>
-            </div>
-
-            {/* -----------------------------------------------
-                MAIN HEADING
-            ------------------------------------------------ */}
-
-            <h1
-              className="
-                mb-8
-                text-4xl
-                font-black
-                leading-[0.9]
-                text-slate-900
-                sm:text-6xl
-                md:text-8xl
-
-                dark:text-white
-              "
-            >
-              Build Skills.
-              <br />
-
-              <span
-                className="
-                  bg-gradient-to-r
-                  from-emerald-700
-                  via-amber-500
-                  to-orange-500
-                  bg-clip-text
-                  text-transparent
-
-                  dark:from-cyan-400
-                  dark:via-indigo-400
-                  dark:to-purple-500
-                "
-              >
-                Get Hired.
-              </span>
-            </h1>
-
-            {/* -----------------------------------------------
-                DESCRIPTION
-            ------------------------------------------------ */}
-
-            <p
-              className="
-                mb-12
-                max-w-lg
-                text-xl
-                font-medium
-                leading-relaxed
-                text-slate-500
-
-                dark:text-slate-300
-              "
-            >
-              EDUROUTE maps each career role into
-              step-by-step levels from Beginner to
-              Pro, with AI Buddy guidance,
-              assessments, internships, and direct
-              hiring opportunities—designed for
-              students from every city and town.
-            </p>
-
-            {/* -----------------------------------------------
-                HERO BUTTONS
-            ------------------------------------------------ */}
-
-            <div
-              className="
-                flex flex-col
-                items-center gap-6
-                sm:flex-row
-              "
-            >
-              <button
-                onClick={() =>
-                  setIsAuthOpen(true)
-                }
-                className="
-                  flex w-full
-                  items-center
-                  justify-center
-                  gap-3
-                  rounded-[24px]
-                  border
-                  border-white/60
-                  bg-white/70
-                  px-10 py-5
-                  text-lg
-                  font-black
-                  text-slate-900
-                  shadow-2xl
-                  shadow-slate-200/60
-                  backdrop-blur-xl
-                  transition-all
-                  hover:scale-105
-                  hover:bg-white/85
-                  active:scale-95
-
-                  sm:w-auto
-
-                  dark:border-slate-700
-                  dark:bg-slate-800/80
-                  dark:text-white
-                  dark:shadow-black/40
-                  dark:hover:bg-slate-700
-                "
-              >
-                Start Your Roadmap
-
-                <Rocket className="h-6 w-6" />
-              </button>
-
-              <button
-                onClick={() =>
-                  demoSectionRef.current?.scrollIntoView(
-                    {
-                      behavior: "smooth",
-                      block: "start",
-                    }
-                  )
-                }
-                className="
-                  flex items-center gap-3
-                  font-bold
-                  text-slate-900
-                  transition-colors
-                  hover:text-emerald-700
-
-                  dark:text-slate-200
-                  dark:hover:text-indigo-400
-                "
-              >
-                <div
-                  className="
-                    flex h-14 w-14
-                    items-center
-                    justify-center
-                    rounded-full
-                    border
-                    border-white/70
-                    bg-white/65
-                    shadow-lg
-                    backdrop-blur-lg
-
-                    dark:border-slate-700
-                    dark:bg-slate-800/80
-                  "
-                >
-                  <Play className="h-5 w-5 fill-current" />
-                </div>
-
-                Watch Demo
-              </button>
-            </div>
-          </motion.div>
-
-          {/* =================================================
-              STATS
-          ================================================= */}
-
-          <motion.div
-            initial={{
-              opacity: 0,
-            }}
-            animate={{
-              opacity: 1,
-            }}
-            transition={{
-              delay: 1,
-              duration: 1,
-            }}
-            className="
-              mt-24
-              grid grid-cols-3
-              gap-8
-              rounded-3xl
-              border border-white/55
-              bg-white/40
-              p-8
-              shadow-lg
-              shadow-slate-200/60
-              backdrop-blur-xl
-
-              dark:border-slate-700/70
-              dark:bg-slate-800/65
-              dark:shadow-black/40
-            "
-          >
-            {[
-              {
-                label: "Learners",
-                value: "45k+",
-              },
-              {
-                label: "Roadmaps",
-                value: "80+",
-              },
-              {
-                label: "Hiring Partners",
-                value: "120+",
-              },
-            ].map((stat, i) => (
-              <div key={i}>
-                <div
-                  className="
-                    text-3xl
-                    font-black
-                    text-slate-900
-
-                    dark:text-white
-                  "
-                >
-                  {stat.value}
-                </div>
-
-                <div
-                  className="
-                    text-sm
-                    font-bold
-                    uppercase
-                    tracking-widest
-                    text-slate-400
-
-                    dark:text-slate-400
-                  "
-                >
-                  {stat.label}
-                </div>
-              </div>
+                {item.label}
+              </a>
             ))}
-          </motion.div>
+          </nav>
 
-          {/* =================================================
-              FEATURE HIGHLIGHTS
-          ================================================= */}
+          <div className="flex items-center gap-2">
+            <a
+              href="#contact"
+              className="hidden rounded-lg px-3 py-2 text-sm font-semibold text-slate-600 hover:text-slate-900 dark:text-slate-300 sm:inline"
+            >
+              Contact
+            </a>
+            <button
+              type="button"
+              onClick={() => setIsAuthOpen(true)}
+              className="rounded-full bg-violet-600 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-violet-700"
+            >
+              Get Started
+            </button>
+            <button
+              type="button"
+              className="rounded-lg p-2 text-slate-600 lg:hidden dark:text-slate-300"
+              aria-label="Menu"
+              onClick={() => setMobileOpen((v) => !v)}
+            >
+              <span className="block h-0.5 w-5 bg-current" />
+              <span className="mt-1.5 block h-0.5 w-5 bg-current" />
+              <span className="mt-1.5 block h-0.5 w-5 bg-current" />
+            </button>
+          </div>
+        </div>
 
-          <motion.div
-            initial={{
-              opacity: 0,
-              y: 20,
-            }}
-            animate={{
-              opacity: 1,
-              y: 0,
-            }}
-            transition={{
-              delay: 0.3,
-              duration: 0.9,
-            }}
-            className="lg:col-span-2 w-full space-y-4"
-          >
-            {[
-              {
-                icon: Sparkles,
-                title:
-                  "AI Buddy in English, Hindi & Hinglish",
-                desc:
-                  "24/7 personalized guidance for roadmap planning, interview prep, and doubts.",
-              },
-              {
-                icon: Trophy,
-                title:
-                  "Gamified Progress + Leaderboards",
-                desc:
-                  "Complete tasks, earn points, unlock rewards, and stand out to recruiters.",
-              },
-              {
-                icon: Briefcase,
-                title:
-                  "Internships & Direct Company Hiring",
-                desc:
-                  "Apply for skill-based roles and discover company culture through short videos.",
-              },
-            ].map((item, index) => (
-              <div
-                key={index}
-                className="
-                  w-full
-                  rounded-3xl
-                  border
-                  border-white/50
-                  bg-white/50
-                  p-8
-                  shadow-lg
-                  shadow-slate-200/40
-                  backdrop-blur-xl
-
-                  dark:border-slate-700/70
-                  dark:bg-slate-800/65
-                  dark:shadow-black/35
-                "
+        {mobileOpen && (
+          <div className="border-t border-slate-100 bg-white px-4 py-3 lg:hidden dark:border-slate-800 dark:bg-slate-950">
+            {NAV.map((item) => (
+              <a
+                key={item.label}
+                href={item.href}
+                onClick={() => setMobileOpen(false)}
+                className="block rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200"
               >
-                <item.icon
-                  className="
-                    mb-4
-                    h-7 w-7
-                    text-emerald-700
-
-                    dark:text-indigo-400
-                  "
-                />
-
-                <h3
-                  className="
-                    mb-2
-                    text-xl
-                    font-black
-                    text-slate-900
-
-                    dark:text-white
-                  "
-                >
-                  {item.title}
-                </h3>
-
-                <p
-                  className="
-                    text-slate-600
-
-                    dark:text-slate-300
-                  "
-                >
-                  {item.desc}
-                </p>
-              </div>
+                {item.label}
+              </a>
             ))}
-          </motion.div>
-        </div>
-      </div>
-
-      {/* =====================================================
-          FEATURED SECTION
-      ===================================================== */}
-
-      <section
-        ref={demoSectionRef}
-        className="
-          relative
-          py-20
-          sm:py-32
-        "
-      >
-        <div
-          className="
-            pointer-events-none
-            absolute inset-0
-            bg-gradient-to-b
-            from-white/15
-            via-sky-50/40
-            to-orange-50/35
-
-            dark:from-slate-950/20
-            dark:via-slate-900/50
-            dark:to-indigo-950/30
-          "
-        />
-
-        <div
-          className="
-            mx-auto
-            max-w-7xl
-            px-4
-            sm:px-6
-            lg:px-8
-          "
-        >
-          <div
-            className="
-              mb-20
-              text-center
-            "
-          >
-            <h2
-              className="
-                mb-4
-                text-4xl
-                font-black
-                text-slate-900
-
-                dark:text-white
-              "
-            >
-              Everything You Need to Succeed
-            </h2>
-
-            <p
-              className="
-                text-lg
-                font-medium
-                text-slate-500
-
-                dark:text-slate-400
-              "
-            >
-              From zero to your first high-paying
-              internship.
-            </p>
-          </div>
-
-          <div
-            className="
-              grid gap-12
-              md:grid-cols-3
-            "
-          >
-            {/* =================================================
-                AI ROADMAPS
-            ================================================= */}
-
-            <div
-              className="
-                rounded-[40px]
-                border
-                border-white/55
-                bg-white/55
-                p-10
-                shadow-lg
-                shadow-slate-200/45
-                backdrop-blur-xl
-                transition-all
-                hover:shadow-2xl
-
-                dark:border-slate-700/70
-                dark:bg-slate-800/65
-                dark:shadow-black/40
-              "
-            >
-              <div
-                className="
-                  mb-8
-                  flex
-                  h-16 w-16
-                  items-center
-                  justify-center
-                  rounded-2xl
-                  bg-emerald-50
-                  text-emerald-600
-
-                  dark:bg-emerald-500/15
-                  dark:text-emerald-400
-                "
-              >
-                <Target className="h-8 w-8" />
-              </div>
-
-              <h3
-                className="
-                  mb-4
-                  text-2xl
-                  font-black
-                  text-slate-900
-
-                  dark:text-white
-                "
-              >
-                AI Roadmaps
-              </h3>
-
-              <p
-                className="
-                  font-medium
-                  leading-relaxed
-                  text-slate-500
-
-                  dark:text-slate-300
-                "
-              >
-                Dynamic paths that adjust based on
-                your speed and performance.
-              </p>
-            </div>
-
-            {/* =================================================
-                SKILL TESTS
-            ================================================= */}
-
-            <div
-              className="
-                rounded-[40px]
-                border
-                border-white/55
-                bg-white/55
-                p-10
-                shadow-lg
-                shadow-slate-200/45
-                backdrop-blur-xl
-                transition-all
-                hover:shadow-2xl
-
-                dark:border-slate-700/70
-                dark:bg-slate-800/65
-                dark:shadow-black/40
-              "
-            >
-              <div
-                className="
-                  mb-8
-                  flex
-                  h-16 w-16
-                  items-center
-                  justify-center
-                  rounded-2xl
-                  bg-amber-50
-                  text-amber-600
-
-                  dark:bg-amber-500/15
-                  dark:text-amber-400
-                "
-              >
-                <BookOpen className="h-8 w-8" />
-              </div>
-
-              <h3
-                className="
-                  mb-4
-                  text-2xl
-                  font-black
-                  text-slate-900
-
-                  dark:text-white
-                "
-              >
-                Skill Tests
-              </h3>
-
-              <p
-                className="
-                  font-medium
-                  leading-relaxed
-                  text-slate-500
-
-                  dark:text-slate-300
-                "
-              >
-                Weekly assessments to keep your
-                skills sharp and points high.
-              </p>
-            </div>
-
-            {/* =================================================
-                DIRECT HIRING
-            ================================================= */}
-
-            <div
-              className="
-                rounded-[40px]
-                border
-                border-white/55
-                bg-white/55
-                p-10
-                shadow-lg
-                shadow-slate-200/45
-                backdrop-blur-xl
-                transition-all
-                hover:shadow-2xl
-
-                dark:border-slate-700/70
-                dark:bg-slate-800/65
-                dark:shadow-black/40
-              "
-            >
-              <div
-                className="
-                  mb-8
-                  flex
-                  h-16 w-16
-                  items-center
-                  justify-center
-                  rounded-2xl
-                  bg-orange-50
-                  text-orange-600
-
-                  dark:bg-orange-500/15
-                  dark:text-orange-400
-                "
-              >
-                <ChevronRight className="h-8 w-8" />
-              </div>
-
-              <h3
-                className="
-                  mb-4
-                  text-2xl
-                  font-black
-                  text-slate-900
-
-                  dark:text-white
-                "
-              >
-                Direct Hiring
-              </h3>
-
-              <p
-                className="
-                  font-medium
-                  leading-relaxed
-                  text-slate-500
-
-                  dark:text-slate-300
-                "
-              >
-                Top performers get fast-tracked
-                into verified internships.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* =====================================================
-          ABOUT EDUROUTE
-      ===================================================== */}
-
-      <section
-        id="about-eduroutee"
-        className="
-          relative
-          py-20
-        "
-      >
-        <div
-          className="
-            mx-auto
-            max-w-7xl
-            px-4
-            sm:px-6
-            lg:px-8
-          "
-        >
-          <div
-            className="
-              rounded-[40px]
-              border
-              border-white/60
-              bg-white/65
-              p-8
-              shadow-xl
-              shadow-slate-200/60
-              backdrop-blur-xl
-              sm:p-12
-
-              dark:border-slate-700/70
-              dark:bg-slate-800/65
-              dark:shadow-black/40
-            "
-          >
-            <h2
-              className="
-                mb-5
-                text-4xl
-                font-black
-                text-slate-900
-
-                dark:text-white
-              "
-            >
-              About EduRoutee
-            </h2>
-
-            <p
-              className="
-                text-lg
-                font-medium
-                leading-relaxed
-                text-slate-600
-
-                dark:text-slate-300
-              "
-            >
-              EduRoutee is a smart learning roadmap
-              platform designed to help students
-              plan, track, and optimize their
-              learning journey. Students waste time
-              because they don’t know what to learn
-              and in what order. EduRoutee provides
-              structured roadmaps, AI guidance, and
-              progress tracking in one platform to
-              help students build skills efficiently
-              and achieve career success.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* =====================================================
-          PROBLEM STATEMENT
-      ===================================================== */}
-
-      <section
-        id="problem-statement"
-        className="
-          relative
-          pb-20
-        "
-      >
-        <div
-          className="
-            mx-auto
-            max-w-7xl
-            px-4
-            sm:px-6
-            lg:px-8
-          "
-        >
-          <div
-            className="
-              rounded-[40px]
-              border
-              border-white/60
-              bg-white/65
-              p-8
-              shadow-xl
-              shadow-slate-200/60
-              backdrop-blur-xl
-              sm:p-12
-
-              dark:border-slate-700/70
-              dark:bg-slate-800/65
-              dark:shadow-black/40
-            "
-          >
-            <h2
-              className="
-                mb-5
-                text-4xl
-                font-black
-                text-slate-900
-
-                dark:text-white
-              "
-            >
-              Problem Statement
-            </h2>
-
-            <p
-              className="
-                text-lg
-                font-medium
-                leading-relaxed
-                text-slate-600
-
-                dark:text-slate-300
-              "
-            >
-              Students waste time because they
-              don’t know what to learn and in what
-              order. EduRoutee solves this by
-              providing structured learning
-              roadmaps, AI-based guidance, and
-              progress tracking in one platform.
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* =====================================================
-          FOOTER
-      ===================================================== */}
-
-      <footer
-        className="
-          relative
-          border-t
-          border-white/60
-          bg-white/65
-          py-14
-          backdrop-blur-xl
-
-          dark:border-slate-700/60
-          dark:bg-slate-950/85
-        "
-      >
-        <div
-          className="
-            mx-auto
-            grid
-            max-w-7xl
-            gap-8
-            px-4
-            sm:px-6
-            md:grid-cols-2
-            lg:grid-cols-4
-            lg:px-8
-          "
-        >
-          {/* =================================================
-              BRAND
-          ================================================= */}
-
-          <div
-            className="
-              rounded-3xl
-              border
-              border-white/70
-              bg-white/70
-              p-6
-              shadow-lg
-              shadow-slate-200/50
-
-              dark:border-slate-700/70
-              dark:bg-slate-800/65
-              dark:shadow-black/40
-            "
-          >
-            <p
-              className="
-                mb-4
-                text-lg
-                font-black
-                text-slate-900
-
-                dark:text-white
-              "
-            >
-              EduRoutee
-            </p>
-
-            <p
-              className="
-                text-sm
-                font-medium
-                leading-relaxed
-                text-slate-500
-
-                dark:text-slate-400
-              "
-            >
-              A smart roadmap platform helping
-              students learn in the right order and
-              reach career goals faster.
-            </p>
-          </div>
-
-          {/* =================================================
-              CONTACT
-          ================================================= */}
-
-          <div
-            className="
-              rounded-3xl
-              border
-              border-white/70
-              bg-white/70
-              p-6
-              shadow-lg
-              shadow-slate-200/50
-
-              dark:border-slate-700/70
-              dark:bg-slate-800/65
-              dark:shadow-black/40
-            "
-          >
-            <h3
-              className="
-                mb-4
-                text-lg
-                font-black
-                text-slate-900
-
-                dark:text-white
-              "
+            <a
+              href="#contact"
+              onClick={() => setMobileOpen(false)}
+              className="block rounded-lg px-3 py-2.5 text-sm font-semibold text-slate-700 dark:text-slate-200"
             >
               Contact Us
-            </h3>
+            </a>
+          </div>
+        )}
+      </header>
 
-            <div
-              className="
-                space-y-3
-                text-sm
-                font-medium
-                text-slate-600
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <video
+            className="h-full w-full scale-105 object-cover"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+          >
+            <source src={HERO_VIDEO_CDN} type="video/mp4" />
+            <source src={HERO_VIDEO_LOCAL} type="video/mp4" />
+          </video>
+          <div className="absolute inset-0 bg-gradient-to-r from-white from-0% via-white/75 via-35% to-white/15 to-100% dark:from-slate-950 dark:from-0% dark:via-slate-950/80 dark:via-40% dark:to-slate-950/25 dark:to-100%" />
+          <div className="absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white/90 to-transparent dark:from-slate-950/90 dark:to-transparent" />
+          <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-white/50 to-transparent dark:from-slate-950/40 dark:to-transparent" />
+        </div>
 
-                dark:text-slate-300
-              "
-            >
-              <a
-                href={`mailto:${contactEmail}`}
-                className="
-                  flex items-center gap-2
-                  transition-colors
-                  hover:text-emerald-700
-
-                  dark:hover:text-indigo-400
-                "
-              >
-                <Mail className="h-4 w-4" />
-
-                {contactEmail}
-              </a>
-
-              <a
-                href={`tel:${contactPhone.replace(
-                  /\s/g,
-                  ""
-                )}`}
-                className="
-                  flex items-center gap-2
-                  transition-colors
-                  hover:text-emerald-700
-
-                  dark:hover:text-indigo-400
-                "
-              >
-                <Phone className="h-4 w-4" />
-
-                {contactPhone}
-              </a>
-
-              <a
-                href={instagramUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="
-                  flex items-center gap-2
-                  transition-colors
-                  hover:text-emerald-700
-
-                  dark:hover:text-indigo-400
-                "
-              >
-                <Instagram className="h-4 w-4" />
-
-                Instagram Profile
-              </a>
-
-              <a
-                href={whatsappUrl}
-                target="_blank"
-                rel="noreferrer"
-                className="
-                  flex items-center gap-2
-                  transition-colors
-                  hover:text-emerald-700
-
-                  dark:hover:text-indigo-400
-                "
-              >
-                <MessageCircle className="h-4 w-4" />
-
-                WhatsApp Chat
-              </a>
+        <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:gap-12 lg:px-8 lg:py-24">
+          <div className="max-w-xl">
+            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-violet-200/80 bg-white/80 px-3.5 py-1.5 text-xs font-bold text-violet-700 shadow-sm backdrop-blur dark:border-violet-500/30 dark:bg-slate-900/70 dark:text-violet-300">
+              <span className="text-sm">⚡</span>
+              Your Growth Partner in Tech
+            </div>
+            <h1 className="text-4xl font-black leading-[1.1] tracking-tight text-slate-900 drop-shadow-sm sm:text-5xl lg:text-6xl dark:text-white">
+              Build Skills.
+              <br />
+              <span className="bg-gradient-to-r from-violet-600 to-indigo-600 bg-clip-text text-transparent">Get Hired.</span>
+            </h1>
+            <p className="mt-5 max-w-md text-base leading-7 text-slate-700 dark:text-slate-200">
+              EDUROUTE helps you find the right roadmap, get internships and job opportunities, participate in hackathons and build the skills you need to grow in tech — all in one place.
+            </p>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <Link to="/roadmaps" className="inline-flex items-center gap-2 rounded-full bg-violet-600 px-5 py-3 text-sm font-bold text-white shadow-md shadow-violet-200/60 transition hover:bg-violet-700 dark:shadow-violet-900/40">
+                <ArrowRight className="h-4 w-4" /> Explore Roadmaps
+              </Link>
+              <Link to="/internships" className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white/90 px-5 py-3 text-sm font-bold text-slate-800 backdrop-blur transition hover:border-violet-300 hover:text-violet-700 dark:border-slate-700 dark:bg-slate-900/80 dark:text-slate-100 dark:hover:border-violet-500">
+                Find Opportunities
+              </Link>
             </div>
           </div>
+          <div className="hidden min-h-[280px] lg:block" aria-hidden />
+        </div>
 
-          {/* =================================================
-              QUICK LINKS
-          ================================================= */}
-
-          <div
-            className="
-              rounded-3xl
-              border
-              border-white/70
-              bg-white/70
-              p-6
-              shadow-lg
-              shadow-slate-200/50
-
-              dark:border-slate-700/70
-              dark:bg-slate-800/65
-              dark:shadow-black/40
-            "
-          >
-            <h3
-              className="
-                mb-4
-                text-lg
-                font-black
-                text-slate-900
-
-                dark:text-white
-              "
-            >
-              Quick Links
-            </h3>
-
-            <div
-              className="
-                grid gap-3
-                text-sm
-                font-semibold
-                text-slate-600
-
-                dark:text-slate-300
-              "
-            >
-              <a
-                href="/"
-                className="
-                  transition-colors
-                  hover:text-emerald-700
-
-                  dark:hover:text-indigo-400
-                "
-              >
-                Home
-              </a>
-
-              <a
-                href="#about-eduroutee"
-                className="
-                  transition-colors
-                  hover:text-emerald-700
-
-                  dark:hover:text-indigo-400
-                "
-              >
-                About
-              </a>
-
-              <a
-                href="/roadmaps"
-                className="
-                  transition-colors
-                  hover:text-emerald-700
-
-                  dark:hover:text-indigo-400
-                "
-              >
-                Roadmaps
-              </a>
-
-              <a
-                href="/dashboard"
-                className="
-                  transition-colors
-                  hover:text-emerald-700
-
-                  dark:hover:text-indigo-400
-                "
-              >
-                Dashboard
-              </a>
-
-              <a
-                href="#team"
-                className="
-                  transition-colors
-                  hover:text-emerald-700
-
-                  dark:hover:text-indigo-400
-                "
-              >
-                Team
-              </a>
-            </div>
+        <div className="relative z-10 mx-auto max-w-7xl px-4 pb-12 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 gap-3 rounded-2xl border border-slate-200/80 bg-white/90 p-4 shadow-lg shadow-slate-200/40 backdrop-blur-md sm:grid-cols-4 dark:border-slate-700 dark:bg-slate-900/80 dark:shadow-black/30">
+            {STATS.map((s) => (
+              <div key={s.label} className="flex items-center gap-3 px-2 py-2">
+                <div className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${s.color}`}>
+                  <s.icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <div className="text-lg font-extrabold text-slate-900 dark:text-white">{s.value}</div>
+                  <div className="text-[11px] font-medium leading-tight text-slate-500 dark:text-slate-400">{s.label}</div>
+                </div>
+              </div>
+            ))}
           </div>
+        </div>
+      </section>
 
-          {/* =================================================
-              SOCIAL
-          ================================================= */}
+      <OfferStackSection onExploreAll={() => setIsAuthOpen(true)} />
 
-          <div
-            className="
-              rounded-3xl
-              border
-              border-white/70
-              bg-white/70
-              p-6
-              shadow-lg
-              shadow-slate-200/50
-
-              dark:border-slate-700/70
-              dark:bg-slate-800/65
-              dark:shadow-black/40
-            "
-          >
-            <h3
-              className="
-                mb-4
-                text-lg
-                font-black
-                text-slate-900
-
-                dark:text-white
-              "
-            >
-              Follow Us
-            </h3>
-
-            <div
-              className="
-                flex
-                flex-wrap
-                items-center
-                gap-3
-              "
-            >
-              {[
-                {
-                  icon: Instagram,
-                  label: "Instagram",
-                  href: instagramUrl,
-                },
-                {
-                  icon: Mail,
-                  label: "Email",
-                  href: `mailto:${contactEmail}`,
-                },
-                {
-                  icon: Phone,
-                  label: "Phone",
-                  href: `tel:${contactPhone.replace(
-                    /\s/g,
-                    ""
-                  )}`,
-                },
-                {
-                  icon: MessageCircle,
-                  label: "WhatsApp",
-                  href: whatsappUrl,
-                },
-              ].map((social) => (
-                <a
-                  key={social.label}
-                  href={social.href}
-                  target={
-                    social.href.startsWith("http")
-                      ? "_blank"
-                      : undefined
-                  }
-                  rel={
-                    social.href.startsWith("http")
-                      ? "noreferrer"
-                      : undefined
-                  }
-                  aria-label={social.label}
-                  className="
-                    inline-flex
-                    h-11 w-11
-                    items-center
-                    justify-center
-                    rounded-full
-                    border
-                    border-white/80
-                    bg-white
-                    text-slate-700
-                    shadow-md
-                    shadow-slate-200/60
-                    transition-all
-                    duration-200
-                    hover:-translate-y-0.5
-                    hover:border-emerald-200
-                    hover:text-emerald-700
-
-                    dark:border-slate-600
-                    dark:bg-slate-900
-                    dark:text-slate-300
-                    dark:shadow-black/40
-                    dark:hover:border-indigo-500
-                    dark:hover:text-indigo-400
-                  "
-                >
-                  <social.icon className="h-5 w-5" />
-                </a>
-              ))}
+      <section className="py-16">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="rounded-3xl border border-slate-200/90 bg-gradient-to-br from-slate-50 to-white p-6 shadow-sm sm:p-8 dark:border-slate-800 dark:from-slate-900 dark:to-slate-950">
+            <div className="grid gap-8 lg:grid-cols-[1fr_1.4fr] lg:items-center">
+              <div>
+                <p className="mb-2 text-xs font-bold uppercase tracking-widest text-violet-600 dark:text-violet-400">Your Journey</p>
+                <h2 className="text-2xl font-extrabold tracking-tight text-slate-900 sm:text-3xl dark:text-white">From Learning to Landing</h2>
+                <p className="mt-3 max-w-sm text-sm leading-6 text-slate-500 dark:text-slate-400">Follow a clear path, build real skills, and turn your effort into opportunities.</p>
+              </div>
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+                {JOURNEY.map((step, i) => (
+                  <div key={step.title} className="relative text-center">
+                    {i < JOURNEY.length - 1 && (
+                      <div className="absolute left-[60%] top-5 hidden h-px w-[80%] border-t border-dashed border-slate-300 sm:block dark:border-slate-600" />
+                    )}
+                    <div className={`relative z-10 mx-auto mb-3 flex h-11 w-11 items-center justify-center rounded-full text-white shadow-md ${step.color}`}>
+                      <step.icon className="h-5 w-5" />
+                    </div>
+                    <div className="text-sm font-bold text-slate-900 dark:text-white">{step.title}</div>
+                    <div className="mt-1 text-[11px] leading-4 text-slate-500 dark:text-slate-400">{step.desc}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
+      </section>
 
-        {/* ===================================================
-            COPYRIGHT
-        =================================================== */}
+      <section className="px-4 pb-16 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-7xl overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 to-indigo-700 px-6 py-12 text-center text-white shadow-xl shadow-violet-200/40 sm:px-12 dark:shadow-violet-900/30">
+          <h2 className="text-2xl font-extrabold tracking-tight sm:text-3xl">Ready to build skills that get you hired?</h2>
+          <p className="mx-auto mt-3 max-w-lg text-sm leading-6 text-violet-100">Join thousands of learners using EDUROUTE roadmaps, practice sheets, and AI Buddy to grow faster.</p>
+          <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+            <button type="button" onClick={() => setIsAuthOpen(true)} className="rounded-full bg-white px-6 py-3 text-sm font-bold text-violet-700 shadow-sm transition hover:bg-violet-50">Create free account</button>
+            <Link to="/roadmaps" className="rounded-full border border-white/40 px-6 py-3 text-sm font-bold text-white transition hover:bg-white/10">Browse roadmaps</Link>
+          </div>
+        </div>
+      </section>
 
-        <div
-          className="
-            mx-auto
-            mt-8
-            max-w-7xl
-            border-t
-            border-white/60
-            px-4
-            pt-6
-            text-center
+      {/* Footer: EDUROUTE watermark first, then columns below (no overlap) */}
+      <footer
+        id="contact"
+        className="border-t border-slate-200 bg-slate-50 dark:border-slate-800 dark:bg-[#0a0a0f]"
+      >
+        <div className="mx-auto max-w-7xl px-4 pt-10 sm:px-6 lg:px-8">
+          {/* Outlined EDUROUTE — in document flow so content sits fully below */}
+          <div className="select-none overflow-hidden text-center" aria-hidden>
+            <span
+              className="inline-block whitespace-nowrap text-[16vw] font-black leading-none tracking-tight sm:text-[12vw] lg:text-[9.5rem]"
+              style={{
+                color: 'transparent',
+                WebkitTextStroke: '2px rgba(109, 40, 217, 0.55)',
+              }}
+            >
+              <span className="dark:hidden">EDUROUTE</span>
+            </span>
+            <span
+              className="hidden whitespace-nowrap text-[16vw] font-black leading-none tracking-tight dark:inline-block sm:text-[12vw] lg:text-[9.5rem]"
+              style={{
+                color: 'transparent',
+                WebkitTextStroke: '2px rgba(167, 139, 250, 0.55)',
+              }}
+            >
+              EDUROUTE
+            </span>
+          </div>
 
-            dark:border-slate-700/60
+          {/* All info below the word — no absolute overlay */}
+          <div className="mt-6 grid gap-10 pb-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-8">
+            {/* Brand */}
+            <div>
+              <div className="flex items-center gap-2.5">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-violet-600 to-indigo-600 text-sm font-black text-white shadow-md">
+                  E
+                </span>
+                <span className="text-lg font-extrabold tracking-tight text-slate-900 dark:text-white">
+                  EDU<span className="text-violet-600 dark:text-violet-400">ROUTE</span>
+                </span>
+              </div>
+              <p className="mt-4 text-sm font-bold text-slate-800 dark:text-slate-100">
+                Learn. Build. Compete. Get Hired.
+              </p>
+              <p className="mt-2 max-w-xs text-xs leading-5 text-slate-500 dark:text-slate-400">
+                Your one stop platform to build skills, explore opportunities and grow your career in tech.
+              </p>
+              <div className="mt-5 flex flex-wrap items-center gap-3">
+                <a
+                  href={instagramUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="Instagram"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-pink-300 hover:text-pink-600 dark:border-slate-700 dark:text-slate-400 dark:hover:border-pink-500/50 dark:hover:text-pink-400"
+                >
+                  <Instagram className="h-4 w-4" />
+                </a>
+                <a
+                  href={whatsappUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="WhatsApp"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-emerald-300 hover:text-emerald-600 dark:border-slate-700 dark:text-slate-400 dark:hover:border-emerald-500/50 dark:hover:text-emerald-400"
+                >
+                  <MessageCircle className="h-4 w-4" />
+                </a>
+                <a
+                  href={`mailto:${supportEmail}`}
+                  aria-label="Email"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition hover:border-violet-300 hover:text-violet-600 dark:border-slate-700 dark:text-slate-400 dark:hover:border-violet-500/50 dark:hover:text-violet-300"
+                >
+                  <Mail className="h-4 w-4" />
+                </a>
+              </div>
+            </div>
 
-            sm:px-6
-            lg:px-8
-          "
-        >
-          <p
-            className="
-              text-sm
-              font-semibold
-              text-slate-500
+            {/* Quick links */}
+            <div>
+              <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-900 dark:text-white">
+                Quick Links
+              </h3>
+              <ul className="space-y-2.5">
+                {QUICK_LINKS.map((item) =>
+                  item.href.startsWith('/') ? (
+                    <li key={item.label}>
+                      <Link
+                        to={item.href}
+                        className="text-sm text-slate-500 transition hover:text-violet-600 dark:text-slate-400 dark:hover:text-violet-300"
+                      >
+                        {item.label}
+                      </Link>
+                    </li>
+                  ) : (
+                    <li key={item.label}>
+                      <a
+                        href={item.href}
+                        className="text-sm text-slate-500 transition hover:text-violet-600 dark:text-slate-400 dark:hover:text-violet-300"
+                      >
+                        {item.label}
+                      </a>
+                    </li>
+                  )
+                )}
+              </ul>
+            </div>
 
-              dark:text-slate-500
-            "
-          >
-            © {new Date().getFullYear()} EduRoutee.
-            All rights reserved.
-          </p>
+            {/* Company */}
+            <div>
+              <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-900 dark:text-white">
+                Company
+              </h3>
+              <ul className="space-y-2.5">
+                {COMPANY_LINKS.map((item) => (
+                  <li key={item.label}>
+                    <a
+                      href={item.href}
+                      className="text-sm text-slate-500 transition hover:text-violet-600 dark:text-slate-400 dark:hover:text-violet-300"
+                    >
+                      {item.label}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Join community */}
+            <div>
+              <h3 className="mb-4 text-xs font-bold uppercase tracking-widest text-slate-900 dark:text-white">
+                Join Our Community
+              </h3>
+              <p className="mb-4 text-xs leading-5 text-slate-500 dark:text-slate-400">
+                Stay updated with latest opportunities, events and learning resources.
+              </p>
+              <form
+                className="flex items-center gap-0 overflow-hidden rounded-full border border-slate-200 bg-white shadow-sm dark:border-slate-700 dark:bg-slate-900"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (newsletterEmail.trim()) {
+                    window.location.href = `mailto:${supportEmail}?subject=Newsletter%20signup&body=${encodeURIComponent(newsletterEmail.trim())}`;
+                  }
+                }}
+              >
+                <input
+                  type="email"
+                  value={newsletterEmail}
+                  onChange={(e) => setNewsletterEmail(e.target.value)}
+                  placeholder="Enter your email"
+                  className="min-w-0 flex-1 bg-transparent px-4 py-2.5 text-sm text-slate-800 outline-none placeholder:text-slate-400 dark:text-slate-100"
+                  required
+                />
+                <button
+                  type="submit"
+                  aria-label="Subscribe"
+                  className="m-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white transition hover:bg-violet-700"
+                >
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              </form>
+            </div>
+          </div>
+
+          <div className="flex flex-col items-center justify-between gap-3 border-t border-slate-200 py-6 text-xs text-slate-500 dark:border-slate-800 dark:text-slate-500 sm:flex-row">
+            <p>© {new Date().getFullYear()} EDUROUTE. All rights reserved.</p>
+            <p className="flex items-center gap-2 font-medium text-slate-600 dark:text-slate-400">
+              Better Skills <span className="text-violet-500">→</span> Brighter Future
+            </p>
+          </div>
         </div>
       </footer>
     </div>
   );
 };
+
+export default LandingPage;

@@ -36,7 +36,7 @@ export const VerifyCollege = () => {
       verificationStatus: 'pending',
     });
 
-    navigate('/dashboard');
+    navigate('/onboarding', { replace: true });
   };
 
   const handleUpload = async (event: React.FormEvent) => {
@@ -184,7 +184,7 @@ export const VerifyCollege = () => {
                 onClick={completeVerification}
                 className="inline-flex items-center px-8 py-3 bg-slate-900 dark:bg-indigo-600 text-white rounded-xl font-bold hover:bg-slate-800 transition-all group"
               >
-                Go to Dashboard <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                Continue <ChevronRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
               </button>
             </div>
           )}

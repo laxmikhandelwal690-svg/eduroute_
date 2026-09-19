@@ -31,7 +31,7 @@ async function forward(event, path) {
     return json(503, {
       success: false,
       error:
-        'GO_API_URL is not set on Netlify. Point it to your Go backend so signup/login can use MySQL.',
+        'MySQL is not configured on Netlify. Set MYSQL_URL (or MYSQL_HOST + MYSQL_USER + MYSQL_PASSWORD from Railway), or set GO_API_URL to your Go backend.',
     });
   }
 

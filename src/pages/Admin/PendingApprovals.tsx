@@ -199,7 +199,7 @@ export const PendingApprovals = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto space-y-6">
+    <div className="max-w-7xl mx-auto space-y-6 text-[var(--text-primary)]">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <h1 className="text-2xl md:text-3xl font-black text-[var(--text-primary)]">Student Approval Requests</h1>
@@ -217,20 +217,20 @@ export const PendingApprovals = () => {
           >
             {backendConnected ? 'Backend connected' : 'Backend offline'}
           </span>
-          <button type="button" onClick={() => load()} className="text-xs font-bold px-3 py-1.5 rounded-lg border border-[var(--border-default)]">
+          <button type="button" onClick={() => load()} className="text-xs font-bold px-3 py-1.5 rounded-lg border border-[var(--border-default)] bg-[var(--bg-card)]">
             Refresh
           </button>
         </div>
       </div>
 
       {message && (
-        <p className="text-sm rounded-xl px-3 py-2 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60">
+        <p className="text-sm rounded-xl px-3 py-2 bg-emerald-50 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-300 border border-emerald-200/60 dark:border-emerald-900/40">
           {message}
         </p>
       )}
 
       <div className="grid grid-cols-1 xl:grid-cols-5 gap-5">
-        <section className="xl:col-span-2 rounded-2xl border border-[var(--border-default)] bg-[var(--surface-card)] overflow-hidden shadow-sm">
+        <section className="xl:col-span-2 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] overflow-hidden shadow-sm">
           <div className="px-5 py-4 border-b border-[var(--border-default)]">
             <h2 className="font-bold">Pending Approvals ({students.length})</h2>
           </div>
@@ -241,7 +241,7 @@ export const PendingApprovals = () => {
               return (
                 <div
                   key={`${student.source}-${student.id}`}
-                  className={`p-4 cursor-pointer ${active ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-l-4 border-l-indigo-500' : 'hover:bg-slate-50 dark:hover:bg-slate-800/40'}`}
+                  className={`p-4 cursor-pointer ${active ? 'bg-indigo-50/80 dark:bg-indigo-950/40 border-l-4 border-l-indigo-500' : 'hover:bg-[var(--bg-elevated)]'}`}
                   onClick={() => {
                     setSelectedId(student.id);
                     setActiveTab('profile');
@@ -254,22 +254,22 @@ export const PendingApprovals = () => {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span className="font-bold">{student.name}</span>
-                        <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-700">
+                        <span className="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded bg-sky-100 text-sky-700 dark:bg-sky-950/40 dark:text-sky-300">
                           {student.source === 'demo' ? 'Demo' : student.source === 'api' ? 'Live' : 'Local'}
                         </span>
                       </div>
                       <div className="text-xs text-[var(--text-secondary)]">{student.course || 'Course not set'}</div>
-                      <div className="text-[11px] text-slate-400">Applied {formatApplied(student.appliedAt)}</div>
+                      <div className="text-[11px] text-[var(--text-muted)]">Applied {formatApplied(student.appliedAt)}</div>
                     </div>
                   </div>
                   <div className="flex gap-2 mt-3">
-                    <button type="button" className="px-3 py-1.5 text-xs font-bold rounded-lg border" onClick={(e) => { e.stopPropagation(); setSelectedId(student.id); }}>
+                    <button type="button" className="px-3 py-1.5 text-xs font-bold rounded-lg border border-[var(--border-default)]" onClick={(e) => { e.stopPropagation(); setSelectedId(student.id); }}>
                       View
                     </button>
                     <button type="button" className="px-3 py-1.5 text-xs font-bold rounded-lg bg-emerald-500 text-white" onClick={(e) => { e.stopPropagation(); setSelectedId(student.id); void handleDecision('approve'); }}>
                       Approve
                     </button>
-                    <button type="button" className="px-3 py-1.5 text-xs font-bold rounded-lg border border-rose-200 text-rose-600" onClick={(e) => { e.stopPropagation(); setSelectedId(student.id); void handleDecision('reject'); }}>
+                    <button type="button" className="px-3 py-1.5 text-xs font-bold rounded-lg border border-rose-200 text-rose-600 dark:border-rose-800 dark:text-rose-400" onClick={(e) => { e.stopPropagation(); setSelectedId(student.id); void handleDecision('reject'); }}>
                       Reject
                     </button>
                   </div>
@@ -279,7 +279,7 @@ export const PendingApprovals = () => {
           </div>
         </section>
 
-        <section className="xl:col-span-3 rounded-2xl border border-[var(--border-default)] bg-[var(--surface-card)] shadow-sm overflow-hidden min-h-[520px] flex flex-col">
+        <section className="xl:col-span-3 rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] shadow-sm overflow-hidden min-h-[520px] flex flex-col">
           {!selected ? (
             <div className="flex-1 flex items-center justify-center text-sm text-[var(--text-secondary)] p-8">Select a student</div>
           ) : (
@@ -320,7 +320,7 @@ export const PendingApprovals = () => {
                 </div>
 
                 {(activeTab === 'id' || activeTab === 'docs' || activeTab === 'profile') && (
-                  <div className="rounded-2xl border border-dashed border-[var(--border-default)] min-h-[160px] flex items-center justify-center p-4">
+                  <div className="rounded-2xl border border-dashed border-[var(--border-default)] min-h-[160px] flex items-center justify-center p-4 bg-[var(--bg-elevated)]">
                     {docPreviewUrl ? (
                       selected.mimeType?.includes('pdf') || selected.fileName?.endsWith('.pdf') ? (
                         <a href={docPreviewUrl} target="_blank" rel="noreferrer" className="text-indigo-600 font-semibold underline">
@@ -350,7 +350,7 @@ export const PendingApprovals = () => {
                     type="button"
                     disabled={actionLoading || selected.source === 'demo'}
                     onClick={() => handleDecision('reject')}
-                    className="inline-flex items-center gap-2 rounded-xl border border-rose-300 px-5 py-2.5 text-sm font-bold text-rose-600 disabled:opacity-50"
+                    className="inline-flex items-center gap-2 rounded-xl border border-rose-300 dark:border-rose-800 px-5 py-2.5 text-sm font-bold text-rose-600 dark:text-rose-400 disabled:opacity-50"
                   >
                     <X className="h-4 w-4" /> Reject
                   </button>

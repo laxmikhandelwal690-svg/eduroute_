@@ -17,3 +17,6 @@ build/
 out/
 .turbo/
 .env
+
+# Vite prebundle cache (should not be committed)
+.vite/

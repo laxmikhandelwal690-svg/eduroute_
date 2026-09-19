@@ -1,148 +1,255 @@
-# EDUROUTE - AI Mentor Platform
+# EDUROUTE
 
-EDUROUTE now includes **Buddy**, a production-oriented AI student mentor that supports learning roadmaps, skill-gap analysis, internship guidance, motivation gamification, and multilingual chat (English, Hindi, Hinglish).
+### Academia–Industry Collaboration Portal for Skill Mapping, Internships & Placement
 
-## Folder Structure
+**Smart India Hackathon 2026 · Problem Statement SIH26044**  
+*Portal for Academia – Industry collaboration for Skill Mapping, Internships and Placement*
 
-```txt
-eduroute_
+[![SIH 2026](https://img.shields.io/badge/SIH-2026-violet)](https://www.sih.gov.in/)
+[![PS](https://img.shields.io/badge/PS-SIH26044-indigo)](https://sih.gov.in/sih2026PS)
+[![Category](https://img.shields.io/badge/Category-Software-blue)]()
+[![Theme](https://img.shields.io/badge/Theme-Smart%20Education%20%2F%20Automation-purple)]()
+
+**Live preview (PR):** https://deploy-preview-67--eduroutee.netlify.app
+
+---
+
+## 1. Problem we solve
+
+There is a clear gap between **skills taught in colleges** and **skills expected by industry**.
+
+| Stakeholder | Pain today |
+|-------------|------------|
+| **Students** | Unclear skill gaps, random internship applications, weak portfolios |
+| **Industry** | Hard to find skill-matched candidates; noisy applications |
+| **Colleges** | Low visibility into placement funnel and cohort skill gaps |
+
+**EDUROUTE** is a unified portal that connects all three sides with skill assessment, mapping, matching, applications, and placement analytics.
+
+---
+
+## 2. Solution overview
+
+```mermaid
+flowchart LR
+  subgraph Student
+    A[Onboarding + Skill Assessment] --> B[Skill Profile]
+    B --> C[Roadmaps / DSA / Buddy AI]
+    B --> D[Matched Internships]
+    D --> E[Apply + Track Status]
+  end
+  subgraph Industry
+    F[Post Internship / Job] --> G[View Applicants]
+    G --> H[Shortlist by Match %]
+  end
+  subgraph College
+    I[Placement Dashboard]
+    I --> J[Funnel + Cohort Gaps]
+  end
+  E --> G
+  H --> I
+  B --> I
+```
+
+---
+
+## 3. Mapping to SIH26044
+
+| SIH26044 requirement | EDUROUTE feature |
+|----------------------|------------------|
+| Skill assessment | Onboarding interest tracks + yes/no gap questions |
+| Skill mapping | Skill Profile (scores, Good / Improve / Gap) + recommended next steps |
+| Internship & job opportunities | Internships feed + Industry postings |
+| Matching students ↔ openings | Match % on cards + “Recommended for you” |
+| Application & tracking | Apply → Applied → Shortlisted → Interview → Hired |
+| Industry collaboration | Industry workspace (`/industry`) |
+| Institution visibility | College placement dashboard (`/college/placements`) |
+| Learning support (value-add) | Roadmaps, DSA Sheet, Assessments, Buddy AI mentor |
+
+---
+
+## 4. Three-sided product
+
+```mermaid
+flowchart TB
+  subgraph Roles
+    S[Student]
+    I[Industry / Recruiter]
+    C[College / Placement Cell]
+  end
+  S -->|Skill Profile, Apply, Learn| P[EDUROUTE Portal]
+  I -->|Post, Shortlist| P
+  C -->|Funnel Analytics| P
+```
+
+| Role | Key screens |
+|------|-------------|
+| **Student** | Dashboard, Skill Profile, Internships, My Applications, Roadmaps, DSA, Buddy AI |
+| **Industry** | Post opening, applicant list, shortlist with match % |
+| **College** | Placement counts, status funnel, cohort skill-gap snapshot |
+
+---
+
+## 5. Core user flow (demo path for jury)
+
+```mermaid
+sequenceDiagram
+  participant St as Student
+  participant ER as EDUROUTE
+  participant In as Industry
+  participant Co as College
+
+  St->>ER: Signup + onboarding (interests + skill gaps)
+  ER->>St: Skill Profile + recommendations
+  St->>ER: Browse matched internships
+  St->>ER: Apply
+  In->>ER: Post job / view applicants
+  In->>ER: Shortlist candidate
+  Co->>ER: View placement funnel and skill gaps
+```
+
+**3-minute live demo order**
+
+1. Student onboarding → **Skill Profile**  
+2. **Internships** → Recommended + match % → **Apply**  
+3. **My Applications** (status)  
+4. **Industry** → post / shortlist  
+5. **College placements** dashboard  
+
+---
+
+## 6. Feature map
+
+```text
+EDUROUTE
+├── Student
+│   ├── Auth + College ID verify (optional)
+│   ├── AI onboarding (track + gap quiz)
+│   ├── Skill Profile (scores, gaps, next steps)
+│   ├── Dashboard (progress, applications shortcut)
+│   ├── Internships (match %, recommended, apply)
+│   ├── My Applications (status pipeline)
+│   ├── Roadmaps / Pathways / Courses
+│   ├── DSA Sheet (100 beginner problems)
+│   ├── Assessments, Leaderboard, Rewards
+│   └── Buddy AI + floating assistant
+├── Industry
+│   ├── Workspace login
+│   ├── Post internship / job (skills, stipend, location)
+│   └── Applicants + shortlist
+└── College / Admin
+    ├── Placement dashboard (funnel metrics)
+    └── Admin panel (approvals, courses)
+```
+
+---
+
+## 7. Architecture (high level)
+
+```mermaid
+flowchart TB
+  UI[React + Vite + Tailwind Frontend]
+  NF[Netlify Functions]
+  DB[(MySQL / Railway)]
+  AI[AI Provider Groq / OpenAI / Gemini]
+  LS[Browser localStorage - industry posts, applications, skill cache]
+
+  UI --> NF
+  UI --> LS
+  NF --> DB
+  NF --> AI
+```
+
+| Layer | Stack |
+|-------|--------|
+| Frontend | React, TypeScript, Vite, Tailwind CSS, Framer Motion |
+| Hosting | Netlify (static + serverless functions) |
+| Auth / data | MySQL (Railway) via Netlify functions where configured |
+| AI mentor | Buddy chat API + web-search fallback |
+| Demo persistence | localStorage for industry posts, applications, DSA progress |
+
+---
+
+## 8. Tech stack
+
+```text
+Frontend     React 18 · TypeScript · Vite · Tailwind · Lucide
+Routing      React Router
+AI           Netlify Functions · Groq / OpenAI / Gemini adapters
+Database     MySQL (Railway) for auth & buddy progress
+Deploy       Netlify continuous deploy from GitHub
+```
+
+---
+
+## 9. Project structure (simplified)
+
+```text
+eduroute_/
 ├── src/
 │   ├── pages/
-│   │   ├── Buddy/BuddyChat.tsx          # Buddy chatbot frontend
-│   │   └── Admin/AdminDashboard.tsx     # Admin content manager for roadmaps
-│   ├── services/buddyApi.ts             # Frontend API client for Buddy functions
-│   └── types/buddy.ts                   # Buddy-specific TypeScript types
-├── netlify/
-│   └── functions/
-│       ├── buddy-chat.js                # AI response + chat history + XP update
-│       ├── buddy-progress.js            # User progress + skill-gap persistence
-│       ├── admin-roadmaps.js            # Admin CRUD-like roadmap update endpoint
-│       ├── courses.js                   # Course catalog CRUD endpoint (MongoDB-backed)
-│       └── _lib/
-│           ├── aiClient.js              # OpenAI/Gemini adapter + safety system prompt
-│           └── database.js              # MySQL connection cache and schema helper
-├── netlify.toml                         # Netlify build + functions routing
+│   │   ├── Dashboard.tsx          # Student home
+│   │   ├── SkillProfile.tsx       # Skill scores & gaps
+│   │   ├── Career/Internships.tsx # Match % + apply
+│   │   ├── Industry/              # Recruiter workspace
+│   │   ├── Admin/PlacementDashboard.tsx
+│   │   ├── Buddy/BuddyChat.tsx
+│   │   ├── DSASheet.tsx
+│   │   ├── Roadmaps/
+│   │   └── Auth/
+│   ├── utils/
+│   │   ├── onboardingStore.ts
+│   │   ├── industryStore.ts
+│   │   └── internshipApplications.ts
+│   └── components/
+├── netlify/functions/             # Auth, buddy, proxies
 └── package.json
 ```
 
-## Buddy Capabilities Implemented
+---
 
-1. **Learning Roadmap Guide**
-   - Buddy is instructed to return Beginner → Intermediate → Pro roadmaps.
-   - Admin can update roadmap content via `admin-roadmaps` API and Admin Dashboard.
+## 10. Why this approach wins for SIH
 
-2. **Skill Gap Analyzer**
-   - Buddy page includes quick yes/no skill assessment.
-   - Missing skills and Buddy chat history are stored in MySQL per user profile.
-
-3. **Internship & Career Guidance**
-   - Prompt templates and AI system prompt force career-focused responses.
-
-4. **Gamified Motivation**
-   - Every message gives XP points.
-   - User level updates automatically using XP thresholds.
-   - Weekly challenges and achievements are persisted.
-
-5. **Events & Growth Assistant**
-   - Quick prompt templates include event discovery and growth guidance.
-
-6. **Multilingual Support**
-   - Language selector: English / Hindi / Hinglish.
-   - Selected language is saved in user profile.
-
-7. **Student Buddy Personality + Safety**
-   - Central system prompt configures friendly mentor tone.
-   - Harmful/unrelated requests are rejected politely.
+| Jury lens | How EDUROUTE responds |
+|-----------|------------------------|
+| **Problem clarity** | Directly addresses academia–industry skill gap |
+| **Completeness** | Student + Industry + College in one product |
+| **Working demo** | Full apply → shortlist → placement path |
+| **Innovation** | Skill gap onboarding + match scoring + AI mentor |
+| **Feasibility** | Built on standard web stack; deployable today |
+| **Impact** | Employability, internship quality, college visibility |
 
 ---
 
-## Production Reliability Notes
+## 11. Future scope
 
-Buddy now has graceful fallback behavior so the UI remains usable even when external services are unavailable:
-- If Netlify functions or DB are temporarily down, chat still works using local browser persistence (`localStorage`).
-- If AI provider keys are missing, Buddy serves a structured fallback mentor response instead of failing.
-- Quick prompt buttons are wired to send immediately for better click feedback.
-
----
-
-   │           └── database.js              # MySQL connection cache and schema helper
-
-Set these variables in **Netlify Site Settings → Environment Variables**:
-
-### Required for Buddy AI
-- `MONGODB_URI` = MongoDB connection string used by the Buddy progress and chat functions
-- `OPENAI_API_KEY` (if using OpenAI)
-
-### Optional
-- `MONGODB_DB_NAME` (default: `eduroute`)
-- `AI_PROVIDER` = `openai` (default) or `gemini`
-- `OPENAI_MODEL` (default: `gpt-4o-mini`)
-- `GEMINI_API_KEY` (required only if `AI_PROVIDER=gemini`)
-- `GEMINI_MODEL` (default: `gemini-1.5-flash`)
-- `ADMIN_SECRET` (protects admin roadmap API and course write operations)
-- `VITE_ADMIN_SECRET` (frontend header for admin writes when using Netlify functions)
-- `CORS_ORIGIN` (for cross-origin control)
+- NSQF / NOS formal competency taxonomy  
+- Faculty FDP & industrial training modules  
+- Server-synced applications (shared live DB for all roles)  
+- Verifiable digital credentials on portfolio  
+- Deeper adaptive skill assessments  
 
 ---
 
-## Local Development
+## 12. Quick start (developers)
 
 ```bash
+git clone https://github.com/laxmikhandelwal690-svg/eduroute_.git
+cd eduroute_
 npm install
 npm run dev
 ```
 
-Netlify functions are available when running through Netlify CLI:
+Configure Netlify env (when using cloud auth / Buddy):
 
-```bash
-npm install -g netlify-cli
-netlify dev
-```
-
----
-
-## Netlify Deployment Steps
-
-1. Push project to GitHub.
-2. Connect repo in Netlify.
-3. Build settings:
-   - Build command: `npm run build`
-   - Publish directory: `dist`
-4. Add all environment variables.
-5. Deploy.
-
-`netlify.toml` already maps `/api/*` to Netlify functions:
-- `/api/buddy-chat`
-- `/api/buddy-progress`
-- `/api/admin-roadmaps`
-- `/api/courses`
-
-   - `MONGODB_URI` and optional `MONGODB_DB_NAME` for Buddy progress and chat persistence
-
-## API Summary
-
-### `POST /api/buddy-chat`
-Request:
-```json
-{ "userId": "demo-student-101", "message": "Create Data Scientist roadmap", "language": "hinglish" }
-```
-Response:
-```json
-{ "ok": true, "reply": "...", "gamification": { "points": 40, "level": 1, "pointsEarned": 5 } }
-```
-
-### `GET /api/buddy-progress?userId=demo-student-101`
-Returns user progress, achievements, weekly challenges, and recent history.
-
-### `POST /api/buddy-progress`
-Save/update missing skills from skill-gap analyzer.
-
-### `GET /api/admin-roadmaps`
-Fetch all roadmaps (admin endpoint).
-
-### `POST /api/admin-roadmaps`
-Create/update roadmap stages for a role.
+- `MYSQL_URL` or Railway MySQL vars  
+- `JWT_SECRET`  
+- `GROQ_API_KEY` / `OPENAI_API_KEY` / `GEMINI_API_KEY` (optional)
 
 ---
 
-Built for student growth with Buddy 🚀
+## 13. Team note
+
+Built as a **software** solution for **SIH26044**, focused on a usable three-sided portal rather than a single student learning app.
+
+**EDUROUTE — Learn · Map skills · Match · Get hired**

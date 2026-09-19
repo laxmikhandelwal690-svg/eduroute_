@@ -4,7 +4,7 @@ import { getCurrentUser } from '../../utils/userProfile';
 
 const TOP_THREE = [
   { rank: 2, name: 'Deepesh chauhan', points: 8420, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=hero1', college: 'IIT Bombay' },
-  { rank: 1, name: 'Vansh Khandelwal', points: 9250, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=hero', college: 'BITS Pilani',isUser : true },
+  { rank: 1, name: 'Vansh Khandelwal', points: 9250, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=hero', college: 'BITS Pilani', isUser: true },
   { rank: 3, name: 'Sarthak Sharma', points: 7980, avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=super', college: 'NIT Trichy' },
 ];
 
@@ -19,142 +19,122 @@ const LEADERBOARD_LIST = [
 export const Leaderboard = () => {
   const currentUser = getCurrentUser();
   const leaderboardList = LEADERBOARD_LIST.map((entry) =>
-    entry.isUser
-      ? {
-          ...entry,
-          name: currentUser.name,
-          avatar: currentUser.avatar,
-        }
+    (entry as { isUser?: boolean }).isUser
+      ? { ...entry, name: currentUser.name, avatar: currentUser.avatar }
       : entry
   );
 
   return (
     <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto">
       <header className="mb-12 text-center">
-        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-50 rounded-full text-amber-600 text-sm font-bold border border-amber-100 mb-4">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-50 dark:bg-amber-500/15 rounded-full text-amber-600 dark:text-amber-300 text-sm font-bold border border-amber-100 dark:border-amber-500/30 mb-4">
           <Trophy className="h-4 w-4" /> Global Ranking
         </div>
-        <h1 className="text-4xl md:text-5xl font-black text-slate-900 mb-4 dark:text-white">Hall of Fame</h1>
-        <p className="text-slate-500 max-w-xl mx-auto ">Compete with learners across the globe. Higher ranks unlock exclusive internship opportunities and rewards.</p>
+        <h1 className="text-4xl md:text-5xl font-black text-slate-900 dark:text-white mb-4">Hall of Fame</h1>
+        <p className="text-slate-500 dark:text-slate-400 max-w-xl mx-auto">
+          Compete with learners across the globe. Higher ranks unlock exclusive internship opportunities and rewards.
+        </p>
       </header>
 
-      {/* Podium */}
       <div className="flex flex-col md:flex-row items-end justify-center gap-6 mb-16 px-4">
-        {/* Rank 2 */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
           className="order-2 md:order-1 flex flex-col items-center group w-full md:w-48"
         >
           <div className="relative mb-4">
-            <div className="w-24 h-24 rounded-3xl bg-slate-200 border-4 border-slate-300 overflow-hidden transform group-hover:rotate-6 transition-transform">
-              <img src={TOP_THREE[0].avatar} alt={TOP_THREE[0].name} className="w-full h-full object-cover" />
+            <img src={TOP_THREE[0].avatar} className="h-20 w-20 rounded-3xl border-4 border-slate-200 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 shadow-lg" alt="" />
+            <div className="absolute -bottom-2 -right-2 h-8 w-8 bg-slate-300 dark:bg-slate-600 rounded-full flex items-center justify-center text-white font-black text-sm border-2 border-white dark:border-slate-900">2</div>
+          </div>
+          <div className="font-bold text-slate-900 dark:text-white text-center">{TOP_THREE[0].name}</div>
+          <div className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-3">{TOP_THREE[0].college}</div>
+          <div className="w-full h-32 bg-slate-100 dark:bg-slate-800 rounded-t-3xl border-x border-t border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-2xl font-black text-slate-700 dark:text-slate-200">{TOP_THREE[0].points.toLocaleString()}</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase">pts</div>
             </div>
-            <div className="absolute -bottom-2 -right-2 h-10 w-10 bg-slate-400 border-4 border-white rounded-full flex items-center justify-center text-white font-black text-lg">2</div>
-          </div>
-          <div className="text-center mb-6">
-            <div className="font-bold text-slate-900 dark:text-white">{TOP_THREE[0].name}</div>
-            <div className="text-xs font-bold text-slate-400 uppercase">{TOP_THREE[0].points} PTS</div>
-          </div>
-          <div className="w-full h-32 bg-slate-100 rounded-t-3xl border-x border-t border-slate-200 shadow-sm flex items-center justify-center">
-             <Medal className="h-12 w-12 text-slate-300" />
           </div>
         </motion.div>
 
-        {/* Rank 1 */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="order-1 md:order-2 flex flex-col items-center group w-full md:w-56"
         >
-          <div className="relative mb-6">
-            <Crown className="absolute -top-10 left-1/2 -translate-x-1/2 h-10 w-10 text-amber-400 animate-bounce" />
-            <div className="w-32 h-32 rounded-[40px] bg-amber-50 border-4 border-amber-400 overflow-hidden transform group-hover:-rotate-6 transition-transform shadow-2xl shadow-amber-200">
-              <img src={TOP_THREE[1].avatar} alt={TOP_THREE[1].name} className="w-full h-full object-cover" />
+          <Crown className="h-8 w-8 text-amber-400 mb-2" />
+          <div className="relative mb-4">
+            <img src={TOP_THREE[1].avatar} className="h-24 w-24 rounded-3xl border-4 border-amber-300 dark:border-amber-500/50 bg-slate-100 dark:bg-slate-800 shadow-xl" alt="" />
+            <div className="absolute -bottom-2 -right-2 h-9 w-9 bg-amber-400 rounded-full flex items-center justify-center text-white font-black border-2 border-white dark:border-slate-900">1</div>
+          </div>
+          <div className="text-xl font-black text-slate-900 dark:text-white text-center">{TOP_THREE[1].name}</div>
+          <div className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-3">{TOP_THREE[1].college}</div>
+          <div className="w-full h-40 bg-gradient-to-b from-amber-100 to-amber-50 dark:from-amber-900/40 dark:to-slate-800 rounded-t-3xl border-x border-t border-amber-200 dark:border-amber-700/40 shadow-md flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-3xl font-black text-amber-700 dark:text-amber-300">{TOP_THREE[1].points.toLocaleString()}</div>
+              <div className="text-[10px] font-bold text-amber-600/70 dark:text-amber-400/70 uppercase">pts</div>
             </div>
-            <div className="absolute -bottom-2 -right-2 h-12 w-12 bg-amber-400 border-4 border-white rounded-full flex items-center justify-center text-white font-black text-xl">1</div>
-          </div>
-          <div className="text-center mb-6">
-            <div className="text-xl font-black text-slate-900 dark:text-white">{TOP_THREE[1].name}</div>
-            <div className="text-sm font-bold text-amber-600 uppercase tracking-widest">{TOP_THREE[1].points} PTS</div>
-          </div>
-          <div className="w-full h-48 bg-gradient-to-b from-amber-400 to-amber-500 rounded-t-[40px] shadow-2xl flex items-center justify-center">
-             <Crown className="h-16 w-16 text-white/50" />
           </div>
         </motion.div>
 
-        {/* Rank 3 */}
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
           className="order-3 flex flex-col items-center group w-full md:w-48"
         >
           <div className="relative mb-4">
-            <div className="w-24 h-24 rounded-3xl bg-orange-50 border-4 border-orange-300 overflow-hidden transform group-hover:rotate-6 transition-transform">
-              <img src={TOP_THREE[2].avatar} alt={TOP_THREE[2].name} className="w-full h-full object-cover" />
+            <img src={TOP_THREE[2].avatar} className="h-20 w-20 rounded-3xl border-4 border-orange-200 dark:border-orange-700/50 bg-slate-100 dark:bg-slate-800 shadow-lg" alt="" />
+            <div className="absolute -bottom-2 -right-2 h-8 w-8 bg-orange-400 rounded-full flex items-center justify-center text-white font-black text-sm border-2 border-white dark:border-slate-900">3</div>
+          </div>
+          <div className="font-bold text-slate-900 dark:text-white text-center">{TOP_THREE[2].name}</div>
+          <div className="text-xs text-slate-400 font-bold uppercase tracking-wider mb-3">{TOP_THREE[2].college}</div>
+          <div className="w-full h-28 bg-slate-100 dark:bg-slate-800 rounded-t-3xl border-x border-t border-slate-200 dark:border-slate-700 shadow-sm flex items-center justify-center">
+            <div className="text-center">
+              <div className="text-2xl font-black text-slate-700 dark:text-slate-200">{TOP_THREE[2].points.toLocaleString()}</div>
+              <div className="text-[10px] font-bold text-slate-400 uppercase">pts</div>
             </div>
-            <div className="absolute -bottom-2 -right-2 h-10 w-10 bg-orange-400 border-4 border-white rounded-full flex items-center justify-center text-white font-black text-lg">3</div>
-          </div>
-          <div className="text-center mb-6">
-            <div className="font-bold text-slate-900 dark:text-white">{TOP_THREE[2].name}</div>
-            <div className="text-xs font-bold text-slate-400 uppercase">{TOP_THREE[2].points} PTS</div>
-          </div>
-          <div className="w-full h-24 bg-orange-50 rounded-t-3xl border-x border-t border-orange-100 shadow-sm flex items-center justify-center">
-             <Award className="h-12 w-12 text-orange-200" />
           </div>
         </motion.div>
       </div>
 
-      {/* List */}
-      <div className="max-w-4xl mx-auto">
-        <div className="bg-white rounded-[40px] border border-slate-100 shadow-xl overflow-hidden">
-          <div className="p-6 border-b border-slate-50 flex flex-col md:flex-row md:items-center justify-between gap-4">
-             <div className="flex items-center gap-2 font-bold text-slate-900">
-                <TrendingUp className="h-5 w-5 text-indigo-600" /> Movers & Shakers
-             </div>
-             <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-                <input 
-                  type="text" 
-                  placeholder="Find a friend..."
-                  className="pl-10 pr-4 py-2 bg-slate-50 border-none rounded-xl text-sm w-full md:w-64"
-                />
-             </div>
+      <div className="bg-white dark:bg-slate-900 rounded-[40px] border border-slate-100 dark:border-slate-800 shadow-xl dark:shadow-black/40 overflow-hidden">
+        <div className="p-6 border-b border-slate-50 dark:border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
+            <TrendingUp className="h-5 w-5 text-indigo-600 dark:text-indigo-400" /> Movers & Shakers
           </div>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Find a friend..."
+              className="pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border-none rounded-xl text-sm w-full md:w-64 text-slate-900 dark:text-white placeholder:text-slate-400"
+            />
+          </div>
+        </div>
 
-          <div className="divide-y divide-slate-50">
-            {leaderboardList.map((user) => (
-              <div 
-                key={user.rank}
-                className={`flex items-center justify-between p-6 transition-colors hover:bg-slate-50 ${user.isUser ? 'bg-indigo-50/50' : ''}`}
-              >
-                <div className="flex items-center gap-6">
-                  <span className="w-6 text-center font-black text-slate-400">{user.rank}</span>
-                  <div className="relative">
-                    <img src={user.avatar} className="h-12 w-12 rounded-2xl bg-slate-100" alt={user.name} />
-                    {user.isUser && (
-                       <div className="absolute -top-1 -right-1 h-4 w-4 bg-indigo-600 border-2 border-white rounded-full"></div>
-                    )}
+        <div className="divide-y divide-slate-50 dark:divide-slate-800">
+          {leaderboardList.map((user) => (
+            <div
+              key={user.rank}
+              className="flex items-center justify-between p-6 transition-colors hover:bg-slate-50 dark:hover:bg-slate-800/60"
+            >
+              <div className="flex items-center gap-6">
+                <span className="w-6 text-center font-black text-slate-400">{user.rank}</span>
+                <img src={user.avatar} className="h-12 w-12 rounded-2xl bg-slate-100 dark:bg-slate-800" alt={user.name} />
+                <div>
+                  <div className="font-bold text-slate-900 dark:text-white flex items-center gap-2">{user.name}</div>
+                  <div className="text-xs font-bold text-slate-400 flex items-center gap-1 uppercase tracking-wider">
+                    <User className="h-3 w-3" /> {user.college}
                   </div>
-                  <div>
-                    <div className="font-bold text-slate-900 flex items-center gap-2">
-                      {user.name}
-                      {user.isUser && <span className="px-2 py-0.5 bg-indigo-600 text-[10px] text-white rounded-full uppercase">You</span>}
-                    </div>
-                    <div className="text-xs font-bold text-slate-400 flex items-center gap-1 uppercase tracking-wider">
-                       <User className="h-3 w-3" /> {user.college}
-                    </div>
-                  </div>
-                </div>
-                <div className="text-right">
-                  <div className="text-lg font-black text-slate-900">{user.points.toLocaleString()}</div>
-                  <div className="text-[10px] font-bold text-indigo-600 uppercase tracking-widest">Points</div>
                 </div>
               </div>
-            ))}
-          </div>
+              <div className="text-right">
+                <div className="text-lg font-black text-slate-900 dark:text-white">{user.points.toLocaleString()}</div>
+                <div className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-widest">Points</div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

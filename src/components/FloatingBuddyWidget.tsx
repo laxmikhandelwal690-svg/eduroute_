@@ -1,6 +1,7 @@
 /**
  * Global floating “How can I help you?” AI assistant.
  * Uses existing sendBuddyMessage — does not modify Buddy page or backend.
+ * Messages share the same localStorage conversation store as Buddy AI so chats continue.
  */
 import { FormEvent, useCallback, useEffect, useRef, useState, type CSSProperties, type PointerEvent as ReactPointerEvent } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -18,8 +19,48 @@ import {
 import { sendBuddyMessage } from '../services/buddyApi';
 import { getAuthUser } from '../utils/rbacAuth';
 import { BuddyMarkdown } from './BuddyMarkdown';
+import type { BuddyMessage } from '../types/buddy';
+import {
+  getActiveConversation,
+  saveActiveMessages,
+} from '../utils/buddyConversations';
+import { buildBuddyOnboardingContext } from '../utils/onboardingStore';
 
 type ChatMsg = { id: number; role: 'user' | 'ai'; text: string };
+
+function toChatMsg(m: BuddyMessage): ChatMsg {
+  return { id: m.id, role: m.role, text: m.text };
+}
+
+function toBuddyMsg(m: ChatMsg): BuddyMessage {
+  return {
+    id: m.id,
+    role: m.role,
+    text: m.text,
+    timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+  };
+}
+
+function loadSharedMessages(userId: string): ChatMsg[] {
+  try {
+    const active = getActiveConversation(userId);
+    if (active.messages?.length) {
+      return active.messages.map(toChatMsg);
+    }
+  } catch {
+    /* ignore */
+  }
+  return [];
+}
+
+function persistSharedMessages(userId: string, msgs: ChatMsg[]) {
+  try {
+    saveActiveMessages(userId, msgs.map(toBuddyMsg));
+    window.dispatchEvent(new CustomEvent('eduroute:buddy-messages-updated'));
+  } catch {
+    /* ignore */
+  }
+}
 
 const POS_KEY = 'eduroute:floating-buddy-pos';
 
@@ -67,7 +108,7 @@ export function FloatingBuddyWidget() {
 
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
-  const [messages, setMessages] = useState<ChatMsg[]>([]);
+  const [messages, setMessages] = useState<ChatMsg[]>(() => loadSharedMessages(userId));
   const [typing, setTyping] = useState(false);
   const [error, setError] = useState('');
 
@@ -82,9 +123,22 @@ export function FloatingBuddyWidget() {
 
   useEffect(() => {
     if (open) {
+      setMessages(loadSharedMessages(userId));
       setTimeout(() => inputRef.current?.focus(), 80);
     }
-  }, [open]);
+  }, [open, userId]);
+
+  useEffect(() => {
+    const onUpdate = () => {
+      if (open) setMessages(loadSharedMessages(userId));
+    };
+    window.addEventListener('eduroute:buddy-messages-updated', onUpdate);
+    window.addEventListener('storage', onUpdate);
+    return () => {
+      window.removeEventListener('eduroute:buddy-messages-updated', onUpdate);
+      window.removeEventListener('storage', onUpdate);
+    };
+  }, [open, userId]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -146,19 +200,36 @@ export function FloatingBuddyWidget() {
     if (!q || typing) return;
     setInput('');
     setError('');
-    setMessages((m) => [...m, { id: Date.now(), role: 'user', text: q }]);
+    const userMsg: ChatMsg = { id: Date.now(), role: 'user', text: q };
+    setMessages((m) => {
+      const next = [...m, userMsg];
+      persistSharedMessages(userId, next);
+      return next;
+    });
     setTyping(true);
     try {
+      const onboard = buildBuddyOnboardingContext();
+      const messageWithContext = onboard.summary
+        ? `[Student profile] ${onboard.summary}\n\n${q}`
+        : q;
       const res = await sendBuddyMessage({
         userId,
-        message: q,
+        message: messageWithContext,
         language: 'english',
-        context: {},
+        context: {
+          missingSkills: onboard.missingSkills,
+        },
       });
-      setMessages((m) => [
-        ...m,
-        { id: Date.now() + 1, role: 'ai', text: res.reply || 'I could not generate a reply right now.' },
-      ]);
+      const aiMsg: ChatMsg = {
+        id: Date.now() + 1,
+        role: 'ai',
+        text: res.reply || 'I could not generate a reply right now.',
+      };
+      setMessages((m) => {
+        const next = [...m, aiMsg];
+        persistSharedMessages(userId, next);
+        return next;
+      });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Buddy is temporarily unavailable.');
     } finally {
@@ -231,7 +302,7 @@ export function FloatingBuddyWidget() {
                 Hi {userName}! 👋
               </p>
               <p className="mt-1 text-xs leading-5 text-slate-600 dark:text-slate-300">
-                I&apos;m your EDUROUTE AI Buddy. Ask me anything about your learning journey, courses, roadmap,
+                I'm your EDUROUTE AI Buddy. Ask me anything about your learning journey, courses, roadmap,
                 assessments, internships, or anything else!
               </p>
             </div>
@@ -315,7 +386,7 @@ export function FloatingBuddyWidget() {
               </button>
             </div>
             <p className="mt-1.5 text-center text-[10px] text-slate-400 dark:text-slate-500">
-              Press Enter to send
+              Press Enter to send · Saved to Buddy AI history
             </p>
           </form>
         </div>

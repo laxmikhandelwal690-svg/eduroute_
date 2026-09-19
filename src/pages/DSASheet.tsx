@@ -32,9 +32,26 @@ export const DSASheet = () => {
       try {
         const response = await apiGetProblemSubmissions();
         const submissions = Array.isArray(response.data) ? response.data : [];
-        setSolvedQuestions(submissions.filter((submission) => submission.status === 'Accepted').map((submission) => Number(submission.problemKey)));
-      } catch (error) {
-        setSaveError(error instanceof Error ? error.message : 'Unable to load saved progress.');
+        const ids = submissions
+          .filter((submission) => submission.status === 'Accepted')
+          .map((submission) => Number(submission.problemKey));
+        setSolvedQuestions(ids);
+        try {
+          localStorage.setItem('eduroute:dsa-solved', JSON.stringify(ids));
+        } catch {
+          /* ignore */
+        }
+      } catch {
+        // Offline / no backend — restore local progress; never show API config errors
+        try {
+          const raw = localStorage.getItem('eduroute:dsa-solved');
+          if (raw) {
+            const parsed = JSON.parse(raw) as number[];
+            if (Array.isArray(parsed)) setSolvedQuestions(parsed.map(Number));
+          }
+        } catch {
+          /* ignore */
+        }
       } finally {
         setIsLoadingProgress(false);
       }
@@ -74,9 +91,26 @@ export const DSASheet = () => {
     setSaveError('');
     try {
       await apiSubmitProblem(String(id), { name: title, difficulty: 'Easy', status: solved ? 'Attempted' : 'Accepted' });
-      setSolvedQuestions((prev) => (solved ? prev.filter((questionId) => questionId !== id) : [...prev, id]));
-    } catch (error) {
-      setSaveError(error instanceof Error ? error.message : 'Unable to save this question.');
+      setSolvedQuestions((prev) => {
+        const next = solved ? prev.filter((questionId) => questionId !== id) : [...prev, id];
+        try {
+          localStorage.setItem('eduroute:dsa-solved', JSON.stringify(next));
+        } catch {
+          /* ignore */
+        }
+        return next;
+      });
+    } catch {
+      // Keep local solved state optimistic; hide backend/API config messages
+      setSolvedQuestions((prev) => {
+        const next = solved ? prev.filter((questionId) => questionId !== id) : prev.includes(id) ? prev : [...prev, id];
+        try {
+          localStorage.setItem('eduroute:dsa-solved', JSON.stringify(next));
+        } catch {
+          /* ignore */
+        }
+        return next;
+      });
     } finally {
       setPendingQuestions((prev) => prev.filter((questionId) => questionId !== id));
     }
@@ -87,7 +121,14 @@ export const DSASheet = () => {
     void Promise.all(ids.map((id) => {
       const question = dsaSheet.flatMap((section) => section.questions).find((item) => item.id === id);
       return question ? apiSubmitProblem(String(id), { name: question.title, difficulty: 'Easy', status: 'Accepted' }) : Promise.resolve();
-    })).then(() => setSolvedQuestions(ids));
+    })).then(() => {
+      setSolvedQuestions(ids);
+      try {
+        localStorage.setItem('eduroute:dsa-solved', JSON.stringify(ids));
+      } catch {
+        /* ignore */
+      }
+    });
   };
 
   return (
@@ -100,7 +141,6 @@ export const DSASheet = () => {
             </div>
             <h1 className="text-3xl font-black text-slate-900 md:text-4xl dark:text-white">DSA Sheet (Beginner - 100 Questions)</h1>
             <p className="mt-2 text-sm font-medium text-slate-600 md:text-base dark:text-slate-400">Practice consistently, track your solved count, and build your coding confidence one easy problem at a time.</p>
-            {saveError && <p className="mt-3 rounded-xl border border-rose-300/40 bg-rose-500/10 px-3 py-2 text-sm font-semibold text-rose-700 dark:text-rose-200">{saveError}</p>}
 
             <div className="mt-6 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
               <div className="relative w-full md:max-w-md">

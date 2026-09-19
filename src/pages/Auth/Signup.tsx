@@ -5,6 +5,7 @@ import { ArrowRight, Lock, Mail, Sparkles, User, ShieldCheck } from 'lucide-reac
 import { apiRegisterUser } from '../../utils/authApi';
 import { saveAuthSession } from '../../utils/rbacAuth';
 import { parseGoogleCredential, saveUserProfile } from '../../utils/userProfile';
+import { isAuthDbConfigError, localDemoRegister } from '../../utils/localDemoAuth';
 
 const GOOGLE_CLIENT_SCRIPT_ID = 'google-identity-services';
 const MIN_PASSWORD_LENGTH = 8;
@@ -64,6 +65,7 @@ export const Signup = () => {
   const [apiError, setApiError] = useState<string | null>(null);
   const [googleError, setGoogleError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [demoHint, setDemoHint] = useState(false);
   const googleButtonRef = useRef<HTMLDivElement | null>(null);
   const googleClientId = useMemo(
     () =>
@@ -106,7 +108,6 @@ export const Signup = () => {
               return;
             }
 
-            // Google users still go to ID verification; password login is email-based only.
             saveUserProfile(googleProfile);
             saveAuthSession(credential, {
               id: `google-${googleProfile.email}`,
@@ -154,6 +155,7 @@ export const Signup = () => {
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     setApiError(null);
+    setDemoHint(false);
 
     const errors = validateForm(formData);
     setFormErrors(errors);
@@ -171,20 +173,40 @@ export const Signup = () => {
     };
 
     try {
-      // MUST succeed: Go API bcrypt-hashes password and inserts into MySQL users table
-      const registerResponse = await apiRegisterUser(payload);
+      let token: string;
+      let user: {
+        id: string;
+        name?: string;
+        email?: string;
+        verificationStatus?: string;
+      };
 
-      if (!registerResponse.token || !registerResponse.user) {
-        throw new Error('Registration succeeded but no session was returned.');
+      try {
+        const registerResponse = await apiRegisterUser(payload);
+        if (!registerResponse.token || !registerResponse.user) {
+          throw new Error('Registration succeeded but no session was returned.');
+        }
+        token = registerResponse.token;
+        user = registerResponse.user;
+      } catch (apiErr) {
+        const msg = apiErr instanceof Error ? apiErr.message : '';
+        if (isAuthDbConfigError(msg)) {
+          const demo = localDemoRegister(payload);
+          token = demo.token;
+          user = demo.user;
+          setDemoHint(true);
+        } else {
+          throw apiErr;
+        }
       }
 
       saveUserProfile({ name: payload.name, email: payload.email });
-      saveAuthSession(registerResponse.token, {
-        id: String(registerResponse.user.id),
-        name: registerResponse.user.name || payload.name,
-        email: registerResponse.user.email || payload.email,
+      saveAuthSession(token, {
+        id: String(user.id),
+        name: user.name || payload.name,
+        email: user.email || payload.email,
         role: 'student',
-        verificationStatus: registerResponse.user.verificationStatus || 'pending',
+        verificationStatus: user.verificationStatus || 'pending',
       });
 
       goToCollegeIdUpload();
@@ -221,7 +243,7 @@ export const Signup = () => {
 
           <div className="mt-4 flex items-center justify-center gap-2 rounded-xl border border-cyan-400/30 bg-cyan-500/10 px-3 py-2 text-xs text-cyan-100">
             <ShieldCheck className="h-4 w-4 shrink-0" />
-            Account is saved in MySQL — then upload college ID
+            Saved to MySQL when configured — otherwise local demo mode
           </div>
 
           <form className="mt-6 space-y-4" onSubmit={handleSubmit} noValidate>
@@ -276,12 +298,18 @@ export const Signup = () => {
               </p>
             ) : null}
 
+            {demoHint ? (
+              <p className="rounded-xl border border-amber-300/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+                MySQL is not configured — account saved in this browser (demo mode).
+              </p>
+            ) : null}
+
             <button
               type="submit"
               disabled={isSubmitting}
               className="group mt-2 flex w-full items-center justify-center rounded-2xl bg-gradient-to-r from-cyan-400 to-violet-500 px-4 py-3.5 text-sm font-semibold text-slate-900 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isSubmitting ? 'Saving to database...' : 'Sign Up & Verify ID'}
+              {isSubmitting ? 'Creating account...' : 'Sign Up & Verify ID'}
               <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
             </button>
           </form>
@@ -304,7 +332,7 @@ export const Signup = () => {
 
           <div className="mt-5 flex items-center justify-center gap-2 text-xs text-slate-400">
             <Sparkles className="h-4 w-4" />
-            Password is stored securely (bcrypt) in MySQL
+            MySQL when configured · local demo otherwise
           </div>
         </motion.div>
       </div>

@@ -34,14 +34,23 @@ function options() {
   return json(200, { ok: true });
 }
 
+function envFirst(...keys) {
+  for (const k of keys) {
+    const v = process.env[k];
+    if (typeof v === 'string' && v.trim()) return v.trim();
+  }
+  return '';
+}
+
+/** True when Railway/MySQL connection can be built from env. */
 function hasMysqlConfig() {
-  if (process.env.MYSQL_URL) return true;
-  return Boolean(
-    process.env.MYSQL_HOST &&
-      process.env.MYSQL_USER &&
-      typeof process.env.MYSQL_PASSWORD === 'string' &&
-      process.env.MYSQL_PASSWORD.length > 0,
-  );
+  // Connection URL styles
+  if (envFirst('MYSQL_URL', 'DATABASE_URL', 'MYSQL_PUBLIC_URL', 'MYSQL_PRIVATE_URL')) return true;
+  // Split vars — standard + Railway naming (MYSQLHOST / MYSQLUSER / …)
+  const host = envFirst('MYSQL_HOST', 'MYSQLHOST', 'DB_HOST');
+  const user = envFirst('MYSQL_USER', 'MYSQLUSER', 'DB_USER', 'DB_USERNAME');
+  const password = envFirst('MYSQL_PASSWORD', 'MYSQLPASSWORD', 'DB_PASSWORD');
+  return Boolean(host && user && typeof password === 'string' && password.length > 0);
 }
 
 function depsReady() {
@@ -54,21 +63,27 @@ async function getPool() {
   }
   if (global.__edurouteMysqlPool) return global.__edurouteMysqlPool;
 
+  const url = envFirst('MYSQL_URL', 'DATABASE_URL', 'MYSQL_PUBLIC_URL', 'MYSQL_PRIVATE_URL');
   let config;
-  if (process.env.MYSQL_URL) {
-    config = process.env.MYSQL_URL;
+  if (url) {
+    config = url;
   } else {
-    const host = (process.env.MYSQL_HOST || '').replace(/:\d+$/, '');
-    const port = Number(process.env.MYSQL_PORT || 3306);
+    const hostRaw = envFirst('MYSQL_HOST', 'MYSQLHOST', 'DB_HOST');
+    const host = hostRaw.replace(/:\d+$/, '');
+    const port = Number(envFirst('MYSQL_PORT', 'MYSQLPORT', 'DB_PORT') || 3306);
+    const user = envFirst('MYSQL_USER', 'MYSQLUSER', 'DB_USER', 'DB_USERNAME');
+    const password = envFirst('MYSQL_PASSWORD', 'MYSQLPASSWORD', 'DB_PASSWORD');
+    const database = envFirst('MYSQL_DATABASE', 'MYSQLDATABASE', 'DB_NAME', 'MYSQL_DB') || 'railway';
+    const sslFlag = (envFirst('MYSQL_SSL', 'DB_SSL') || '').toLowerCase();
     config = {
       host,
       port,
-      user: process.env.MYSQL_USER,
-      password: process.env.MYSQL_PASSWORD,
-      database: process.env.MYSQL_DATABASE || 'railway',
+      user,
+      password,
+      database,
       waitForConnections: true,
       connectionLimit: 4,
-      ssl: process.env.MYSQL_SSL === 'true' ? { rejectUnauthorized: false } : undefined,
+      ssl: sslFlag === 'true' || sslFlag === '1' ? { rejectUnauthorized: false } : undefined,
       timezone: 'Z',
     };
   }
@@ -129,15 +144,15 @@ async function register({ name, email, password }) {
   const pool = await getPool();
   await ensureUsersTable(pool);
 
-  const cleanEmail = String(email || '').trim().toLowerCase();
   const cleanName = String(name || '').trim();
+  const cleanEmail = String(email || '').trim().toLowerCase();
   const cleanPass = String(password || '');
 
   if (!cleanName || !cleanEmail || !cleanPass) {
-    return json(400, { success: false, error: 'Name, email, and password are required' });
+    return json(400, { success: false, error: 'Name, email and password are required' });
   }
-  if (cleanPass.length < 8) {
-    return json(400, { success: false, error: 'Password must be at least 8 characters' });
+  if (cleanPass.length < 6) {
+    return json(400, { success: false, error: 'Password must be at least 6 characters' });
   }
 
   const [existing] = await pool.query('SELECT id FROM users WHERE email = ? LIMIT 1', [cleanEmail]);

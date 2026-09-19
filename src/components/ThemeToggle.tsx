@@ -43,8 +43,8 @@ function clampPos(x: number, y: number, width: number, height: number): Pos {
 }
 
 /**
- * Compact sun/moon pill toggle.
- * Fixed internal geometry so className size overrides cannot clip the knob.
+ * Compact sun/moon pill toggle — same size everywhere (matches student dashboard).
+ * Fixed h-8 w-14 so knob never clips even if className tries to resize.
  */
 export const ThemeToggle = ({ className = '', movable = false }: ThemeToggleProps) => {
   const { isDark, toggleTheme } = useTheme();
@@ -181,7 +181,7 @@ export const ThemeToggle = ({ className = '', movable = false }: ThemeToggleProp
       onPointerCancel={endDrag}
       aria-label={`Switch to ${isDark ? 'light' : 'dark'} mode${movable ? ' (drag to move)' : ''}`}
       title={movable ? 'Switch theme · Drag to move' : `Switch to ${isDark ? 'light' : 'dark'} mode`}
-      className={`theme-toggle relative inline-flex h-8 w-14 shrink-0 items-center rounded-full border border-white/15 p-0.5 ${className}`}
+      className={`theme-toggle relative inline-flex shrink-0 items-center rounded-full border border-white/15 p-0.5 overflow-hidden ${className} h-8 w-14`}
       style={style}
     >
       <span className="sr-only">Toggle theme</span>

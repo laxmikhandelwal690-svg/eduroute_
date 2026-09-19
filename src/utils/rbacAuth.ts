@@ -1,4 +1,4 @@
-export type UserRole = 'student' | 'admin';
+export type UserRole = 'student' | 'admin' | 'industry' | 'college' | 'faculty';
 
 export type AuthUser = {
   id: string;
@@ -7,6 +7,8 @@ export type AuthUser = {
   avatar?: string;
   role: UserRole;
   verificationStatus?: string;
+  /** Institution display name when role is college */
+  institutionName?: string;
 };
 
 const TOKEN_KEY = 'eduroute:auth-token';

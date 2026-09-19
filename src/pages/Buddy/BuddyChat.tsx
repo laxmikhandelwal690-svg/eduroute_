@@ -1,94 +1,118 @@
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowUpRight, Bot, BriefcaseBusiness, Briefcase, CalendarRange, Check, Brain, Clipboard, Code2, Copy, FileText, Languages, Map, MessageSquare, MoreHorizontal, Plus, RotateCcw, Search, Send, Sparkles, ThumbsUp, Trash2, Trophy, UserRound, X } from 'lucide-react';
-import { fetchBuddyProgress, saveSkillGap, sendBuddyMessage } from '../../services/buddyApi';
+import { FormEvent, useCallback, useEffect, useRef, useState, type PointerEvent as ReactPointerEvent, type MouseEvent as ReactMouseEvent } from 'react';
+import {
+  BookOpen,
+  Briefcase,
+  ChevronLeft,
+  ChevronRight,
+  Code2,
+  Languages,
+  Lightbulb,
+  Map,
+  MessageSquare,
+  MoreHorizontal,
+  Paperclip,
+  Plus,
+  Send,
+  Sparkles,
+  Trash2,
+  UserRound,
+} from 'lucide-react';
+import { fetchBuddyProgress, sendBuddyMessage } from '../../services/buddyApi';
 import type { BuddyLanguage, BuddyMessage, BuddyProgress } from '../../types/buddy';
 import { getAuthUser } from '../../utils/rbacAuth';
 import { BuddyMarkdown } from '../../components/BuddyMarkdown';
 import {
   type BuddyConversation,
   deleteConversation,
-  formatChatTime,
   getActiveConversation,
   listConversations,
   saveActiveMessages,
   startNewConversation,
   switchConversation,
 } from '../../utils/buddyConversations';
+import { buildBuddyOnboardingContext } from '../../utils/onboardingStore';
 
-const SKILL_CHECK_QUESTIONS = [
-  { key: 'html', text: 'Can you build a semantic responsive webpage using HTML/CSS?' },
-  { key: 'js', text: 'Are you comfortable with JavaScript fundamentals?' },
-  { key: 'react', text: 'Can you create React apps with state and API calls?' },
-  { key: 'dsa', text: 'Do you solve DSA problems at least 3 times per week?' },
-];
+const timestamp = () =>
+  new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
 const QUICK_PROMPTS = [
-  { label: 'Build my roadmap', prompt: 'Create a Web Developer roadmap for beginner to pro', icon: ArrowUpRight },
-  { label: 'Find my skill gaps', prompt: 'What skill gaps should I work on next based on my current progress?', icon: Brain },
-  { label: 'Plan my week', prompt: 'Create a focused study plan for this week', icon: CalendarRange },
-  { label: 'Improve my portfolio', prompt: 'How should I improve my resume and portfolio?', icon: BriefcaseBusiness },
+  { label: 'Explain a DSA topic', prompt: 'Explain a core DSA topic step by step for a beginner.', icon: Code2 },
+  { label: 'Plan my study roadmap', prompt: 'Create a practical study roadmap based on my goals and skill gaps.', icon: Map },
+  { label: 'Help with project ideas', prompt: 'Suggest project ideas that will strengthen my portfolio for internships.', icon: Lightbulb },
+  { label: 'Interview preparation tips', prompt: 'Share practical interview preparation tips for software roles.', icon: UserRound },
+  { label: 'Career guidance', prompt: 'Give me career guidance for landing an SDE or related role.', icon: Briefcase },
+] as const;
+
+const LANGUAGE_OPTIONS: { value: BuddyLanguage; label: string; short: string }[] = [
+  { value: 'english', label: 'English', short: 'EN' },
+  { value: 'hindi', label: 'Hindi', short: 'HI' },
+  { value: 'hinglish', label: 'Hinglish', short: 'HN' },
 ];
 
-const POPULAR_SEARCHES = [
-  { label: 'Suggest a roadmap', prompt: 'Suggest a personalized learning roadmap based on my goals', icon: Map },
-  { label: 'DSA practice questions', prompt: 'Give me DSA practice questions for interviews', icon: Code2 },
-  { label: 'Interview tips', prompt: 'Share practical interview tips for tech roles', icon: FileText },
-  { label: 'Internship opportunities', prompt: 'How can I find and prepare for internship opportunities?', icon: Briefcase },
-];
+function welcomeMessage(name: string): BuddyMessage {
+  return {
+    id: 1,
+    role: 'ai',
+    text: [
+      `Hey ${name}! 👋`,
+      ``,
+      `I'm your AI Buddy — your personal learning and career companion. I can help you with:`,
+      ``,
+      `• Explain concepts in simple terms`,
+      `• Solve DSA & coding problems`,
+      `• Plan your learning roadmap`,
+      `• Guide you for internships & SDE roles`,
+      `• Answer your doubts anytime`,
+      ``,
+      `Just tell me what you want to work on, and I'll guide you step by step! 🚀`,
+    ].join('\n'),
+    timestamp: timestamp(),
+  };
+}
 
-const timestamp = () => new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-const initialMessage: BuddyMessage = { id: 1, role: 'ai', text: "Hi, I'm Buddy. Tell me what you are trying to learn or achieve, and I will turn it into a practical next step.", timestamp: timestamp() };
+const SIDEBAR_MIN = 0;
+const SIDEBAR_MAX = 360;
+const SIDEBAR_DEFAULT = 300;
+const SIDEBAR_COLLAPSED = 0;
 
 export const BuddyChat = () => {
-  const currentUserId = getAuthUser()?.id || 'demo-student-101';
+  const authUser = getAuthUser();
+  const currentUserId = authUser?.id || 'demo-student-101';
+  const firstName = authUser?.name?.split(' ')[0] || 'there';
+
   const [conversations, setConversations] = useState<BuddyConversation[]>([]);
   const [activeChatId, setActiveChatId] = useState<string | null>(null);
-  const [historyOpen, setHistoryOpen] = useState(false);
-  const [messages, setMessages] = useState<BuddyMessage[]>([initialMessage]);
+  const [messages, setMessages] = useState<BuddyMessage[]>(() => [welcomeMessage(firstName)]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [language, setLanguage] = useState<BuddyLanguage>('english');
   const [progress, setProgress] = useState<BuddyProgress | null>(null);
-  const [skillAnswers, setSkillAnswers] = useState<Record<string, boolean>>({});
   const [error, setError] = useState('');
-  const [lastFailedMessage, setLastFailedMessage] = useState('');
-  const [copiedMessageId, setCopiedMessageId] = useState<number | null>(null);
-  const scrollRef = useRef<HTMLDivElement>(null);
-  const inputRef = useRef<HTMLTextAreaElement>(null);
+  const [sidebarWidth, setSidebarWidth] = useState(SIDEBAR_DEFAULT);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-  // Multi-chat history (local) + existing progress API (unchanged)
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const dragging = useRef(false);
+  const startX = useRef(0);
+  const startWidth = useRef(SIDEBAR_DEFAULT);
+
   useEffect(() => {
     const active = getActiveConversation(currentUserId);
     setActiveChatId(active.id);
-    setMessages(active.messages.length ? active.messages : [initialMessage]);
+    setMessages(active.messages.length ? active.messages : [welcomeMessage(firstName)]);
     setConversations(listConversations(currentUserId));
-
-    const load = async () => {
-      const data = await fetchBuddyProgress(currentUserId);
-      setProgress(data.progress);
-      setLanguage(data.progress.preferredLanguage || 'english');
-      const current = getActiveConversation(currentUserId);
-      const hasUserMsgs = current.messages.some((m) => m.role === 'user');
-      if (!hasUserMsgs && data.history?.length) {
-        const seeded: BuddyMessage[] = [
-          initialMessage,
-          ...data.history.map((entry, index) => ({
-            id: index + 2,
-            role: (entry.role === 'assistant' ? 'ai' : 'user') as 'ai' | 'user',
-            text: entry.text,
-            timestamp: timestamp(),
-          })),
-        ];
-        setMessages(seeded);
-        saveActiveMessages(currentUserId, seeded);
-        setConversations(listConversations(currentUserId));
+    void (async () => {
+      try {
+        const data = await fetchBuddyProgress(currentUserId);
+        setProgress(data.progress);
+        setLanguage(data.progress.preferredLanguage || 'english');
+      } catch {
+        /* offline ok */
       }
-    };
-    void load();
-  }, [currentUserId]);
+    })();
+  }, [currentUserId, firstName]);
 
-  // Persist messages into the active conversation
   useEffect(() => {
     if (!activeChatId) return;
     saveActiveMessages(currentUserId, messages);
@@ -102,19 +126,54 @@ export const BuddyChat = () => {
   }, [messages, isTyping]);
 
   useEffect(() => {
-    const onKeyDown = (event: KeyboardEvent) => {
-      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
-        event.preventDefault();
-        inputRef.current?.focus();
-      }
+    const refresh = () => {
+      const active = getActiveConversation(currentUserId);
+      setActiveChatId(active.id);
+      setMessages(active.messages.length ? active.messages : [welcomeMessage(firstName)]);
+      setConversations(listConversations(currentUserId));
     };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
+    window.addEventListener('eduroute:buddy-messages-updated', refresh);
+    return () => window.removeEventListener('eduroute:buddy-messages-updated', refresh);
+  }, [currentUserId, firstName]);
+
+  const onDragStart = (e: ReactPointerEvent) => {
+    dragging.current = true;
+    startX.current = e.clientX;
+    startWidth.current = sidebarWidth;
+    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+  };
+
+  const onDragMove = useCallback((e: ReactPointerEvent) => {
+    if (!dragging.current) return;
+    const delta = startX.current - e.clientX;
+    const next = Math.min(SIDEBAR_MAX, Math.max(SIDEBAR_MIN, startWidth.current + delta));
+    setSidebarWidth(next);
+    setSidebarOpen(next > 40);
   }, []);
 
-  const missingSkills = useMemo(() => SKILL_CHECK_QUESTIONS.filter((question) => skillAnswers[question.key] === false).map((question) => question.key.toUpperCase()), [skillAnswers]);
-  const answeredSkills = Object.keys(skillAnswers).length;
-  const skillProgress = Math.round((answeredSkills / SKILL_CHECK_QUESTIONS.length) * 100);
+  const onDragEnd = (e: ReactPointerEvent) => {
+    if (!dragging.current) return;
+    dragging.current = false;
+    try {
+      (e.target as HTMLElement).releasePointerCapture?.(e.pointerId);
+    } catch {
+      /* ignore */
+    }
+    if (sidebarWidth < 80) {
+      setSidebarWidth(SIDEBAR_COLLAPSED);
+      setSidebarOpen(false);
+    }
+  };
+
+  const toggleSidebar = () => {
+    if (sidebarOpen && sidebarWidth > 40) {
+      setSidebarOpen(false);
+      setSidebarWidth(SIDEBAR_COLLAPSED);
+    } else {
+      setSidebarOpen(true);
+      setSidebarWidth(SIDEBAR_DEFAULT);
+    }
+  };
 
   const handleSend = async (preset?: string) => {
     const text = (preset ?? input).trim();
@@ -122,14 +181,39 @@ export const BuddyChat = () => {
     setMessages((current) => [...current, { id: Date.now(), role: 'user', text, timestamp: timestamp() }]);
     setInput('');
     setError('');
-    setLastFailedMessage('');
     setIsTyping(true);
     try {
-      const response = await sendBuddyMessage({ userId: currentUserId, message: text, language, context: { level: progress?.level, points: progress?.points, missingSkills: missingSkills.length ? missingSkills : progress?.missingSkills, weeklyChallenge: progress?.weeklyChallenges?.[0] } });
-      setMessages((current) => [...current, { id: Date.now() + 1, role: 'ai', text: response.reply, timestamp: timestamp() }]);
-      setProgress((current) => ({ points: response.gamification?.points || current?.points || 0, level: response.gamification?.level || current?.level || 1, achievements: current?.achievements || ['Welcome to Buddy'], weeklyChallenges: current?.weeklyChallenges || ['Complete one skill challenge this week'], missingSkills: current?.missingSkills || [], preferredLanguage: language }));
+      const onboard = buildBuddyOnboardingContext();
+      const mergedMissing = [...(progress?.missingSkills || []), ...onboard.missingSkills].filter(
+        (v, i, arr) => arr.indexOf(v) === i,
+      );
+      const messageWithContext = onboard.summary
+        ? `[Student profile] ${onboard.summary}\n\n${text}`
+        : text;
+      const response = await sendBuddyMessage({
+        userId: currentUserId,
+        message: messageWithContext,
+        language,
+        context: {
+          level: progress?.level,
+          points: progress?.points,
+          missingSkills: mergedMissing,
+          weeklyChallenge: progress?.weeklyChallenges?.[0],
+        },
+      });
+      setMessages((current) => [
+        ...current,
+        { id: Date.now() + 1, role: 'ai', text: response.reply, timestamp: timestamp() },
+      ]);
+      setProgress((current) => ({
+        points: response.gamification?.points || current?.points || 0,
+        level: response.gamification?.level || current?.level || 1,
+        achievements: current?.achievements || ['Welcome to Buddy'],
+        weeklyChallenges: current?.weeklyChallenges || ['Complete one skill challenge this week'],
+        missingSkills: current?.missingSkills || [],
+        preferredLanguage: language,
+      }));
     } catch (sendError: unknown) {
-      setLastFailedMessage(text);
       setError(sendError instanceof Error ? sendError.message : 'Buddy is temporarily unavailable.');
     } finally {
       setIsTyping(false);
@@ -137,232 +221,206 @@ export const BuddyChat = () => {
     }
   };
 
-  const runSkillGapAnalyzer = async () => {
-    if (answeredSkills !== SKILL_CHECK_QUESTIONS.length) return;
-    try {
-      const saved = await saveSkillGap({ userId: currentUserId, missingSkills });
-      setProgress(saved.progress);
-      setMessages((current) => [...current, { id: Date.now(), role: 'ai', text: `Skill check complete. Your focus areas are ${missingSkills.length ? missingSkills.join(', ') : 'clear right now'}. I can build a plan around them.`, timestamp: timestamp() }]);
-    } catch (analysisError: unknown) {
-      setError(analysisError instanceof Error ? analysisError.message : 'Could not save your skill check.');
-    }
+  const onSubmit = (e: FormEvent) => {
+    e.preventDefault();
+    void handleSend();
   };
 
-  const submitMessage = (event: FormEvent) => { event.preventDefault(); void handleSend(); };
-
-  const startNewChat = () => {
-    const fresh = startNewConversation(currentUserId);
-    setActiveChatId(fresh.id);
-    setMessages(fresh.messages);
+  const onNewChat = () => {
+    const conv = startNewConversation(currentUserId);
+    setActiveChatId(conv.id);
+    setMessages([welcomeMessage(firstName)]);
     setConversations(listConversations(currentUserId));
-    setInput('');
-    setError('');
-    setLastFailedMessage('');
-    setIsTyping(false);
-    setHistoryOpen(false);
   };
 
-  const openConversation = (id: string) => {
-    const target = switchConversation(currentUserId, id);
-    if (!target) return;
-    setActiveChatId(target.id);
-    setMessages(target.messages.length ? target.messages : [initialMessage]);
+  const onSelectChat = (id: string) => {
+    const conv = switchConversation(currentUserId, id);
+    if (!conv) return;
+    setActiveChatId(conv.id);
+    setMessages(conv.messages.length ? conv.messages : [welcomeMessage(firstName)]);
     setConversations(listConversations(currentUserId));
-    setInput('');
-    setError('');
-    setLastFailedMessage('');
-    setIsTyping(false);
-    setHistoryOpen(false);
   };
 
-  const deleteChat = () => {
-    if (!activeChatId) return;
-    if (messages.length <= 1 && conversations.length <= 1) return;
-    const ok = window.confirm('Delete this chat? It will be removed from your history.');
-    if (!ok) return;
-    const next = deleteConversation(currentUserId, activeChatId);
+  const onDeleteChat = (id: string, e?: ReactMouseEvent) => {
+    e?.stopPropagation();
+    e?.preventDefault();
+    if (!window.confirm('Delete this chat? This cannot be undone.')) return;
+    const next = deleteConversation(currentUserId, id);
+    setConversations(listConversations(currentUserId));
     setActiveChatId(next.id);
-    setMessages(next.messages.length ? next.messages : [initialMessage]);
-    setConversations(listConversations(currentUserId));
-    setInput('');
-    setError('');
-    setLastFailedMessage('');
-    setIsTyping(false);
+    setMessages(next.messages.length ? next.messages : [welcomeMessage(firstName)]);
   };
 
-  const copyMessage = async (message: BuddyMessage) => {
-    await navigator.clipboard?.writeText(message.text);
-    setCopiedMessageId(message.id);
-    window.setTimeout(() => setCopiedMessageId(null), 1500);
-  };
+  const effectiveWidth = sidebarOpen ? Math.max(sidebarWidth, 200) : 0;
 
   return (
-    <div className="flex h-[calc(100vh-64px)] max-h-[calc(100vh-64px)] flex-1 flex-col overflow-hidden bg-[#f5f7fb] dark:bg-slate-950">
-      <header className="shrink-0 border-b border-slate-200/80 bg-white/90 px-4 py-4 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-900/90 md:px-8">
-        <div className="mx-auto flex max-w-[1440px] flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-4">
-          <div className="relative flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-600 text-white shadow-lg shadow-indigo-200 dark:shadow-indigo-900/40"><Sparkles className="h-6 w-6" /><span className="absolute -bottom-1 -right-1 h-3 w-3 rounded-full border-2 border-white bg-emerald-400" /></div>
-          <div><div className="flex flex-wrap items-center gap-2"><h1 className="text-xl font-black tracking-tight text-slate-950 dark:text-white">Buddy AI Mentor</h1><span className="rounded-full bg-emerald-50 px-2 py-1 text-[10px] font-black uppercase tracking-wider text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400">AI online</span></div><p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Your context-aware study and career copilot</p></div>
-        </div>
-        <div className="flex flex-wrap items-center gap-2 sm:gap-3"><label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">Language<select value={language} onChange={(event) => setLanguage(event.target.value as BuddyLanguage)} className="rounded-xl border border-slate-200 bg-white px-3 py-2 text-sm font-semibold normal-case tracking-normal text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"><option value="english">English</option><option value="hindi">Hindi</option><option value="hinglish">Hinglish</option></select></label><button type="button" onClick={() => setHistoryOpen((v) => !v)} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:border-indigo-300 hover:text-indigo-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-indigo-500 dark:hover:text-indigo-300"><MessageSquare className="h-4 w-4" /> Chats{conversations.length > 0 ? ` (${conversations.length})` : ''}</button><button type="button" onClick={deleteChat} disabled={messages.length <= 1 && conversations.length <= 1} className="inline-flex items-center gap-2 rounded-xl border border-red-200 bg-white px-3 py-2 text-xs font-bold text-red-600 hover:border-red-300 hover:bg-red-50 disabled:cursor-not-allowed disabled:opacity-40 dark:border-red-900/50 dark:bg-slate-900 dark:text-red-400 dark:hover:bg-red-950/40"><Trash2 className="h-4 w-4" /> Delete chat</button><button type="button" onClick={startNewChat} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-bold text-slate-700 hover:border-indigo-300 hover:text-indigo-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-indigo-500 dark:hover:text-indigo-300"><Plus className="h-4 w-4" /> New chat</button></div>
-        </div>
-        {historyOpen && (
-          <div className="border-t border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900 md:px-8">
-            <div className="mx-auto flex max-w-[1440px] items-center justify-between gap-2">
-              <p className="text-xs font-bold uppercase tracking-wider text-slate-400">Chat history</p>
-              <button type="button" onClick={() => setHistoryOpen(false)} className="rounded-lg p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200" aria-label="Close history"><X className="h-4 w-4" /></button>
+    <div className="relative flex h-[calc(100vh-5.5rem)] min-h-[520px] w-full gap-0 overflow-hidden rounded-2xl border border-slate-200/80 bg-slate-50/50 dark:border-slate-800 dark:bg-slate-950/40">
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex shrink-0 items-center justify-between gap-3 border-b border-slate-200/80 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900/80 sm:px-5">
+          <div className="flex min-w-0 items-center gap-3">
+            <div className="relative flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-white shadow-md shadow-violet-200/50 dark:shadow-violet-900/40">
+              <span className="text-lg" aria-hidden>🤖</span>
+              <span className="absolute bottom-0 right-0 h-2.5 w-2.5 rounded-full border-2 border-white bg-emerald-500 dark:border-slate-900" />
             </div>
-            <div className="mx-auto mt-2 max-h-48 max-w-[1440px] space-y-1 overflow-y-auto">
-              {conversations.length === 0 && (
-                <p className="py-3 text-center text-sm text-slate-500">No saved chats yet. Send a message, then start a new chat to keep history.</p>
+            <div className="min-w-0">
+              <div className="flex flex-wrap items-center gap-2">
+                <h1 className="text-base font-bold text-slate-900 dark:text-white">Buddy AI</h1>
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> Online
+                </span>
+              </div>
+              <p className="truncate text-xs text-slate-500 dark:text-slate-400">Your personal study & career companion</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <div className="relative flex items-center">
+              <label htmlFor="buddy-language" className="sr-only">Reply language</label>
+              <div className="flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2 py-1 dark:border-slate-700 dark:bg-slate-800/80">
+                <Languages className="h-3.5 w-3.5 shrink-0 text-violet-500" aria-hidden />
+                <select
+                  id="buddy-language"
+                  value={language}
+                  onChange={(e) => setLanguage(e.target.value as BuddyLanguage)}
+                  className="max-w-[6.5rem] cursor-pointer appearance-none border-0 bg-transparent py-0.5 pr-4 text-xs font-semibold text-slate-700 outline-none dark:text-slate-200"
+                  title="Buddy reply language"
+                  aria-label="Buddy reply language"
+                >
+                  {LANGUAGE_OPTIONS.map((opt) => (
+                    <option key={opt.value} value={opt.value}>{opt.label}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <button type="button" onClick={onNewChat} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 dark:hover:bg-slate-800 dark:hover:text-slate-200" title="New chat" aria-label="New chat">
+              <Plus className="h-5 w-5" />
+            </button>
+            <button type="button" onClick={toggleSidebar} className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 dark:hover:bg-slate-800 dark:hover:text-slate-200 lg:hidden" title={sidebarOpen ? 'Hide panel' : 'Show prompts'} aria-label="Toggle side panel">
+              {sidebarOpen ? <ChevronRight className="h-5 w-5" /> : <ChevronLeft className="h-5 w-5" />}
+            </button>
+            <button type="button" className="rounded-xl p-2 text-slate-500 transition hover:bg-slate-100 hover:text-slate-800 dark:hover:bg-slate-800 dark:hover:text-slate-200" aria-label="More options">
+              <MoreHorizontal className="h-5 w-5" />
+            </button>
+          </div>
+        </header>
+
+        <div ref={scrollRef} className="min-h-0 flex-1 space-y-4 overflow-y-auto px-4 py-5 sm:px-6">
+          {messages.map((m) => (
+            <div key={m.id} className={`flex gap-2.5 ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+              {m.role === 'ai' && (
+                <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-sm text-white shadow-sm">🤖</div>
               )}
-              {conversations.map((c) => {
-                const isActive = c.id === activeChatId;
-                const preview = c.messages.find((m) => m.role === 'user')?.text || c.title;
-                return (
-                  <button
-                    key={c.id}
-                    type="button"
-                    onClick={() => openConversation(c.id)}
-                    className={`flex w-full items-center justify-between gap-3 rounded-xl px-3 py-2.5 text-left transition ${
-                      isActive
-                        ? 'bg-indigo-50 text-indigo-800 ring-1 ring-indigo-200 dark:bg-indigo-950/50 dark:text-indigo-200 dark:ring-indigo-800'
-                        : 'hover:bg-slate-50 text-slate-700 dark:text-slate-200 dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <span className="min-w-0 flex-1">
-                      <span className="block truncate text-sm font-semibold">{c.title || 'New chat'}</span>
-                      <span className="mt-0.5 block truncate text-xs text-slate-500 dark:text-slate-400">{preview}</span>
-                    </span>
-                    <span className="shrink-0 text-[10px] font-medium text-slate-400">{formatChatTime(c.updatedAt)}</span>
-                  </button>
-                );
-              })}
+              <div className={`max-w-[min(100%,36rem)] ${m.role === 'user' ? 'order-1' : ''}`}>
+                <div className={`rounded-2xl px-4 py-3 text-sm leading-6 ${m.role === 'user' ? 'rounded-br-md bg-violet-600 text-white shadow-sm shadow-violet-200/40 dark:shadow-violet-900/30' : 'rounded-bl-md border border-slate-100 bg-white text-slate-800 shadow-sm dark:border-slate-700 dark:bg-slate-800/90 dark:text-slate-100'}`}>
+                  {m.role === 'ai' ? <BuddyMarkdown text={m.text} /> : m.text}
+                </div>
+                <p className={`mt-1 text-[10px] font-medium text-slate-400 dark:text-slate-500 ${m.role === 'user' ? 'text-right' : 'text-left'}`}>
+                  {m.timestamp}{m.role === 'user' ? ' ✓' : ''}
+                </p>
+              </div>
+              {m.role === 'user' && (
+                <div className="mt-1 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-violet-600 text-xs font-bold text-white">{(firstName[0] || 'U').toUpperCase()}</div>
+              )}
             </div>
+          ))}
+          {isTyping && (
+            <div className="flex items-center gap-2.5">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-indigo-600 text-sm text-white">🤖</div>
+              <div className="rounded-2xl rounded-bl-md border border-slate-100 bg-white px-4 py-3 text-xs font-medium text-slate-500 shadow-sm dark:border-slate-700 dark:bg-slate-800 dark:text-slate-400">
+                <span className="inline-flex items-center gap-1.5"><Sparkles className="h-3.5 w-3.5 animate-pulse text-violet-500" /> Buddy is thinking…</span>
+              </div>
+            </div>
+          )}
+          {error && (
+            <p className="rounded-xl bg-red-50 px-3 py-2 text-xs font-medium text-red-600 dark:bg-red-950/40 dark:text-red-300">{error}</p>
+          )}
+        </div>
+
+        <form onSubmit={onSubmit} className="shrink-0 border-t border-slate-200/80 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900/80 sm:px-5">
+          <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-2 py-1.5 focus-within:border-violet-400 focus-within:ring-2 focus-within:ring-violet-500/15 dark:border-slate-700 dark:bg-slate-800/80 dark:focus-within:border-violet-500/50">
+            <button type="button" className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-slate-400 hover:bg-slate-200/60 hover:text-slate-600 dark:hover:bg-slate-700 dark:hover:text-slate-300" aria-label="Attach" title="Attachments coming soon">
+              <Paperclip className="h-4 w-4" />
+            </button>
+            <input ref={inputRef} value={input} onChange={(e) => setInput(e.target.value)} placeholder="Ask Buddy anything about your learning journey..." className="min-w-0 flex-1 border-0 bg-transparent py-2 text-sm text-slate-800 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500" />
+            <button type="submit" disabled={!input.trim() || isTyping} aria-label="Send" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-600 text-white shadow-sm transition hover:bg-violet-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 dark:disabled:bg-slate-700 dark:disabled:text-slate-500">
+              <Send className="h-4 w-4" />
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div role="separator" aria-orientation="vertical" aria-label="Resize side panel" onPointerDown={onDragStart} onPointerMove={onDragMove} onPointerUp={onDragEnd} onPointerCancel={onDragEnd} className="group relative z-10 hidden w-1.5 shrink-0 cursor-col-resize touch-none bg-transparent hover:bg-violet-400/40 lg:block" title="Drag to resize side panel">
+        <div className="absolute inset-y-0 -left-1 -right-1" />
+        <div className="absolute left-1/2 top-1/2 h-10 w-1 -translate-x-1/2 -translate-y-1/2 rounded-full bg-slate-300 opacity-0 transition group-hover:opacity-100 dark:bg-slate-600" />
+      </div>
+
+      <aside style={{ width: effectiveWidth }} className={`relative hidden shrink-0 flex-col overflow-hidden border-l border-slate-200/80 bg-white transition-[width] duration-200 ease-out dark:border-slate-800 dark:bg-slate-900/60 lg:flex ${effectiveWidth === 0 ? 'border-l-0' : ''}`}>
+        {effectiveWidth > 0 && (
+          <div className="flex h-full min-w-[200px] flex-col gap-4 overflow-y-auto p-4">
+            <div className="flex items-center justify-between">
+              <button type="button" onClick={toggleSidebar} className="rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700 dark:hover:bg-slate-800 dark:hover:text-slate-200" title="Collapse panel" aria-label="Collapse side panel">
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+            <section className="rounded-2xl border border-slate-100 bg-slate-50/80 p-3.5 dark:border-slate-800 dark:bg-slate-900/80">
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <h2 className="flex items-center gap-1.5 text-sm font-bold text-slate-900 dark:text-white"><Sparkles className="h-4 w-4 text-violet-500" /> Quick Prompts</h2>
+                <span className="text-[11px] font-semibold text-violet-600 dark:text-violet-400">Try these</span>
+              </div>
+              <ul className="space-y-1">
+                {QUICK_PROMPTS.map((item) => (
+                  <li key={item.label}>
+                    <button type="button" onClick={() => void handleSend(item.prompt)} className="flex w-full items-center gap-2.5 rounded-xl px-2.5 py-2.5 text-left text-xs font-semibold text-slate-700 transition hover:bg-white hover:text-violet-700 hover:shadow-sm dark:text-slate-200 dark:hover:bg-slate-800 dark:hover:text-violet-300">
+                      <item.icon className="h-3.5 w-3.5 shrink-0 text-violet-500" />
+                      <span className="min-w-0 flex-1 truncate">{item.label}</span>
+                      <span className="text-slate-300 dark:text-slate-600">›</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
+            <section className="rounded-2xl border border-slate-100 bg-slate-50/80 p-3.5 dark:border-slate-800 dark:bg-slate-900/80">
+              <div className="mb-3 flex items-center justify-between gap-2">
+                <h2 className="flex items-center gap-1.5 text-sm font-bold text-slate-900 dark:text-white"><MessageSquare className="h-4 w-4 text-violet-500" /> Recent Chats</h2>
+                <button type="button" onClick={onNewChat} className="text-[11px] font-semibold text-violet-600 hover:underline dark:text-violet-400">New</button>
+              </div>
+              <ul className="space-y-1">
+                {conversations.length === 0 && (
+                  <li className="px-2 py-3 text-xs text-slate-400">No chats yet — start one below.</li>
+                )}
+                {conversations.slice(0, 8).map((c) => {
+                  const active = c.id === activeChatId;
+                  const title = c.title || c.messages.find((m) => m.role === 'user')?.text?.slice(0, 42) || 'New conversation';
+                  const when = c.updatedAt
+                    ? new Date(c.updatedAt).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })
+                    : '';
+                  return (
+                    <li key={c.id} className="group flex items-stretch gap-0.5">
+                      <button type="button" onClick={() => onSelectChat(c.id)} className={`flex min-w-0 flex-1 items-start gap-2.5 rounded-xl px-2.5 py-2.5 text-left transition ${active ? 'bg-violet-50 text-violet-800 dark:bg-violet-950/50 dark:text-violet-200' : 'text-slate-700 hover:bg-white hover:shadow-sm dark:text-slate-200 dark:hover:bg-slate-800'}`}>
+                        <MessageSquare className="mt-0.5 h-3.5 w-3.5 shrink-0 text-violet-500" />
+                        <span className="min-w-0 flex-1">
+                          <span className="block truncate text-xs font-semibold">{title}</span>
+                          {when && <span className="mt-0.5 block text-[10px] font-medium text-slate-400 dark:text-slate-500">{when}</span>}
+                        </span>
+                      </button>
+                      <button type="button" onClick={(e) => onDeleteChat(c.id, e)} className="mt-1 shrink-0 self-start rounded-lg p-1.5 text-slate-300 opacity-0 transition group-hover:opacity-100 hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-950/40 dark:hover:text-red-400" title="Delete chat" aria-label="Delete chat">
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </section>
           </div>
         )}
-      </header>
+      </aside>
 
-      <div className="mx-auto grid min-h-0 w-full max-w-[1440px] flex-1 grid-cols-1 overflow-hidden lg:grid-cols-[minmax(0,1fr)_350px]">
-        <main className="relative flex min-h-0 flex-1 flex-col overflow-hidden">
-          <div ref={scrollRef} className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-6 md:px-8"><div className="mx-auto max-w-4xl space-y-6">
-            {messages.length === 1 && <div className="rounded-3xl border border-indigo-100 bg-linear-to-br from-indigo-50 via-white to-white p-5 shadow-sm dark:border-indigo-900/40 dark:from-indigo-950/50 dark:via-slate-900 dark:to-slate-900 md:p-7"><div className="flex items-start gap-4"><div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-600 text-white"><Sparkles className="h-5 w-5" /></div><div><p className="text-xs font-black uppercase tracking-[0.18em] text-indigo-600">Personal mentor mode</p><h2 className="mt-1 text-2xl font-black tracking-tight text-slate-950 dark:text-white">What are you working toward?</h2><p className="mt-2 max-w-xl text-sm leading-6 text-slate-600 dark:text-slate-300">Ask about a roadmap, a project, interviews, internships, or the next skill to unlock. Buddy uses your progress to make the answer practical.</p></div></div></div>}
-            {messages.map((message) => (
-              <motion.div
-                key={message.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className={`group flex items-end gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                {message.role === 'ai' && (
-                  <div className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-slate-950 text-white sm:flex">
-                    <Bot className="h-4 w-4" />
-                  </div>
-                )}
-                <div
-                  className={`max-w-[min(720px,88%)] rounded-3xl px-5 py-4 shadow-sm ${
-                    message.role === 'user'
-                      ? 'rounded-br-md bg-indigo-600 text-white'
-                      : 'rounded-bl-md border border-slate-200 bg-white text-slate-800 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100'
-                  }`}
-                >
-                  <div className="mb-2 flex items-center justify-between gap-5 text-[10px] font-black uppercase tracking-widest opacity-60">
-                    <div className="flex items-center gap-2">
-                      <span>{message.role === 'user' ? 'You' : 'Buddy AI'}</span>
-                      <span>•</span>
-                      <span>{message.timestamp}</span>
-                    </div>
-                    {message.role === 'ai' && (
-                      <button type="button" onClick={() => void copyMessage(message)} aria-label="Copy Buddy response" className="opacity-0 transition-opacity group-hover:opacity-100">
-                        <Copy className="h-3.5 w-3.5" />
-                      </button>
-                    )}
-                  </div>
-                  {message.role === 'ai' ? (
-                    <BuddyMarkdown text={message.text} />
-                  ) : (
-                    <p className="whitespace-pre-wrap text-sm leading-7">{message.text}</p>
-                  )}
-                  {message.role === 'ai' && (
-                    <div className="mt-3 flex items-center gap-3 border-t border-slate-100 pt-3 text-[11px] font-bold text-slate-400 dark:border-slate-800 dark:text-slate-500">
-                      <button type="button" onClick={() => void copyMessage(message)} className="inline-flex items-center gap-1 hover:text-indigo-600 dark:hover:text-indigo-400">
-                        {copiedMessageId === message.id ? <Check className="h-3.5 w-3.5" /> : <Clipboard className="h-3.5 w-3.5" />}
-                        {copiedMessageId === message.id ? 'Copied' : 'Copy'}
-                      </button>
-                      <button type="button" aria-label="Like response" className="hover:text-indigo-600 dark:hover:text-indigo-400"><ThumbsUp className="h-3.5 w-3.5" /></button>
-                      <button type="button" aria-label="More response actions" className="hover:text-indigo-600 dark:hover:text-indigo-400"><MoreHorizontal className="h-3.5 w-3.5" /></button>
-                    </div>
-                  )}
-                </div>
-                {message.role === 'user' && (
-                  <div className="hidden h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 sm:flex">
-                    <UserRound className="h-4 w-4" />
-                  </div>
-                )}
-              </motion.div>
-            ))}
-            {isTyping && <div className="flex items-center gap-3 text-sm font-semibold text-slate-500 dark:text-slate-400"><div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-950 text-white"><Bot className="h-4 w-4" /></div><span className="rounded-2xl bg-white px-4 py-3 shadow-sm dark:bg-slate-900 dark:text-slate-200">Buddy is thinking<span className="ml-1 animate-pulse">...</span></span></div>}
-            {error && <div className="flex items-center justify-between gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 dark:border-red-900/50 dark:bg-red-950/40 dark:text-red-300"><span>{error}</span>{lastFailedMessage && <button type="button" onClick={() => void handleSend(lastFailedMessage)} className="inline-flex shrink-0 items-center gap-1 rounded-lg bg-red-100 px-3 py-2 font-bold text-red-800 dark:bg-red-900/50 dark:text-red-200"><RotateCcw className="h-3.5 w-3.5" /> Retry</button>}</div>}
-          </div></div>
-          <form onSubmit={submitMessage} className="sticky bottom-0 z-20 shrink-0 border-t border-slate-200/80 bg-gradient-to-t from-white via-white/95 to-white/80 p-4 pb-5 backdrop-blur-xl dark:border-slate-800/80 dark:from-slate-950 dark:via-slate-950/95 dark:to-slate-950/80 md:px-6 md:pb-6">
-            <div className="mx-auto max-w-3xl">
-              <div className="flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-1.5 py-1.5 shadow-[0_4px_24px_rgba(15,23,42,0.08)] transition-all focus-within:border-violet-400 focus-within:shadow-[0_4px_28px_rgba(139,92,246,0.2)] focus-within:ring-2 focus-within:ring-violet-500/15 dark:border-slate-700/80 dark:bg-slate-900/90 dark:shadow-[0_4px_32px_rgba(0,0,0,0.45)] dark:focus-within:border-violet-500/60 dark:focus-within:ring-violet-500/20">
-                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-300" aria-hidden="true">
-                  <Search className="h-4 w-4" />
-                </div>
-                <textarea
-                  ref={inputRef}
-                  rows={1}
-                  value={input}
-                  onChange={(event) => setInput(event.target.value)}
-                  onKeyDown={(event) => {
-                    if (event.key === 'Enter' && !event.shiftKey) {
-                      event.preventDefault();
-                      void handleSend();
-                    }
-                  }}
-                  placeholder="Ask Buddy anything about your learning journey..."
-                  className="max-h-32 min-h-[40px] flex-1 resize-none border-0 bg-transparent px-1 py-2 text-[15px] leading-6 text-slate-800 outline-none placeholder:text-slate-400 dark:text-slate-100 dark:placeholder:text-slate-500"
-                />
-                <kbd className="hidden shrink-0 select-none items-center gap-0.5 rounded-lg border border-slate-200 bg-slate-50 px-2 py-1 font-sans text-[11px] font-medium text-slate-400 sm:inline-flex dark:border-slate-600 dark:bg-slate-800/80 dark:text-slate-500">
-                  Ctrl&nbsp;K
-                </kbd>
-                <button type="submit" disabled={!input.trim() || isTyping} aria-label="Send message" className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-violet-500 text-white shadow-md shadow-violet-200/60 transition-all hover:bg-violet-600 hover:shadow-lg hover:shadow-violet-300/50 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-400 disabled:shadow-none dark:shadow-violet-900/40 dark:disabled:bg-slate-700 dark:disabled:text-slate-500">
-                  <Send className="h-4 w-4" />
-                </button>
-              </div>
-              <div className="mt-3 flex flex-wrap items-center gap-2 px-0.5">
-                <span className="mr-1 text-[11px] font-semibold uppercase tracking-wider text-slate-400 dark:text-slate-500">Popular</span>
-                {POPULAR_SEARCHES.map((item) => (
-                  <button key={item.label} type="button" onClick={() => void handleSend(item.prompt)} disabled={isTyping} className="inline-flex items-center gap-1.5 rounded-full border border-slate-200/90 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 shadow-sm transition hover:border-violet-300 hover:bg-violet-50 hover:text-violet-700 disabled:opacity-50 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-violet-500/50 dark:hover:bg-violet-950/40 dark:hover:text-violet-300">
-                    <item.icon className="h-3.5 w-3.5 text-violet-500" />
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </form>
-        </main>
-
-        <aside className="hidden min-h-0 overflow-y-auto border-l border-slate-200 bg-slate-50/80 p-4 dark:border-slate-800 dark:bg-slate-950/50 lg:block">
-          <div className="grid grid-cols-2 gap-3">
-            <InfoCard icon={Trophy} title="Level" value={String(progress?.level ?? 1)} />
-            <InfoCard icon={Sparkles} title="Points" value={String(progress?.points ?? 0)} />
-          </div>
-          <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:shadow-none">
-            <h2 className="flex items-center gap-2 text-sm font-black text-slate-900 dark:text-white"><Brain className="h-4 w-4 text-indigo-600" /> Skill check</h2>
-            <div className="mt-2 h-2 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800"><div className="h-full rounded-full bg-indigo-600 transition-all" style={{ width: `${skillProgress}%` }} /></div>
-            <div className="mt-3 space-y-2">{SKILL_CHECK_QUESTIONS.map((question) => <div key={question.key} className="rounded-xl border border-slate-100 bg-slate-50 p-3 dark:border-slate-800 dark:bg-slate-800/50"><p className="text-xs font-semibold text-slate-700 dark:text-slate-200">{question.text}</p><div className="mt-2 flex gap-2"><button type="button" onClick={() => setSkillAnswers((c) => ({ ...c, [question.key]: true }))} className={`rounded-lg px-3 py-1.5 text-xs font-bold ${skillAnswers[question.key] === true ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/50 dark:text-emerald-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'}`}>Yes</button><button type="button" onClick={() => setSkillAnswers((c) => ({ ...c, [question.key]: false }))} className={`rounded-lg px-3 py-1.5 text-xs font-bold ${skillAnswers[question.key] === false ? 'bg-red-100 text-red-700 dark:bg-red-950/50 dark:text-red-400' : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'}`}>No</button></div></div>)}</div>
-            <button type="button" onClick={() => void runSkillGapAnalyzer()} disabled={answeredSkills !== SKILL_CHECK_QUESTIONS.length} className="mt-3 w-full bg-slate-950 py-2.5 text-sm font-bold text-white disabled:cursor-not-allowed disabled:opacity-40">Analyze my gap</button>
-          </section>
-          <section className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:shadow-none"><h2 className="flex items-center gap-2 text-sm font-black text-slate-900 dark:text-white"><Languages className="h-4 w-4 text-indigo-600" /> Start with a prompt</h2><div className="mt-3 grid gap-2">{QUICK_PROMPTS.map(({ label, prompt, icon: PromptIcon }) => <button type="button" key={prompt} onClick={() => void handleSend(prompt)} className="group flex w-full items-center justify-between rounded-xl border border-slate-100 bg-slate-50 px-3 py-3 text-left text-xs font-bold text-slate-700 hover:border-indigo-200 hover:bg-indigo-50 hover:text-indigo-700 dark:border-slate-800 dark:bg-slate-800/50 dark:text-slate-200 dark:hover:border-indigo-500/40 dark:hover:bg-indigo-950/40 dark:hover:text-indigo-300"><span className="flex items-center gap-2"><PromptIcon className="h-4 w-4 text-indigo-500" />{label}</span><ArrowUpRight className="h-3.5 w-3.5 opacity-0 transition-opacity group-hover:opacity-100" /></button>)}</div></section>
-          <div className="mt-4 rounded-2xl bg-slate-950 p-4 text-white"><div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-indigo-300"><CalendarRange className="h-4 w-4" /> This week</div><p className="mt-2 text-sm font-semibold leading-6 text-slate-200">{progress?.weeklyChallenges?.[0] || 'Build your next skill'}</p></div>
-        </aside>
-      </div>
+      {!sidebarOpen && (
+        <button type="button" onClick={toggleSidebar} className="absolute right-3 top-1/2 z-20 hidden -translate-y-1/2 rounded-l-xl border border-r-0 border-slate-200 bg-white px-1.5 py-3 text-slate-500 shadow-md hover:text-violet-600 dark:border-slate-700 dark:bg-slate-900 dark:hover:text-violet-400 lg:flex" title="Show Quick Prompts & Recent Chats" aria-label="Expand side panel">
+          <ChevronLeft className="h-4 w-4" />
+        </button>
+      )}
     </div>
   );
 };
-
-const InfoCard = ({ icon: Icon, title, value }: { icon: typeof Trophy; title: string; value: string }) => <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:border-slate-700 dark:bg-slate-900 dark:shadow-none"><div className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500"><Icon className="h-4 w-4 text-indigo-600 dark:text-indigo-400" /> {title}</div><div className="mt-2 text-sm font-black text-slate-900 dark:text-white">{value}</div></div>;
 
 export default BuddyChat;

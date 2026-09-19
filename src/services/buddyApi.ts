@@ -143,39 +143,8 @@ export async function sendBuddyMessage(params: {
     weeklyChallenge?: string;
   };
 }) {
-  try {
-    const response = await fetch(`${BASE}/buddy-chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(params),
-    });
-
-    const data = await response.json();
-    if (!response.ok || !data.ok) {
-      throw new Error(data.error || 'Unable to send message to Buddy.');
-    }
-
+  const persist = (reply: string, gamification: ReturnType<typeof buildLocalGamification>) => {
     const local = readBuddyStore(params.userId);
-    writeBuddyStore(params.userId, {
-      progress: {
-        ...local.progress,
-        points: data.gamification?.points || local.progress.points,
-        level: data.gamification?.level || local.progress.level,
-        preferredLanguage: params.language,
-      },
-      history: [
-        ...local.history,
-        { role: 'user', text: params.message },
-        { role: 'assistant', text: data.reply },
-      ].slice(-20),
-    });
-
-    return data;
-  } catch {
-    const local = readBuddyStore(params.userId);
-    const reply = localFallbackReply(params.message, params.language);
-    const gamification = buildLocalGamification(local.progress);
-
     writeBuddyStore(params.userId, {
       progress: {
         ...local.progress,
@@ -189,8 +158,77 @@ export async function sendBuddyMessage(params: {
         { role: 'assistant', text: reply },
       ].slice(-20),
     });
+  };
 
-    return { ok: true, reply, usedWebSearch, sources, gamification };
+  try {
+    const response = await fetch(`${BASE}/buddy-chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        userId: params.userId || 'demo-student-101',
+        message: params.message,
+        language: params.language || 'english',
+        context: params.context,
+      }),
+    });
+
+    let data: any = null;
+    try {
+      data = await response.json();
+    } catch {
+      throw new Error(`Buddy API returned non-JSON (status ${response.status})`);
+    }
+
+    if (!response.ok || !data?.ok || typeof data.reply !== 'string' || !data.reply.trim()) {
+      throw new Error(data?.error || `Unable to send message to Buddy (status ${response.status}).`);
+    }
+
+    const local = readBuddyStore(params.userId);
+    const gamification = {
+      points: data.gamification?.points ?? local.progress.points,
+      level: data.gamification?.level ?? local.progress.level,
+      pointsEarned: data.gamification?.pointsEarned ?? 5,
+    };
+    persist(data.reply, gamification);
+
+    return {
+      ok: true,
+      reply: data.reply,
+      usedWebSearch: Boolean(data.usedWebSearch),
+      sources: Array.isArray(data.sources) ? data.sources : [],
+      gamification,
+    };
+  } catch (primaryError) {
+    // Try free client-side Wikipedia search for factual queries
+    try {
+      if (needsClientSearch(params.message)) {
+        const live = await clientLiveSearch(params.message, params.language);
+        const gamification = buildLocalGamification(readBuddyStore(params.userId).progress, live.usedWebSearch ? 8 : 5);
+        persist(live.reply, gamification);
+        return {
+          ok: true,
+          reply: live.reply,
+          usedWebSearch: live.usedWebSearch,
+          sources: live.sources || [],
+          gamification,
+        };
+      }
+    } catch {
+      /* fall through to local template */
+    }
+
+    const reply = localFallbackReply(params.message, params.language);
+    const gamification = buildLocalGamification(readBuddyStore(params.userId).progress);
+    persist(reply, gamification);
+
+    console.warn('[Buddy] API unavailable, using local fallback:', primaryError);
+    return {
+      ok: true,
+      reply,
+      usedWebSearch: false,
+      sources: [] as Array<{ title: string; url: string }>,
+      gamification,
+    };
   }
 }
 

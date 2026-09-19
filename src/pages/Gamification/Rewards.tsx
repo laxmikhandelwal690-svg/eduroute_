@@ -5,42 +5,42 @@ import { Gift, Lock, CheckCircle2, ShoppingBag, Sparkles, ArrowRight, Star, Volu
 import { useUISound } from '../../contexts/SoundContext';
 
 const REWARDS = [
-  { 
-    id: '1', 
-    title: '50% Off IIT Jodhpur Professional Courses', 
+  {
+    id: '1',
+    title: '50% Off IIT Jodhpur Professional Courses',
     description: 'Get deep discounts on certified professional courses from IIT J.',
-    points: 5000, 
+    points: 5000,
     locked: false,
     category: 'Education',
-    partner: 'IIT Jodhpur'
+    partner: 'IIT Jodhpur',
   },
-  { 
-    id: '2', 
-    title: 'Free 1-Month LinkedIn Premium', 
+  {
+    id: '2',
+    title: 'Free 1-Month LinkedIn Premium',
     description: 'Boost your job search with LinkedIn Premium Career features.',
-    points: 8000, 
+    points: 8000,
     locked: true,
     category: 'Career',
-    partner: 'LinkedIn'
+    partner: 'LinkedIn',
   },
-  { 
-    id: '3', 
-    title: 'Premium Resume Review', 
+  {
+    id: '3',
+    title: 'Premium Resume Review',
     description: 'Get your resume reviewed by top recruiters from FAANG companies.',
-    points: 3000, 
+    points: 3000,
     locked: false,
     category: 'Coaching',
-    partner: 'EDUROUTE'
+    partner: 'EDUROUTE',
   },
-  { 
-    id: '4', 
-    title: 'AWS Certification Voucher', 
+  {
+    id: '4',
+    title: 'AWS Certification Voucher',
     description: '100% discount on any AWS Associate level certification exam.',
-    points: 15000, 
+    points: 15000,
     locked: true,
     category: 'Certification',
-    partner: 'Amazon Web Services'
-  }
+    partner: 'Amazon Web Services',
+  },
 ];
 
 export const Rewards = () => {
@@ -56,122 +56,95 @@ export const Rewards = () => {
     <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto">
       <header className="mb-12 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-          <div className="flex items-center gap-2 text-pink-600 font-bold mb-4">
-             <Gift className="h-6 w-6" /> <span className="uppercase tracking-widest text-sm">Reward Store</span>
+          <div className="flex items-center gap-2 text-pink-600 dark:text-pink-400 font-bold mb-4">
+            <Gift className="h-6 w-6" />
+            <span className="uppercase tracking-widest text-sm">Reward Store</span>
           </div>
-          <h1 className="text-4xl font-black text-slate-900 mb-4 dark:text-white">Redeem Your Points</h1>
-          <p className="text-slate-500 text-lg max-w-xl leading-relaxed">
+          <h1 className="text-4xl font-black text-slate-900 dark:text-white mb-4">Redeem Your Points</h1>
+          <p className="text-slate-500 dark:text-slate-400 text-lg max-w-xl leading-relaxed">
             Your hard work pays off. Exchange your learning points for exclusive vouchers, courses, and perks.
           </p>
         </div>
-        <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-8 rounded-[40px] text-white shadow-2xl shadow-indigo-200">
-           <div className="text-sm font-bold uppercase opacity-80 mb-1">Your Balance</div>
-           <div className="text-5xl font-black mb-2 flex items-center gap-3">
-              1,250 <Star className="h-8 w-8 fill-yellow-400 text-yellow-400" />
-           </div>
-           <div className="text-xs font-bold bg-white/20 px-3 py-1.5 rounded-full inline-block">
-              Top 15% of all learners
-           </div>
+        <div className="bg-gradient-to-br from-indigo-600 to-violet-700 p-8 rounded-[40px] text-white shadow-2xl shadow-indigo-200 dark:shadow-indigo-950/40">
+          <div className="text-sm font-bold uppercase opacity-80 mb-1">Your Balance</div>
+          <div className="text-4xl font-black mb-2">12,450</div>
+          <div className="text-sm opacity-80">points available</div>
         </div>
       </header>
 
-
-      {claimedReward && (
-        <div className="mb-8 rounded-2xl border border-emerald-100 bg-emerald-50 px-5 py-4 text-emerald-700 font-semibold flex items-center justify-between gap-4">
-          <span>Success! <strong>{claimedReward}</strong> has been added to your claimed rewards.</span>
-          <button
-            onClick={() => setClaimedReward(null)}
-            className="text-sm font-bold text-emerald-700 hover:text-emerald-900 transition-colors"
-          >
-            Dismiss
-          </button>
+      <div className="flex items-center justify-between mb-8">
+        <div className="flex items-center gap-2 text-sm font-bold text-slate-500 dark:text-slate-400">
+          <ShoppingBag className="h-4 w-4" /> {REWARDS.length} rewards
         </div>
-      )}
-
-      <div className="mb-8 flex justify-end">
         <button
+          type="button"
           onClick={toggleMuted}
-          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 py-2 text-sm font-bold text-slate-600 hover:bg-slate-50 transition-colors"
+          className="flex items-center gap-2 px-3 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 text-xs font-bold text-slate-600 dark:text-slate-300"
         >
-          {isMuted ? <VolumeX className="h-4 w-4" /> : <Volume2 className="h-4 w-4" />}
-          UI Sounds: {isMuted ? 'Muted' : 'On'}
+          {isMuted ? <VolumeX className="h-3.5 w-3.5" /> : <Volume2 className="h-3.5 w-3.5" />}
+          {isMuted ? 'Sound off' : 'Sound on'}
         </button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-        {REWARDS.map((reward) => (
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {REWARDS.map((reward, i) => (
           <motion.div
             key={reward.id}
-            whileHover={{ y: -5 }}
-            className={`group relative overflow-hidden rounded-[40px] border-2 transition-all p-8 flex flex-col ${
-              reward.locked ? 'bg-slate-50 border-slate-100 opacity-80' : 'bg-white border-white shadow-xl hover:shadow-2xl hover:border-indigo-100'
-            }`}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.05 }}
+            className="relative bg-white dark:bg-slate-900 rounded-[32px] border border-slate-100 dark:border-slate-800 p-8 shadow-sm hover:shadow-xl dark:shadow-black/30 transition-all"
           >
             {reward.locked && (
-              <div className="absolute inset-0 bg-slate-900/5 backdrop-blur-[2px] z-10 flex items-center justify-center">
-                 <div className="bg-white px-6 py-3 rounded-2xl shadow-xl flex items-center gap-3 font-bold text-slate-900">
-                    <Lock className="h-5 w-5 text-slate-400" /> Insufficient Points
-                 </div>
+              <div className="absolute top-6 right-6 flex items-center gap-1.5 px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-full text-[10px] font-black uppercase">
+                <Lock className="h-3 w-3" /> Locked
               </div>
             )}
-
-            <div className="flex items-start justify-between mb-8">
-               <div className="p-4 bg-slate-50 rounded-2xl group-hover:bg-indigo-50 transition-colors">
-                  <ShoppingBag className={`h-8 w-8 ${reward.locked ? 'text-slate-300' : 'text-indigo-600'}`} />
-               </div>
-               <div className={`px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider ${
-                 reward.locked ? 'bg-slate-200 text-slate-500' : 'bg-green-100 text-green-700'
-               }`}>
-                  {reward.category}
-               </div>
+            <div className="text-[10px] font-black uppercase tracking-widest text-indigo-600 dark:text-indigo-400 mb-3">
+              {reward.category} · {reward.partner}
             </div>
-
-            <h3 className="text-2xl font-black text-slate-900 mb-2">{reward.title}</h3>
-            <p className="text-slate-500 mb-8 leading-relaxed font-medium">
-               {reward.description}
-            </p>
-
-            <div className="mt-auto flex items-center justify-between">
-               <div>
-                  <div className="text-[10px] font-bold text-slate-400 uppercase">Cost</div>
-                  <div className={`text-2xl font-black ${reward.locked ? 'text-slate-400' : 'text-slate-900'}`}>
-                    {reward.points.toLocaleString()} <span className="text-sm font-bold text-slate-400">PTS</span>
-                  </div>
-               </div>
-               <button 
-                 disabled={reward.locked}
-                 onClick={() => handleClaim(reward.title)}
-                 className={`flex items-center gap-2 px-8 py-4 rounded-2xl font-black text-sm transition-all shadow-lg ${
-                   reward.locked 
-                     ? 'bg-slate-200 text-slate-400 shadow-none cursor-not-allowed' 
-                     : 'bg-indigo-600 text-white shadow-indigo-200 hover:bg-indigo-700 hover:scale-105 active:scale-95'
-                 }`}
-               >
-                  Claim Now <ArrowRight className="h-4 w-4" />
-               </button>
-            </div>
-
-            <div className="mt-6 pt-6 border-t border-slate-50 flex items-center justify-between text-xs font-bold">
-               <span className="text-slate-400 uppercase tracking-widest">Partner</span>
-               <div className="flex items-center gap-1.5 text-slate-700">
-                  <Sparkles className="h-3 w-3 text-amber-400" /> {reward.partner}
-               </div>
+            <h3 className="text-xl font-black text-slate-900 dark:text-white mb-2 leading-tight">{reward.title}</h3>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6 leading-relaxed">{reward.description}</p>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-1.5 text-amber-600 dark:text-amber-400 font-black">
+                <Star className="h-4 w-4 fill-current" /> {reward.points.toLocaleString()} pts
+              </div>
+              {reward.locked ? (
+                <button
+                  type="button"
+                  disabled
+                  className="px-5 py-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 text-sm font-bold cursor-not-allowed"
+                >
+                  Need more points
+                </button>
+              ) : claimedReward === reward.title ? (
+                <button
+                  type="button"
+                  disabled
+                  className="px-5 py-2.5 rounded-2xl bg-emerald-600 text-white text-sm font-bold flex items-center gap-1.5"
+                >
+                  <CheckCircle2 className="h-4 w-4" /> Claimed
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => handleClaim(reward.title)}
+                  className="px-5 py-2.5 rounded-2xl bg-indigo-600 text-white text-sm font-bold hover:bg-indigo-700 transition-colors flex items-center gap-1.5"
+                >
+                  <Sparkles className="h-4 w-4" /> Redeem
+                </button>
+              )}
             </div>
           </motion.div>
         ))}
       </div>
 
-      <div className="mt-20 p-12 bg-indigo-900 rounded-[60px] text-center relative overflow-hidden">
-         <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-600/30 blur-[100px] -z-10"></div>
-         <div className="absolute bottom-0 left-0 w-64 h-64 bg-indigo-600/30 blur-[100px] -z-10"></div>
-         
-         <CheckCircle2 className="h-12 w-12 text-indigo-400 mx-auto mb-6" />
-         <h2 className="text-3xl font-black text-white mb-4">How to Earn More?</h2>
-         <p className="text-indigo-200 max-w-2xl mx-auto mb-10 font-medium">
-            Completing modules gives you 50 pts, finishing roadmaps earns you 500 pts, 
-            and scoring high on assessments can net you up to 200 pts per test.
-         </p>
-        <Link to="/browse" className="inline-block px-12 py-5 bg-white text-indigo-900 rounded-[30px] font-black hover:bg-indigo-50 transition-all shadow-2xl">
-            Start Learning Now
+      <div className="mt-12 text-center">
+        <Link
+          to="/leaderboard"
+          className="inline-flex items-center gap-2 text-sm font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+        >
+          Climb the leaderboard for more points <ArrowRight className="h-4 w-4" />
         </Link>
       </div>
     </div>

@@ -28,6 +28,9 @@ const INITIAL_FORM: CourseForm = {
   level: 'Beginner',
 };
 
+const fieldClass =
+  'border border-[var(--border-default)] rounded-lg px-3 py-2 bg-[var(--bg-input)] text-[var(--text-primary)]';
+
 export const AdminDashboard = () => {
   const [courses, setCourses] = useState<any[]>([]);
   const [pendingStudents, setPendingStudents] = useState<any[]>([]);
@@ -100,60 +103,115 @@ export const AdminDashboard = () => {
   };
 
   return (
-    <div className="flex-1 p-4 md:p-8 max-w-7xl mx-auto space-y-8">
-      <h1 className="text-3xl font-black text-slate-900">Admin Dashboard</h1>
-      {message && <p className="text-sm text-emerald-700 bg-emerald-50 rounded-lg px-3 py-2">{message}</p>}
+    <div className="flex-1 max-w-7xl mx-auto space-y-8 text-[var(--text-primary)]">
+      <h1 className="text-3xl font-black text-[var(--text-primary)]">Admin Dashboard</h1>
+      {message && (
+        <p className="text-sm text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/40 rounded-lg px-3 py-2">
+          {message}
+        </p>
+      )}
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-5 shadow-[var(--shadow-sm)]">
         <h2 className="text-xl font-bold mb-4">{editingId ? 'Edit Course' : 'Add New Course'}</h2>
         <form onSubmit={submitCourse} className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <input className="border rounded-lg px-3 py-2" placeholder="Course title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
-          <input className="border rounded-lg px-3 py-2" placeholder="Instructor" value={form.instructor} onChange={(e) => setForm({ ...form, instructor: e.target.value })} required />
-          <input className="border rounded-lg px-3 py-2" placeholder="Category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required />
-          <input className="border rounded-lg px-3 py-2" placeholder="Duration" value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} required />
-          <select className="border rounded-lg px-3 py-2" value={form.level} onChange={(e) => setForm({ ...form, level: e.target.value as CourseForm['level'] })}>
-            <option>Beginner</option><option>Intermediate</option><option>Advanced</option>
+          <input className={fieldClass} placeholder="Course title" value={form.title} onChange={(e) => setForm({ ...form, title: e.target.value })} required />
+          <input className={fieldClass} placeholder="Instructor" value={form.instructor} onChange={(e) => setForm({ ...form, instructor: e.target.value })} required />
+          <input className={fieldClass} placeholder="Category" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} required />
+          <input className={fieldClass} placeholder="Duration" value={form.duration} onChange={(e) => setForm({ ...form, duration: e.target.value })} required />
+          <select className={fieldClass} value={form.level} onChange={(e) => setForm({ ...form, level: e.target.value as CourseForm['level'] })}>
+            <option>Beginner</option>
+            <option>Intermediate</option>
+            <option>Advanced</option>
           </select>
-          <input className="border rounded-lg px-3 py-2 md:col-span-2" placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
+          <input className={`${fieldClass} md:col-span-2`} placeholder="Description" value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} required />
           <div className="md:col-span-2 flex gap-2">
-            <button className="rounded-lg px-4 py-2 bg-indigo-600 text-white font-semibold" type="submit">{editingId ? 'Update' : 'Add'} Course</button>
-            {editingId && <button className="rounded-lg px-4 py-2 bg-slate-200" type="button" onClick={() => { setEditingId(null); setForm(INITIAL_FORM); }}>Cancel</button>}
+            <button className="rounded-lg px-4 py-2 bg-indigo-600 text-white font-semibold" type="submit">
+              {editingId ? 'Update' : 'Add'} Course
+            </button>
+            {editingId && (
+              <button
+                className="rounded-lg px-4 py-2 bg-[var(--bg-elevated)] text-[var(--text-primary)] border border-[var(--border-default)]"
+                type="button"
+                onClick={() => {
+                  setEditingId(null);
+                  setForm(INITIAL_FORM);
+                }}
+              >
+                Cancel
+              </button>
+            )}
           </div>
         </form>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-5 shadow-[var(--shadow-sm)]">
         <h2 className="text-xl font-bold mb-4">Manage Courses</h2>
         <div className="space-y-3">
           {courses.map((course) => (
-            <div key={course._id} className="border rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div
+              key={course._id}
+              className="border border-[var(--border-default)] rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-[var(--bg-elevated)]"
+            >
               <div>
                 <h3 className="font-bold">{course.title}</h3>
-                <p className="text-sm text-slate-500">{course.category} • {course.level} • {course.duration}</p>
+                <p className="text-sm text-[var(--text-secondary)]">
+                  {course.category} • {course.level} • {course.duration}
+                </p>
               </div>
               <div className="flex gap-2">
-                <button className="px-3 py-2 rounded bg-amber-100 text-amber-800" onClick={() => startEdit(course)}><Pencil className="h-4 w-4 inline" /> Edit</button>
-                <button className="px-3 py-2 rounded bg-rose-100 text-rose-700" onClick={() => removeCourse(course._id)}><Trash2 className="h-4 w-4 inline" /> Delete</button>
+                <button
+                  className="px-3 py-2 rounded bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-300"
+                  onClick={() => startEdit(course)}
+                >
+                  <Pencil className="h-4 w-4 inline" /> Edit
+                </button>
+                <button
+                  className="px-3 py-2 rounded bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300"
+                  onClick={() => removeCourse(course._id)}
+                >
+                  <Trash2 className="h-4 w-4 inline" /> Delete
+                </button>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      <section className="rounded-2xl border border-slate-200 bg-white p-5">
+      <section className="rounded-2xl border border-[var(--border-default)] bg-[var(--bg-card)] p-5 shadow-[var(--shadow-sm)]">
         <h2 className="text-xl font-bold mb-4">Pending Student Verifications</h2>
         <div className="space-y-3">
           {pendingStudents.map((student) => (
-            <div key={student.id} className="border rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div
+              key={student.id}
+              className="border border-[var(--border-default)] rounded-xl p-4 flex flex-col md:flex-row md:items-center md:justify-between gap-3 bg-[var(--bg-elevated)]"
+            >
               <div>
                 <p className="font-semibold">{student.name}</p>
-                <p className="text-sm text-slate-500">{student.email}</p>
-                <p className="text-xs text-slate-400 mt-1">{student.fileName || 'No document attached'}</p>
+                <p className="text-sm text-[var(--text-secondary)]">{student.email}</p>
+                <p className="text-xs text-[var(--text-muted)] mt-1">{student.fileName || 'No document attached'}</p>
               </div>
               <div className="flex gap-2">
-                {student.verificationId && <button className="px-3 py-2 rounded bg-slate-100 text-slate-700" disabled={loadingDocumentId === student.verificationId} onClick={() => viewDocument(student.verificationId)}>{loadingDocumentId === student.verificationId ? 'Loading...' : 'View document'}</button>}
-                <button className="px-3 py-2 rounded bg-emerald-100 text-emerald-700" onClick={() => verifyStudent(student.id, 'approve')}><Check className="h-4 w-4 inline" /> Approve</button>
-                <button className="px-3 py-2 rounded bg-rose-100 text-rose-700" onClick={() => verifyStudent(student.id, 'reject')}><X className="h-4 w-4 inline" /> Reject</button>
+                {student.verificationId && (
+                  <button
+                    className="px-3 py-2 rounded bg-[var(--bg-input)] text-[var(--text-primary)] border border-[var(--border-default)]"
+                    disabled={loadingDocumentId === student.verificationId}
+                    onClick={() => viewDocument(student.verificationId)}
+                  >
+                    {loadingDocumentId === student.verificationId ? 'Loading...' : 'View document'}
+                  </button>
+                )}
+                <button
+                  className="px-3 py-2 rounded bg-emerald-100 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300"
+                  onClick={() => verifyStudent(student.id, 'approve')}
+                >
+                  <Check className="h-4 w-4 inline" /> Approve
+                </button>
+                <button
+                  className="px-3 py-2 rounded bg-rose-100 text-rose-700 dark:bg-rose-950/40 dark:text-rose-300"
+                  onClick={() => verifyStudent(student.id, 'reject')}
+                >
+                  <X className="h-4 w-4 inline" /> Reject
+                </button>
               </div>
             </div>
           ))}
@@ -162,3 +220,5 @@ export const AdminDashboard = () => {
     </div>
   );
 };
+
+export default AdminDashboard;
